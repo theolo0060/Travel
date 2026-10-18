@@ -181,17 +181,13 @@
         </div>
     </header>
 
-    <section class="trip-hero text-white" aria-label="互動式三維列車旅程">
-        <canvas id="route-canvas" aria-label="JR 列車沿行程站點移動的三維示意動畫"></canvas>
+    <section class="trip-hero text-white" aria-label="互動式旅程路線">
+        <canvas id="route-canvas" aria-label="行程站點與路線示意"></canvas>
         <div class="map-copy">
             <p class="text-xs uppercase tracking-[.28em] text-cyan-200 font-bold">A FIVE-DAY JAPAN RAIL JOURNEY</p>
-            <h2 class="mt-3 max-w-xl text-3xl md:text-5xl font-bold leading-tight">搭上列車<br>探索每日旅程</h2>
-            <p class="mt-3 max-w-md text-sm text-slate-200">選擇日期或站點，看列車前往下一站、搭乘方式與預估剩餘車程；Google 地圖連結可查實際路線。</p>
+            <h2 class="mt-3 max-w-xl text-3xl md:text-5xl font-bold leading-tight">探索每日旅程</h2>
+            <p class="mt-3 max-w-md text-sm text-slate-200">選擇日期或站點，查看行程安排與交通方式；Google 地圖連結可查實際路線。</p>
             <div id="trip-budget" class="mt-4 inline-flex items-center gap-2 rounded-full border border-amber-200/30 bg-amber-300/10 px-3 py-1.5 text-xs font-semibold text-amber-100" aria-live="polite">計算五日預算中…</div>
-            <details class="mt-3 max-w-md rounded-lg border border-white/15 bg-slate-950/40 px-3 py-2 text-[11px] leading-relaxed text-slate-200 pointer-events-auto">
-                <summary class="cursor-pointer font-semibold text-cyan-100">隱私與外部服務</summary>
-                <p class="mt-2">打卡與自選行程存於此瀏覽器的 localStorage；本頁程式不會將它們傳送出去，但第三方 JavaScript 會在本頁權限下執行。頁面會向 Tailwind、Font Awesome、jsDelivr（Three.js）請求程式／圖示，服務商可收到一般連線資料（如 IP）。開啟 Google 地圖會將所選地點與路線傳給 Google。已停用 referrer 傳送。</p>
-            </details>
         </div>
         <div id="map-controls">
             <div id="map-days" class="flex flex-wrap justify-end gap-1.5" aria-label="選擇旅程日期">
@@ -202,20 +198,12 @@
                 <button type="button" data-map-day="4" onclick="selectMapDay(4)" class="rounded-full border border-white/25 bg-slate-900/60 px-3 py-1.5 text-xs text-white">Day 5</button>
             </div>
             <div id="map-stop-list" class="mt-2 flex flex-wrap justify-end gap-1.5" aria-label="選擇旅程站點"></div>
-            <p id="map-hint" class="mt-2 rounded-lg bg-slate-950/60 px-2.5 py-1.5 text-right text-[10px] leading-relaxed text-slate-100 drop-shadow">列車移動為動畫示意 · 車程為概算，非即時交通資訊 · 點選 Google 地圖查看當日路線</p>
+            <p id="map-hint" class="mt-2 rounded-lg bg-slate-950/60 px-2.5 py-1.5 text-right text-[10px] leading-relaxed text-slate-100 drop-shadow">路線為行程示意 · 點選 Google 地圖查看當日路線</p>
         </div>
         <div id="map-stop-card" class="rounded-2xl border border-white/20 bg-slate-950/75 p-4 shadow-xl backdrop-blur-md" aria-live="polite">
-            <p class="text-[10px] font-bold uppercase tracking-widest text-cyan-200">INTERACTIVE RAIL JOURNEY</p>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-cyan-200">INTERACTIVE ITINERARY</p>
             <h3 id="map-stop-title" class="mt-1 text-base font-bold text-white">載入景點中…</h3>
-            <p id="map-stop-detail" class="mt-1 text-xs leading-relaxed text-slate-200">選取站點，查看下一站、交通方式與預估剩餘車程。</p>
-            <div id="next-stop-countdown" class="mt-3 rounded-xl border border-cyan-200/25 bg-cyan-950/50 px-3 py-2.5" aria-label="距離下一站的倒數">
-                <div class="flex items-center justify-between gap-3">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-100">距離下一站</span>
-                    <span id="countdown-target" class="text-[10px] text-slate-300">出發日 22/10/2026 · JST</span>
-                </div>
-                <div id="countdown-value" class="mt-1 font-mono text-2xl font-bold tracking-tight text-white tabular-nums" role="timer">計算中…</div>
-                <p id="countdown-note" class="mt-0.5 text-[10px] text-slate-300">依行程預定時間倒數；非即時交通資訊</p>
-            </div>
+            <p id="map-stop-detail" class="mt-1 text-xs leading-relaxed text-slate-200">選取站點，查看交通方式與行程預算。</p>
             <div class="mt-3 flex flex-wrap gap-2">
                 <a id="map-directions-link" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 rounded-lg bg-amber-300 px-3 py-2 text-xs font-bold text-slate-900 hover:bg-amber-200"><i class="fa-solid fa-route"></i> Google 地圖路線</a>
                 <button id="map-view-itinerary" type="button" onclick="openSelectedMapStop()" class="rounded-lg border border-white/25 px-3 py-2 text-xs font-semibold text-white hover:bg-white/10">查看行程</button>
@@ -640,6 +628,12 @@
                 const values = new FormData(form);
                 const min = Number(values.get('min')) || 0;
                 const max = Number(values.get('max')) || 0;
+                const title = String(values.get('title')).trim();
+                const location = String(values.get('location')).trim();
+                if (!title || !location) {
+                    window.alert('請輸入景點名稱與地圖搜尋地點。');
+                    return;
+                }
                 if (max < min) {
                     form.elements.max.setCustomValidity('最高預算不可低於最低預算');
                     form.elements.max.reportValidity();
@@ -650,10 +644,10 @@
                     id: `custom-${dayKey}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
                     custom: true,
                     time: String(values.get('time')).trim() || '彈性安排',
-                    title: String(values.get('title')).trim(),
+                    title,
                     transit: String(values.get('transit')).trim() || '自行安排',
                     note: String(values.get('note')).trim() || '自訂景點',
-                    location: String(values.get('location')).trim(),
+                    location,
                     price: { min, max, note: '自訂預算估算' }
                 };
                 localStorage.setItem(`trip-custom-stops-${dayKey}`, JSON.stringify(customStops(dayKey).concat(stop)));
@@ -985,11 +979,7 @@
             renderer.render(scene, camera);
         }
 
-        const railCurves = [];
-        const trainCars = [];
         const stationPoints = [];
-        const stopStationIndices = [];
-        const animationClock = new THREE.Clock();
         const legOverrides = {
             "d2-2": { label: '步行／路線巴士', icon: 'fa-bus' },
             "d2-3": { label: '熱海高速船', icon: 'fa-ferry' },
@@ -1002,75 +992,6 @@
             "d4-1": 15, "d4-2": 20, "d4-3": 20, "d4-4": 30, "d4-5": 35, "d4-6": 30, "d4-7": 100,
             "d5-2": 20, "d5-3": 45, "d5-4": 90, "d5-5": 60
         };
-        const tripStartDate = { year: 2026, month: 9, day: 22 };
-        let activeJourney = null;
-        let journeyProgress = 0;
-
-        function scheduledStart(time) {
-            const match = String(time || '').match(/(\d{1,2}):(\d{2})/);
-            return match ? { hours: Number(match[1]), minutes: Number(match[2]) } : null;
-        }
-
-        function scheduledTimestamp(dayIndex, time) {
-            const start = scheduledStart(time);
-            if (!start) return null;
-            return Date.UTC(
-                tripStartDate.year,
-                tripStartDate.month,
-                tripStartDate.day + dayIndex,
-                start.hours - 9,
-                start.minutes
-            );
-        }
-
-        function updateCountdown() {
-            const value = document.getElementById('countdown-value');
-            const targetLabel = document.getElementById('countdown-target');
-            const note = document.getElementById('countdown-note');
-            if (!value || !targetLabel || !note || !selectedMapStop) return;
-
-            const { stop, index, stops } = selectedMapStop;
-            const nextIndex = stops.findIndex((item, itemIndex) =>
-                itemIndex > index && item.location !== stop.location
-            );
-            if (nextIndex < 0) {
-                value.textContent = '今日行程已完成';
-                targetLabel.textContent = '沒有下一站';
-                note.textContent = '選擇其他站點查看該段行程';
-                return;
-            }
-
-            const nextStop = stops[nextIndex];
-            const time = scheduledStart(nextStop.time);
-            const timestamp = scheduledTimestamp(activeDay, nextStop.time);
-            if (!time || timestamp === null) {
-                value.textContent = '未設定時間';
-                targetLabel.textContent = '彈性行程';
-                note.textContent = `下一站：${nextStop.title}`;
-                return;
-            }
-
-            const remainingSeconds = Math.ceil((timestamp - Date.now()) / 1000);
-            if (remainingSeconds <= 0) {
-                showSelectedStop(nextStop, nextIndex, stops);
-                return;
-            }
-
-            const days = Math.floor(remainingSeconds / 86400);
-            const hours = Math.floor((remainingSeconds % 86400) / 3600);
-            const minutes = Math.floor((remainingSeconds % 3600) / 60);
-            const seconds = remainingSeconds % 60;
-            const pad = number => String(number).padStart(2, '0');
-            value.textContent = `${days ? `${days}天 ` : ''}${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-            const date = new Date(Date.UTC(
-                tripStartDate.year,
-                tripStartDate.month,
-                tripStartDate.day + activeDay
-            )).toISOString().slice(0, 10).split('-').reverse().join('/');
-            targetLabel.textContent = `預定 ${date} ${pad(time.hours)}:${pad(time.minutes)} JST`;
-            note.textContent = `旅程出發 22/10/2026 · 倒數至「${nextStop.title}」預定時間 · 非即時交通資訊`;
-        }
-
         function transportFor(stop) {
             if (legOverrides[stop.id]) return legOverrides[stop.id];
             const transit = stop.transit || '';
@@ -1108,42 +1029,6 @@
             });
         }
 
-        function createTrain() {
-            const train = new THREE.Group();
-            const body = new THREE.Mesh(
-                new THREE.BoxGeometry(0.62, 0.2, 0.22),
-                new THREE.MeshBasicMaterial({ color: 0xf3f6f8 })
-            );
-            const stripe = new THREE.Mesh(
-                new THREE.BoxGeometry(0.63, 0.045, 0.232),
-                new THREE.MeshBasicMaterial({ color: 0xd73535 })
-            );
-            stripe.position.y = -0.035;
-            const windows = new THREE.Mesh(
-                new THREE.BoxGeometry(0.38, 0.065, 0.235),
-                new THREE.MeshBasicMaterial({ color: 0x63c7d4 })
-            );
-            windows.position.set(-0.035, 0.045, 0);
-            const front = new THREE.Mesh(
-                new THREE.BoxGeometry(0.1, 0.13, 0.24),
-                new THREE.MeshBasicMaterial({ color: 0xdfe9ed })
-            );
-            front.position.set(0.27, 0.015, 0);
-            train.add(body, stripe, windows, front);
-            [-0.19, 0.19].forEach(x => {
-                const wheel = new THREE.Mesh(
-                    new THREE.CylinderGeometry(0.045, 0.045, 0.25, 12),
-                    new THREE.MeshBasicMaterial({ color: 0x18222b })
-                );
-                wheel.rotation.x = Math.PI / 2;
-                wheel.position.set(x, -0.115, 0);
-                train.add(wheel);
-            });
-            mapRoot.add(train);
-            trainCars.push(train);
-            return train;
-        }
-
         function showSelectedStop(stop, index, stops) {
             selectedMapStop = { stop, index, stops, day: activeDay };
             const nextIndex = stops.findIndex((item, itemIndex) =>
@@ -1157,24 +1042,9 @@
                 detail.innerHTML = `<span class="block">${dayNames[`day${activeDay + 1}`]} · ${escapeHtml(stop.time)} · ${formatPrice(stop.price)}</span>
                     <span class="mt-1 block font-semibold text-white"><i class="fa-solid ${mode.icon} mr-1 text-cyan-200"></i>${escapeHtml(mode.label)} → ${escapeHtml(nextStop.title)}</span>
                     <span class="mt-1 block text-amber-200">預估剩餘車程：約 ${minutes} 分鐘（非即時概算）</span>`;
-                activeJourney = {
-                    from: stopStationIndices[index],
-                    to: stopStationIndices[nextIndex]
-                };
-                journeyProgress = 0;
-                const curve = railCurves[activeJourney.from];
-                if (trainCars[0] && curve) {
-                    const point = curve.getPoint(0);
-                    const tangent = curve.getTangent(0);
-                    trainCars[0].visible = true;
-                    trainCars[0].position.copy(point).setZ(0.35);
-                    trainCars[0].rotation.z = Math.atan2(tangent.y, tangent.x);
-                }
             } else {
                 detail.innerHTML = `<span class="block">${dayNames[`day${activeDay + 1}`]} · ${escapeHtml(stop.time)} · ${formatPrice(stop.price)}</span>
                     <span class="mt-1 block font-semibold text-white">今日最後一站 · 行程已抵達</span>`;
-                activeJourney = null;
-                if (trainCars[0]) trainCars[0].visible = false;
             }
             document.getElementById('map-stop-title').textContent = stop.title;
 
@@ -1203,7 +1073,6 @@
                 button.classList.toggle('bg-slate-900/60', !active);
                 button.classList.toggle('text-white', !active);
             });
-            updateCountdown();
             renderer.render(scene, camera);
         }
 
@@ -1222,19 +1091,12 @@
                 mapRoot.remove(label);
                 disposeObject(label);
             });
-            trainCars.splice(0).forEach(train => {
-                mapRoot.remove(train);
-                disposeObject(train);
-            });
-            railCurves.length = 0;
             stationPoints.length = 0;
-            stopStationIndices.length = 0;
 
             const stops = stopsForDay(activeDay);
             const seenLocations = new Map();
             stops.forEach(stop => {
                 if (!seenLocations.has(stop.location)) seenLocations.set(stop.location, seenLocations.size);
-                stopStationIndices.push(seenLocations.get(stop.location));
             });
             const uniqueStops = [...seenLocations.entries()];
             const count = uniqueStops.length;
@@ -1249,7 +1111,6 @@
                 const end = stationPoints[index + 1];
                 const control = new THREE.Vector3((start.x + end.x) / 2, (start.y + end.y) / 2 + (index % 2 ? -0.25 : 0.25), 0.08);
                 const curve = new THREE.QuadraticBezierCurve3(start, control, end);
-                railCurves.push(curve);
                 const railMaterial = new THREE.MeshBasicMaterial({ color: dayColors[activeDay], transparent: true, opacity: 0.82 });
                 const rail = new THREE.Mesh(new THREE.TubeGeometry(curve, 36, 0.025, 8, false), railMaterial);
                 mapRoot.add(rail);
@@ -1324,8 +1185,6 @@
                 4.75 / (Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * Math.max(camera.aspect, 0.5))
             ));
             camera.updateProjectionMatrix();
-            if (railCurves.length) createTrain();
-            stopStationIndices.length = stops.length;
 
             document.querySelectorAll('[data-map-day]').forEach(button => {
                 const active = Number(button.dataset.mapDay) === activeDay;
@@ -1390,28 +1249,8 @@
         const resizeObserver = new ResizeObserver(resizeMap);
         resizeObserver.observe(canvas);
         window.addEventListener('resize', resizeMap);
-        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         renderRailDay(0);
         resizeMap();
-        updateCountdown();
-        window.setInterval(updateCountdown, 1000);
-
-        function animateMap() {
-            const delta = Math.min(animationClock.getDelta(), 0.05);
-            if (activeJourney && trainCars[0] && activeJourney.to > activeJourney.from) {
-                journeyProgress = (journeyProgress + delta * 0.045) % 2;
-                const progress = journeyProgress <= 1 ? journeyProgress : 2 - journeyProgress;
-                const curve = railCurves[activeJourney.from];
-                if (curve) {
-                    const point = curve.getPoint(progress);
-                    const tangent = curve.getTangent(progress);
-                    trainCars[0].position.copy(point).setZ(0.35);
-                    trainCars[0].rotation.z = Math.atan2(tangent.y, tangent.x) + (journeyProgress > 1 ? Math.PI : 0);
-                }
-            }
-            renderer.render(scene, camera);
-        }
-        if (!reduceMotion) renderer.setAnimationLoop(animateMap);
     </script>
 </body>
 </html>
