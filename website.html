@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>熱海 & 伊豆 5天4夜深度遊 | 互動行程 App</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background-color: #f8fafc;
+        }
+        html { scroll-behavior: smooth; }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .trip-hero {
+            position: relative;
+            min-height: 720px;
+            overflow: hidden;
+            isolation: isolate;
+            background: radial-gradient(ellipse at 78% 55%, #185981 0, #122c50 35%, #0b172c 78%);
+        }
+        #route-canvas {
+            position: absolute;
+            inset: 205px 0 185px 34%;
+            z-index: 1;
+            width: 66%;
+            height: calc(100% - 390px);
+            opacity: .95;
+            cursor: default;
+            touch-action: manipulation;
+        }
+        .map-copy {
+            position: absolute;
+            z-index: 2;
+            top: 0;
+            left: clamp(1rem, 4vw, 3.5rem);
+            width: min(34%, 410px);
+            padding: 4rem 1.25rem;
+            pointer-events: none;
+        }
+        .map-copy a, .map-copy button { pointer-events: auto; }
+        #map-controls {
+            position: absolute;
+            z-index: 3;
+            inset: 1.25rem 1.25rem auto auto;
+            width: min(540px, 56%);
+            pointer-events: none;
+        }
+        #map-controls button, #map-stop-card, #map-hint { pointer-events: auto; }
+        #map-stop-list {
+            max-height: 92px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            padding: .4rem;
+            border: 1px solid rgb(255 255 255 / 14%);
+            border-radius: .85rem;
+            background: rgb(2 12 27 / 55%);
+            backdrop-filter: blur(8px);
+        }
+        #map-stop-card {
+            position: absolute;
+            z-index: 3;
+            right: 1.25rem;
+            bottom: 1.25rem;
+            width: min(390px, 42%);
+        }
+        @media (max-width: 767px) {
+            .trip-hero { min-height: 820px; }
+            #route-canvas { inset: 430px 0 190px; width: 100%; height: calc(100% - 620px); opacity: .9; }
+            .map-copy { width: 100%; padding: 1.75rem 1.25rem 0; }
+            .map-copy h2 { max-width: 100%; font-size: 2.25rem; }
+            .map-copy > p:nth-of-type(2) { max-width: 100%; }
+            #map-controls { top: 270px; left: 1rem; right: 1rem; width: auto; }
+            #map-stop-card { right: 1rem; bottom: 1rem; left: 1rem; width: auto; }
+        }
+        .day-summary {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: .75rem;
+            margin: 1rem 0;
+            padding: .85rem 1rem;
+            border: 1px solid #dbeafe;
+            border-radius: 1rem;
+            background: linear-gradient(110deg, #eff6ff, #fff 70%);
+        }
+        .price-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            padding: .25rem .6rem;
+            border-radius: 999px;
+            color: #075985;
+            background: #e0f2fe;
+            font-size: .75rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .optional-card { border-style: dashed !important; }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased pb-20 md:pb-10">
+
+    <!-- Header / Navbar -->
+    <header class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white sticky top-0 z-50 shadow-md">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="bg-amber-400 text-slate-900 p-2.5 rounded-xl font-bold text-xl shadow">
+                    <i class="fa-solid fa-route"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold tracking-tight">熱海 & 伊豆半島深度遊</h1>
+                    <p class="text-xs text-slate-300">5 天 4 夜行程手冊 • 溫泉海岸、火山地景與南伊豆</p>
+                </div>
+            </div>
+            
+            <!-- App Quick Tools -->
+            <div class="flex items-center space-x-2 text-xs">
+                <button onclick="resetProgress()" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg backdrop-blur transition flex items-center gap-1.5 border border-white/10">
+                    <i class="fa-solid fa-rotate-right"></i> 重置打卡
+                </button>
+                <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer" class="bg-amber-400 hover:bg-amber-300 text-slate-900 font-semibold px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-map-location-dot"></i> 開啟地圖
+                </a>
+            </div>
+        </div>
+
+        <!-- Scrollable Navigation Tabs -->
+        <div class="max-w-5xl mx-auto px-4 mt-2 overflow-x-auto hide-scrollbar border-t border-white/10">
+            <div class="flex space-x-2 py-2 min-w-max" id="tab-container">
+                <button onclick="switchTab('tab-strategy')" id="btn-tab-strategy" class="nav-tab active bg-amber-400 text-slate-900 font-bold px-4 py-2 rounded-lg text-sm transition shadow flex items-center gap-2">
+                    <i class="fa-solid fa-ticket"></i> 交通與票券策略
+                </button>
+                <button onclick="switchTab('tab-day1')" id="btn-tab-day1" class="nav-tab bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-day"></i> Day 1 (週四) 熱海
+                </button>
+                <button onclick="switchTab('tab-day2')" id="btn-tab-day2" class="nav-tab bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-day"></i> Day 2 (週五) 初島/熱海
+                </button>
+                <button onclick="switchTab('tab-day3')" id="btn-tab-day3" class="nav-tab bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-day"></i> Day 3 (週六) 城崎海岸/伊豆高原
+                </button>
+                <button onclick="switchTab('tab-day4')" id="btn-tab-day4" class="nav-tab bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-day"></i> Day 4 (週日) 下田/南伊豆
+                </button>
+                <button onclick="switchTab('tab-day5')" id="btn-tab-day5" class="nav-tab bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-plane-departure"></i> Day 5 (週一) 返程/成田
+                </button>
+                <button onclick="switchTab('tab-stay')" id="btn-tab-stay" class="nav-tab bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-suitcase"></i> 住宿與行李策略
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <section class="trip-hero text-white" aria-label="互動式三維列車旅程">
+        <canvas id="route-canvas" aria-label="JR 列車沿行程站點移動的三維示意動畫"></canvas>
+        <div class="map-copy">
+            <p class="text-xs uppercase tracking-[.28em] text-cyan-200 font-bold">A FIVE-DAY JAPAN RAIL JOURNEY</p>
+            <h2 class="mt-3 max-w-xl text-3xl md:text-5xl font-bold leading-tight">搭上列車<br>探索每日旅程</h2>
+            <p class="mt-3 max-w-md text-sm text-slate-200">選擇日期或站點，看列車前往下一站、搭乘方式與預估剩餘車程；Google 地圖連結可查實際路線。</p>
+            <div id="trip-budget" class="mt-4 inline-flex items-center gap-2 rounded-full border border-amber-200/30 bg-amber-300/10 px-3 py-1.5 text-xs font-semibold text-amber-100" aria-live="polite">計算五日預算中…</div>
+            <details class="mt-3 max-w-md rounded-lg border border-white/15 bg-slate-950/40 px-3 py-2 text-[11px] leading-relaxed text-slate-200 pointer-events-auto">
+                <summary class="cursor-pointer font-semibold text-cyan-100">隱私與外部服務</summary>
+                <p class="mt-2">打卡與自選行程存於此瀏覽器的 localStorage；本頁程式不會將它們傳送出去，但第三方 JavaScript 會在本頁權限下執行。頁面會向 Tailwind、Font Awesome、jsDelivr（Three.js）請求程式／圖示，服務商可收到一般連線資料（如 IP）。開啟 Google 地圖會將所選地點與路線傳給 Google。已停用 referrer 傳送。</p>
+            </details>
+        </div>
+        <div id="map-controls">
+            <div id="map-days" class="flex flex-wrap justify-end gap-1.5" aria-label="選擇旅程日期">
+                <button type="button" data-map-day="0" onclick="selectMapDay(0)" class="rounded-full border border-white/25 bg-amber-300 px-3 py-1.5 text-xs font-bold text-slate-900">Day 1</button>
+                <button type="button" data-map-day="1" onclick="selectMapDay(1)" class="rounded-full border border-white/25 bg-slate-900/60 px-3 py-1.5 text-xs text-white">Day 2</button>
+                <button type="button" data-map-day="2" onclick="selectMapDay(2)" class="rounded-full border border-white/25 bg-slate-900/60 px-3 py-1.5 text-xs text-white">Day 3</button>
+                <button type="button" data-map-day="3" onclick="selectMapDay(3)" class="rounded-full border border-white/25 bg-slate-900/60 px-3 py-1.5 text-xs text-white">Day 4</button>
+                <button type="button" data-map-day="4" onclick="selectMapDay(4)" class="rounded-full border border-white/25 bg-slate-900/60 px-3 py-1.5 text-xs text-white">Day 5</button>
+            </div>
+            <div id="map-stop-list" class="mt-2 flex flex-wrap justify-end gap-1.5" aria-label="選擇旅程站點"></div>
+            <p id="map-hint" class="mt-2 rounded-lg bg-slate-950/60 px-2.5 py-1.5 text-right text-[10px] leading-relaxed text-slate-100 drop-shadow">列車移動為動畫示意 · 車程為概算，非即時交通資訊 · 點選 Google 地圖查看當日路線</p>
+        </div>
+        <div id="map-stop-card" class="rounded-2xl border border-white/20 bg-slate-950/75 p-4 shadow-xl backdrop-blur-md" aria-live="polite">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-cyan-200">INTERACTIVE RAIL JOURNEY</p>
+            <h3 id="map-stop-title" class="mt-1 text-base font-bold text-white">載入景點中…</h3>
+            <p id="map-stop-detail" class="mt-1 text-xs leading-relaxed text-slate-200">選取站點，查看下一站、交通方式與預估剩餘車程。</p>
+            <div id="next-stop-countdown" class="mt-3 rounded-xl border border-cyan-200/25 bg-cyan-950/50 px-3 py-2.5" aria-label="距離下一站的倒數">
+                <div class="flex items-center justify-between gap-3">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-100">距離下一站</span>
+                    <span id="countdown-target" class="text-[10px] text-slate-300">出發日 22/10/2026 · JST</span>
+                </div>
+                <div id="countdown-value" class="mt-1 font-mono text-2xl font-bold tracking-tight text-white tabular-nums" role="timer">計算中…</div>
+                <p id="countdown-note" class="mt-0.5 text-[10px] text-slate-300">依行程預定時間倒數；非即時交通資訊</p>
+            </div>
+            <div class="mt-3 flex flex-wrap gap-2">
+                <a id="map-directions-link" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 rounded-lg bg-amber-300 px-3 py-2 text-xs font-bold text-slate-900 hover:bg-amber-200"><i class="fa-solid fa-route"></i> Google 地圖路線</a>
+                <button id="map-view-itinerary" type="button" onclick="openSelectedMapStop()" class="rounded-lg border border-white/25 px-3 py-2 text-xs font-semibold text-white hover:bg-white/10">查看行程</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="max-w-5xl mx-auto px-4 py-6">
+
+        <!-- TAB: Strategy & Tickets -->
+        <section id="tab-strategy" class="tab-content">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 mb-6">
+                <h2 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-compass text-blue-600"></i> 導遊核心交通與票券規劃
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    <!-- Izu rail and transfer planning -->
+                    <div class="bg-slate-50 rounded-xl p-5 border border-slate-200 relative overflow-hidden flex flex-col justify-between">
+                        <div class="absolute top-0 right-0 bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg">伊豆移動</div>
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-train-subway text-blue-600 text-xl"></i>
+                                <h3 class="font-bold text-slate-900">熱海・伊豆急行線交通</h3>
+                            </div>
+                            <p class="text-xs text-slate-600 mb-3">Day 3 由熱海沿東岸南下至伊豆高原、下田；Day 4 遊覽南伊豆後返回熱海住宿，Day 5 從熱海前往成田。</p>
+                            <ul class="text-xs space-y-1.5 text-slate-700 mb-4">
+                                <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i><b>Day 3</b>：搭 JR 伊東線／伊豆急行線前往城崎海岸、伊豆高原及下田；依上車站及目的地購買車票。</li>
+                                <li><i class="fa-solid fa-yen-sign text-emerald-500 mr-1.5"></i><b>交通預算</b>：熱海至下田單程列車約 ¥2,000–¥3,000；特急券、座席與列車種類會影響票價。</li>
+                                <li><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1.5"></i><b>Day 4–5</b>：南伊豆行程後搭車回熱海住宿；Day 5 從熱海經東京轉往成田，需預留轉乘緩衝並核對當日班次。</li>
+                            </ul>
+                            <p class="text-[11px] text-slate-500 mb-3">行程不預設購買周遊券；票價為概算，出發前請查看伊豆急行及 JR 官方資訊。</p>
+                        </div>
+                        <a href="https://www.izukyu.co.jp/" target="_blank" rel="noopener noreferrer" class="block text-center bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs py-2 rounded-lg transition">
+                            <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> 伊豆急行列車與乘車資訊
+                        </a>
+                    </div>
+
+                    <!-- Regional Tickets -->
+                    <div class="bg-slate-50 rounded-xl p-5 border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-bus text-indigo-600 text-xl"></i>
+                                <h3 class="font-bold text-slate-900">分段實用票券 & 交通推薦</h3>
+                            </div>
+                            <ul class="text-xs space-y-2.5 text-slate-700 mb-4">
+                                <li class="bg-white p-2.5 rounded-lg border border-slate-150">
+                                    <span class="font-bold text-indigo-700 block mb-0.5">Day 1：羽田機場 ➔ 熱海</span>
+                                    搭乘京急空港線至品川，轉乘 JR 東海道新幹線/東海道本線（刷 IC 卡/現場購票即可）。
+                                </li>
+                                <li class="bg-white p-2.5 rounded-lg border border-slate-150">
+                                    <span class="font-bold text-indigo-700 block mb-0.5">Day 3-4：伊豆東岸／南伊豆巴士</span>
+                                    城崎海岸、伊豆高原、下田與南伊豆景點之間可搭乘伊豆急行及東海巴士；單段車資約 ¥200–¥1,500，班次及周遊券適用範圍請按日期確認。
+                                </li>
+                            </ul>
+                        </div>
+                        <a href="https://www.tokaibus.jp/" target="_blank" rel="noopener noreferrer" class="block text-center bg-slate-800 hover:bg-slate-900 text-white font-medium text-xs py-2 rounded-lg transition">
+                            <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> 查看東海巴士路線與時刻表
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Useful Quick Links -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80">
+                <h3 class="font-bold text-slate-900 mb-3 text-sm"><i class="fa-solid fa-link text-indigo-500 mr-2"></i>行前必備實用連結</h3>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs">
+                    <a href="https://www.ataminews.gr.jp/" target="_blank" rel="noopener noreferrer" class="p-3 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 rounded-xl border border-slate-200 transition text-center font-medium">
+                        <i class="fa-solid fa-umbrella-beach block text-lg mb-1 text-blue-500"></i> 熱海觀光協會官網
+                    </a>
+                    <a href="https://www.shimoda-city.info/" target="_blank" rel="noopener noreferrer" class="p-3 bg-slate-50 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 rounded-xl border border-slate-200 transition text-center font-medium">
+                        <i class="fa-solid fa-umbrella-beach block text-lg mb-1 text-emerald-500"></i> 下田觀光協會
+                    </a>
+                    <a href="https://izugeopark.org/" target="_blank" rel="noopener noreferrer" class="p-3 bg-slate-50 hover:bg-teal-50 text-slate-700 hover:text-teal-700 rounded-xl border border-slate-200 transition text-center font-medium">
+                        <i class="fa-solid fa-mountain-sun block text-lg mb-1 text-teal-500"></i> 伊豆半島地質公園
+                    </a>
+                    <a href="https://www.kuronekoyamato.co.jp/ytc/en/" target="_blank" rel="noopener noreferrer" class="p-3 bg-slate-50 hover:bg-amber-50 text-slate-700 hover:text-amber-700 rounded-xl border border-slate-200 transition text-center font-medium">
+                        <i class="fa-solid fa-box block text-lg mb-1 text-amber-500"></i> 黑貓宅急便 luggage
+                    </a>
+                    <a href="https://www.jma.go.jp/jma/index.html" target="_blank" rel="noopener noreferrer" class="p-3 bg-slate-50 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 rounded-xl border border-slate-200 transition text-center font-medium">
+                        <i class="fa-solid fa-cloud-sun block text-lg mb-1 text-indigo-500"></i> 日本氣象廳天氣預報
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: Day 1 -->
+        <section id="tab-day1" class="tab-content hidden">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">Day 1（週四）：羽田機場 ➔ 熱海海洋風情與溫泉老街</h2>
+                    <p class="text-xs text-slate-500">亮點：熱海海鮮丼、熱海布丁、來宮神社神木、MOA美術館</p>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                    <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">宿：熱海來宮之湯松月日式旅館</span>
+                    <a id="day-route-day1" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-route mr-1"></i>Google 地圖一日路線</a>
+                </div>
+            </div>
+            <div class="day-summary" id="summary-day1" aria-live="polite"></div>
+            <div class="flex justify-end mb-3"><button onclick="toggleOptions('day1')" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-circle-plus mr-1"></i>探索更多玩法</button></div>
+            <div class="space-y-4" id="timeline-day1">
+                <!-- Items populated dynamically or static cards with interactive checkboxes -->
+            </div>
+            <div class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 gap-3" id="options-day1"></div>
+        </section>
+
+        <!-- TAB: Day 2 -->
+        <section id="tab-day2" class="tab-content hidden">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">Day 2（週五）：初島離島巡禮 & 大室山火山口散策</h2>
+                    <p class="text-xs text-slate-500">亮點：初島海鮮食堂街、伊豆高原、大室山登山纜車與火山口步道</p>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                    <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">宿：熱海來宮之湯松月日式旅館</span>
+                    <a id="day-route-day2" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-route mr-1"></i>Google 地圖一日路線</a>
+                </div>
+            </div>
+            <div class="day-summary" id="summary-day2" aria-live="polite"></div>
+            <div class="flex justify-end mb-3"><button onclick="toggleOptions('day2')" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-circle-plus mr-1"></i>探索更多玩法</button></div>
+            <div class="space-y-4" id="timeline-day2"></div>
+            <div class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 gap-3" id="options-day2"></div>
+        </section>
+
+        <!-- TAB: Day 3 -->
+        <section id="tab-day3" class="tab-content hidden">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">Day 3（週六）：熱海 ➔ 城崎海岸、伊豆高原、下田</h2>
+                    <p class="text-xs text-slate-500">亮點：城崎海岸門脇吊橋、伊豆高原散策、沿海列車風景</p>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">Day 3 晚住宿：下田海濱酒店</span>
+                    <a id="day-route-day3" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-route mr-1"></i>Google 地圖一日路線</a>
+                </div>
+            </div>
+            <div class="day-summary" id="summary-day3" aria-live="polite"></div>
+            <div class="flex justify-end mb-3"><button onclick="toggleOptions('day3')" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-circle-plus mr-1"></i>探索更多玩法</button></div>
+            <div class="space-y-4" id="timeline-day3"></div>
+            <div class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 gap-3" id="options-day3"></div>
+        </section>
+
+        <!-- TAB: Day 4 -->
+        <section id="tab-day4" class="tab-content hidden">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">Day 4（週日）：下田與南伊豆海岸巡禮</h2>
+                    <p class="text-xs text-slate-500">亮點：佩里之路、下田公園、白濱海岸、龍宮窟；傍晚返回熱海住宿</p>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                    <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">Day 4 晚住宿：熱海大野屋酒店</span>
+                    <a id="day-route-day4" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-route mr-1"></i>Google 地圖一日路線</a>
+                </div>
+            </div>
+            <div class="day-summary" id="summary-day4" aria-live="polite"></div>
+            <div class="flex justify-end mb-3"><button onclick="toggleOptions('day4')" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-circle-plus mr-1"></i>探索更多玩法</button></div>
+            <div class="space-y-4" id="timeline-day4"></div>
+            <div class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 gap-3" id="options-day4"></div>
+        </section>
+
+        <!-- TAB: Day 5 -->
+        <section id="tab-day5" class="tab-content hidden">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">Day 5（週一）：熱海 ➔ 成田機場（NRT）返程</h2>
+                    <p class="text-xs text-slate-500">早上先在熱海站周邊購物，再經東京前往成田；建議預訂 18:00 後航班</p>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                    <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full">班機：建議 18:00 後起飛</span>
+                    <a id="day-route-day5" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-route mr-1"></i>Google 地圖一日路線</a>
+                </div>
+            </div>
+            <div class="day-summary" id="summary-day5" aria-live="polite"></div>
+            <div class="flex justify-end mb-3"><button onclick="toggleOptions('day5')" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-circle-plus mr-1"></i>探索更多玩法</button></div>
+            <div class="space-y-4" id="timeline-day5"></div>
+            <div class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 gap-3" id="options-day5"></div>
+        </section>
+
+        <!-- TAB: Stay & Luggage -->
+        <section id="tab-stay" class="tab-content hidden">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 mb-6">
+                <h2 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-hotel text-indigo-600"></i> 住宿區域選擇策略
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-blue-50/60 p-4 rounded-xl border border-blue-100">
+                        <h3 class="font-bold text-blue-900 text-sm mb-2"><i class="fa-solid fa-spa mr-1.5"></i>熱海住宿（Day 1 - Day 2、Day 4）</h3>
+                        <p class="text-xs text-slate-700 mb-2"><b>Day 1–2：</b>熱海來宮之湯松月日式旅館。<b>Day 4：</b>熱海大野屋酒店；請分別確認訂房、入住時間與餐食安排。</p>
+                        <ul class="text-xs text-slate-600 space-y-1">
+                            <li>• 抵達熱海後，確認旅館行李寄放及前往旅館的交通方式。</li>
+                            <li>• Day 3 早上退房前往伊豆；Day 4 返回後入住大野屋酒店，Day 5 由酒店前往熱海站及成田。</li>
+                        </ul>
+                    </div>
+                    <div class="bg-emerald-50/60 p-4 rounded-xl border border-emerald-100">
+                        <h3 class="font-bold text-emerald-900 text-sm mb-2"><i class="fa-solid fa-mountain mr-1.5"></i>下田住宿（Day 3）</h3>
+                        <p class="text-xs text-slate-700 mb-2"><b>Day 3 晚指定住宿：下田海濱酒店，入住一晚。</b>Day 4 白天遊覽南伊豆，傍晚退房後搭車返回熱海，不在下田續住。</p>
+                        <ul class="text-xs text-slate-600 space-y-1">
+                            <li>• 請依訂房確認資料核對酒店地址、往返伊豆急下田站的交通及行李寄存安排。</li>
+                            <li>• Day 4 晚離開下田返回熱海，入住大野屋酒店。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Luggage Strategy -->
+            <div class="bg-amber-50/80 border border-amber-200/80 rounded-2xl p-6 shadow-sm">
+                <h2 class="text-lg font-bold text-amber-900 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-truck-ramp-box text-amber-600"></i> 導遊行李移動「黃金解法」
+                </h2>
+                <div class="text-xs text-slate-700 space-y-3 leading-relaxed">
+                    <div class="flex items-start gap-2.5">
+                        <div class="bg-amber-200 text-amber-900 font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">1</div>
+                        <p><b>移動策略：</b>Day 3 由熱海沿伊豆東岸前往下田；Day 4 退房後寄存或攜帶行李，搭乘路線巴士遊覽南伊豆，並預留傍晚由下田返回熱海的鐵路時間。</p>
+                    </div>
+                    <div class="flex items-start gap-2.5">
+                        <div class="bg-amber-200 text-amber-900 font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">2</div>
+                        <p><b>行李建議：</b>Day 3 從熱海前往下田時攜帶過夜用品；Day 4 離開下田前可向旅館確認寄存服務，並安排取回行李後搭車回熱海。Day 5 從熱海前往成田，請攜帶行李並預留轉乘時間。</p>
+                    </div>
+                    <div class="flex items-start gap-2.5">
+                        <div class="bg-amber-200 text-amber-900 font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">3</div>
+                        <p><b>隨身裝備：</b>海岸步道可能有階梯、坡道及濕滑路面，建議穿防滑步行鞋、攜帶飲水與防曬用品；出海或海岸活動依天候及現場公告調整。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Data & Script Logic -->
+    <script>
+        // Itinerary Data
+        const itineraryData = {
+            day1: [
+                { id: "d1-1", time: "08:00 - 09:30", title: "羽田機場 (HND) 入境與準備", transit: "機場手續", note: "辦理入境手續、領取行李、購買/綁定 Suica 或 Pasmo IC 卡。", location: "Haneda Airport", price: { min: 0, max: 0, note: "入境與領行李" } },
+                { id: "d1-2", time: "09:30 - 11:00", title: "羽田機場 ➔ 熱海車站", transit: "京急線 ➔ 東海道新幹線/特急", note: "車程約 75-90 分鐘。到達後將大行李寄存在車站置物櫃或送至飯店。", location: "Atami Station", price: { min: 1500, max: 4500, note: "轉乘車資估算" } },
+                { id: "d1-3", time: "11:30 - 13:00", title: "平和通商店街 & 熱海銀座散策", transit: "步行", note: "【午餐推薦】享用熱海海鮮丼（如: 魚主 或 圍莊），飯後必吃「熱海布丁」。", location: "Atami Ginza Shopping Street", price: { min: 1500, max: 3500, note: "午餐與甜點預算" } },
+                { id: "d1-4", time: "13:30 - 15:30", title: "來宮神社 (Kinomiya Shrine)", transit: "JR 伊東線 / 步行 15 分鐘", note: "參拜 2000 年樹齡「大楠神木」，於神社內『茶寮 報鼓』享用抹茶與和菓子。", location: "Kinomiya Shrine", price: { min: 0, max: 1200, note: "參拜免費；茶點另計" } },
+                { id: "d1-5", time: "16:00 - 18:00", title: "MOA 美術館 (MOA Museum of Art)", transit: "公車 (熱海站8號月台)", note: "坐落山頂擁絕美相模灣框架窗景，巨型萬花筒影音大廳不容錯過。", location: "MOA Museum of Art", price: { min: 1600, max: 2000, note: "門票與接駁車估算" } },
+                { id: "d1-6", time: "18:30+", title: "入住：熱海來宮之湯松月日式旅館", transit: "依旅館指引前往", note: "Day 1–2 住宿。確認入住時間、晚餐供應與接駁安排；若房價已含晚餐，請勿重複計算餐費。", location: "熱海來宮之湯松月日式旅館", price: { min: 0, max: 5000, note: "晚餐預算；住宿另計" } }
+            ],
+            day2: [
+                { id: "d2-1", time: "08:30 - 09:30", title: "熱海來宮之湯松月日式旅館早餐", transit: "旅館內", note: "於指定住宿享用早餐，確認訂房方案是否含餐；用餐後出發前往熱海港搭船。", location: "熱海來宮之湯松月日式旅館", price: { min: 0, max: 1500, note: "早餐預算；依房價是否含餐而定" } },
+                { id: "d2-2", time: "09:00 - 09:30", title: "熱海港 ➔ 初島 (Hatsushima)", transit: "首都圈高速船 (約 30 分鐘)", note: "搭乘渡輪前往靜岡縣唯一離島，遠眺富士山與南國度假風情。為銜接下午大室山，請預先確認去回程船班並選擇較早出發的班次。", location: "Atami Port", price: { min: 2800, max: 3200, note: "初島來回船票估算" } },
+                { id: "d2-3", time: "09:30 - 12:30", title: "初島島嶼漫遊 & 海鮮午餐", transit: "島上步行", note: "漫步島上步道及海景花園，於「初島食堂街」享用當日新鮮海鮮。預留時間搭乘早一班回熱海的船，避免錯過大室山末班交通。", location: "Hatsushima", price: { min: 1500, max: 4000, note: "午餐與園區活動預算" } },
+                { id: "d2-4", time: "12:30 - 13:00", title: "初島 ➔ 返回熱海港", transit: "高速船", note: "為銜接伊豆高原交通，建議搭乘中午前後的回程船班；船班依季節與天候調整，請查詢當日官方時刻表。", location: "Atami Port", price: { min: 0, max: 0, note: "已計入初島來回船票" } },
+                { id: "d2-5", time: "13:00 - 14:30", title: "熱海港 ➔ 伊豆高原 ➔ 大室山", transit: "步行 / JR 伊東線・伊豆急行線 / 路線巴士", note: "由熱海港前往熱海站，搭列車至伊豆高原，再轉巴士上山。轉乘時間依當日船班與列車銜接而異，請預留緩衝並先確認末班巴士。", location: "Mount Omuro", price: { min: 2000, max: 3000, note: "伊豆高原往返列車與巴士交通估算" } },
+                { id: "d2-6", time: "14:30 - 16:30", title: "大室山登山纜車 & 火山口步道", transit: "大室山登山纜車 / 環山步道", note: "搭乘吊椅登頂，沿火山口步道漫步，眺望伊豆半島與相模灣。登山纜車可能因強風停駛，營運日期、末班時間及當日狀況請以官方公告為準；若交通延誤或停駛，改留在熱海。", location: "Mount Omuro", price: { min: 1000, max: 1500, note: "大室山登山纜車票價估算" } },
+                { id: "d2-7", time: "18:00+", title: "返回熱海市區晚餐 & 溫泉舒壓", transit: "路線巴士 / 伊豆急行線・JR 伊東線", note: "預留返回熱海及轉乘時間，再享用市區晚餐；返回列車與巴士班次請先查詢，避免錯過末班車。", location: "Atami Station", price: { min: 2000, max: 4000, note: "晚餐預算；住宿另計" } }
+            ],
+            day3: [
+                { id: "d3-1", time: "07:30 - 08:00", title: "熱海來宮之湯松月日式旅館退房", transit: "步行 / 旅館接駁", note: "確認退房及早餐安排，前往熱海站。若要寄送行李至下田住宿，先確認旅館是否代辦、收件時限及預計送達日期；不確定時請自行攜帶。", location: "熱海來宮之湯松月日式旅館", price: { min: 0, max: 2500, note: "行李寄送費估算；依尺寸及服務而異" } },
+                { id: "d3-2", time: "08:00 - 09:30", title: "熱海 ➔ 城崎海岸站", transit: "JR 伊東線 ➔ 伊豆急行線", note: "沿伊豆東岸南下，在城崎海岸站下車。車種、轉乘及所需時間依當日班次而異，出發前查看路線與票價。", location: "Jogasaki-Kaigan Station", price: { min: 1200, max: 2500, note: "熱海至城崎海岸單程車資估算" } },
+                { id: "d3-3", time: "09:30 - 12:00", title: "城崎海岸步道與門脇吊橋", transit: "步行", note: "沿海岸步道前往門脇吊橋及燈塔周邊觀景。步道有坡度、階梯及不平路面；遇風雨或路況不佳時縮短步行，並預留回車站時間。", location: "Jogasaki Coast", price: { min: 0, max: 500, note: "步道免費；飲品等個人消費" } },
+                { id: "d3-4", time: "12:00 - 13:30", title: "伊豆高原午餐與休息", transit: "伊豆急行線 / 步行", note: "搭車至伊豆高原站用午餐，可選海鮮或在地餐館；用餐後依時間前往車站周邊短暫散策。", location: "Izu Kogen Station", price: { min: 1200, max: 3000, note: "午餐與飲品預算" } },
+                { id: "d3-5", time: "13:30 - 15:00", title: "伊豆高原 ➔ 伊豆急下田", transit: "伊豆急行線", note: "搭乘伊豆急行線前往下田辦理入住或寄放行李。列車停站、班距及車資依所搭列車而異；勿將概算視為時刻表。", location: "Izukyu-Shimoda Station", price: { min: 1000, max: 2500, note: "伊豆高原至下田單程車資估算" } },
+                { id: "d3-6", time: "15:00 - 17:30", title: "入住下田海濱酒店（僅住一晚）", transit: "依酒店指引前往", note: "今晚入住指定的下田海濱酒店。請依訂房確認資料核對酒店地址及從伊豆急下田站前往方式；Day 4 退房遊覽南伊豆後返回熱海。若要寄放行李，請先向酒店確認。", location: "下田海濱酒店", price: { min: 0, max: 1500, note: "住宿另計；飲品與小食預算" } },
+                { id: "d3-7", time: "18:00+", title: "下田晚餐", transit: "步行 / 酒店內", note: "可在下田海濱酒店或附近享用金目鯛料理、海鮮；若住宿方案包含晚餐，請從餐費預算扣除。", location: "下田海濱酒店", price: { min: 2000, max: 5000, note: "晚餐預算；住宿另計" } }
+            ],
+            day4: [
+                { id: "d4-0", time: "08:00 - 08:30", title: "下田海濱酒店退房／寄存行李", transit: "酒店櫃檯 / 步行", note: "辦理退房並向酒店確認行李寄存；若無法寄存，請先安排可行的行李寄放方式再出發遊覽。傍晚需返回下田站取行李並搭車前往熱海。", location: "下田海濱酒店", price: { min: 0, max: 500, note: "行李寄存與個人消費估算" } },
+                { id: "d4-1", time: "08:30 - 09:00", title: "佩里之路與下田港散策", transit: "步行", note: "從下田市區沿平緩街道走訪佩里之路、歷史街區與港邊；依天氣調整步行時間。", location: "Perry Road", price: { min: 0, max: 500, note: "步行免費；飲品等個人消費" } },
+                { id: "d4-2", time: "09:00 - 11:00", title: "下田公園與下田港景觀", transit: "步行", note: "登下田公園俯瞰港灣及市區。園區有坡道與階梯；紫陽花花期因年份不同，請以當季資訊為準。", location: "Shimoda Park", price: { min: 0, max: 500, note: "公園免費；飲品等個人消費" } },
+                { id: "d4-3", time: "11:00 - 12:30", title: "下田市區午餐", transit: "步行 / 路線巴士", note: "回市區享用金目鯛、海鮮或日式定食；如要搭巴士至白濱，先查看班次及站點。", location: "Izukyu-Shimoda Station", price: { min: 1500, max: 3500, note: "午餐預算" } },
+                { id: "d4-4", time: "12:30 - 14:00", title: "白濱海岸散步", transit: "東海巴士 / 步行", note: "前往白濱大濱海岸欣賞海景與白色沙灘。游泳只限指定季節及開放海灘，請留意海況、救生員與現場公告。", location: "Shirahama Beach", price: { min: 500, max: 1800, note: "巴士來回及個人消費估算" } },
+                { id: "d4-5", time: "14:00 - 16:00", title: "龍宮窟與田牛海岸", transit: "東海巴士 / 步行", note: "視巴士銜接前往龍宮窟及田牛周邊海岸。步道及洞窟可能因潮汐、風浪或安全管制關閉；請以現場公告為準，預留返回下田的時間。", location: "Ryugu Cave", price: { min: 500, max: 2000, note: "巴士車資與個人消費估算" } },
+                { id: "d4-6", time: "16:00 - 17:00", title: "返回伊豆急下田站並領取行李", transit: "東海巴士 / 步行", note: "由田牛／龍宮窟一帶搭巴士返回下田，領取寄存行李並前往車站。南伊豆巴士班距可能較長，請按當日班次調整景點停留時間。", location: "Izukyu-Shimoda Station", price: { min: 500, max: 1500, note: "巴士車資估算" } },
+                { id: "d4-7", time: "17:00 - 20:00", title: "伊豆急下田 ➔ 熱海，前往大野屋酒店", transit: "伊豆急行線 / JR 伊東線 / 計程車或巴士", note: "搭乘北上列車返回熱海，再前往熱海大野屋酒店。酒店接駁服務、發車時間及預約方式請先向酒店確認；列車與接駁時間依當日班次為準。", location: "熱海大野屋酒店", price: { min: 2000, max: 5000, note: "下田至熱海單程車資及市區接駁估算；住宿另計" } },
+                { id: "d4-8", time: "20:00+", title: "入住熱海大野屋酒店", transit: "酒店接駁 / 計程車 / 步行", note: "Day 4 晚入住熱海大野屋酒店。請確認當晚訂房、最晚入住時間，以及晚餐是否須事先預約或包含於房價。", location: "熱海大野屋酒店", price: { min: 1500, max: 5000, note: "晚餐預算；住宿另計" } }
+            ],
+            day5: [
+                { id: "d5-1", time: "07:00 - 08:00", title: "大野屋酒店退房，前往熱海站", transit: "酒店接駁 / 計程車 / 巴士", note: "由熱海大野屋酒店退房，攜帶行李前往熱海站。酒店接駁班次與預約方式請事先確認；若航班較早，應考慮前一晚住東京或成田。", location: "熱海大野屋酒店", price: { min: 0, max: 1500, note: "早餐或前往車站交通預算" } },
+                { id: "d5-2", time: "08:00 - 09:00", title: "熱海站周邊早晨購物與伴手禮採買", transit: "步行", note: "在熱海站商店街購買伴手禮、點心或補給後出發。各店開門時間不同，請事先查營業時間；若店舖尚未營業，改至便利商店或咖啡店，不要因此錯過預定列車。", location: "Atami Station", price: { min: 1000, max: 5000, note: "伴手禮與早餐預算" } },
+                { id: "d5-3", time: "09:00 - 11:00", title: "熱海 ➔ 東京轉乘", transit: "JR 東海道線 / 新幹線", note: "依實際車票和班次選擇列車前往東京；此為規劃時段而非保證班次，預留轉乘緩衝，不要依最短銜接時間安排行程。", location: "Tokyo Station", price: { min: 2000, max: 5000, note: "熱海至東京單程車資估算" } },
+                { id: "d5-4", time: "11:00 - 13:00", title: "東京 ➔ 成田機場（NRT）", transit: "JR 成田特快 / 機場巴士 / 京成線", note: "按當日班次與車票選擇合適交通方式前往成田。以上為概略規劃時段，實際時間及車資依路線、列車與轉乘等候而異。", location: "Narita Airport", price: { min: 1500, max: 4000, note: "東京至成田單程交通估算" } },
+                { id: "d5-5", time: "13:00+", title: "成田機場報到、用餐與候機", transit: "步行", note: "抵達後預留充足時間辦理報到、託運及安檢，並依航班航廈安排用餐與候機。建議航班 18:00 後起飛。", location: "Narita Airport", price: { min: 1000, max: 2500, note: "餐飲預算；航班與購物未計" } }
+            ]
+        };
+
+        const dayOptions = {
+            day1: [
+                { id: "d1-alt1", time: "彈性加選", title: "熱海梅園漫步", transit: "巴士 / 步行", note: "在溪流與庭園間放慢腳步；花季以外也適合散步，出發前確認開園資訊。", location: "Atami Plum Garden", price: { min: 0, max: 1000, note: "入園及接駁車估算" } },
+                { id: "d1-alt2", time: "彈性加選", title: "Sun Beach 海岸夕陽", transit: "步行 / 巴士", note: "把海灘散步排進抵達日，天氣晴朗時欣賞相模灣日落。", location: "Atami Sun Beach", price: { min: 0, max: 600, note: "步行免費；市區交通另計" } }
+            ],
+            day2: [
+                { id: "d2-alt1", time: "彈性加選", title: "初島海上運動體驗", transit: "島上步行", note: "依天氣及營業狀況選擇海上活動或島上休閒設施，請先查詢營運資訊。", location: "Hatsushima Island", price: { min: 1000, max: 3500, note: "活動票價預算，依項目而異" } },
+                { id: "d2-alt2", time: "雨天／交通備案", title: "熱海纜車與熱海城", transit: "熱海市區巴士 / 纜車", note: "若初島船班、列車銜接或大室山纜車因天候不適合，改在熱海搭纜車登錦浦山，視時間加訪熱海城。營業時間及票價請行前確認。", location: "Atami Ropeway", price: { min: 700, max: 2500, note: "纜車與可選熱海城門票" } }
+            ],
+            day3: [
+                { id: "d3-alt1", time: "彈性加選", title: "伊豆高原站周邊咖啡與足湯", transit: "步行", note: "若城崎海岸步行時間較短，可在伊豆高原站附近安排咖啡或足湯休息；依設施營業時間與現場狀況調整。", location: "Izu Kogen Station", price: { min: 300, max: 1500, note: "飲品與設施費用估算" } },
+                { id: "d3-alt2", time: "彈性加選", title: "伊豆仙人掌動物公園", transit: "路線巴士", note: "適合喜歡動物與植物園的旅客；此選項會增加移動時間，建議取代伊豆高原長時間休息，並先確認營業資訊。", location: "Izu Shaboten Zoo", price: { min: 2500, max: 3500, note: "門票與接駁交通估算" } }
+            ],
+            day4: [
+                { id: "d4-alt1", time: "彈性加選", title: "下田海中水族館", transit: "步行 / 路線巴士", note: "以水族展示及海豚活動為主，可替代一段市區散步；查看當日開館時間與活動安排。", location: "Shimoda Aquarium", price: { min: 2000, max: 3000, note: "門票與市區交通估算" } },
+                { id: "d4-alt2", time: "彈性加選", title: "石廊崎與南伊豆海岸", transit: "東海巴士", note: "若想把海岸行程延伸至南伊豆，可選擇石廊崎取代白濱或龍宮窟；巴士班距較疏，先確認往返班次。", location: "Cape Irozaki", price: { min: 1000, max: 2500, note: "巴士車資與個人消費估算" } }
+            ],
+            day5: [
+                { id: "d5-alt1", time: "機場彈性安排", title: "成田機場午餐與補給", transit: "步行", note: "到機場後再安排用餐與購物；此選項不可作為延後離開熱海的理由，請以航班報到時間為優先。", location: "Narita Airport", price: { min: 1000, max: 2500, note: "餐飲預算" } },
+                { id: "d5-alt2", time: "機場彈性安排", title: "成田機場觀景台", transit: "機場接駁 / 步行", note: "若已完成報到且時間充裕，可至航廈觀景台短暫休息；先依航班確認所在航廈及觀景台開放狀況。", location: "Narita Airport", price: { min: 0, max: 500, note: "免費；飲品等個人消費" } }
+            ]
+        };
+
+        const dayNames = {
+            day1: "Day 1 熱海抵達",
+            day2: "Day 2 初島海島",
+            day3: "Day 3 城崎海岸・伊豆高原・下田",
+            day4: "Day 4 下田・南伊豆",
+            day5: "Day 5 成田返程"
+        };
+
+        function formatYen(amount) {
+            return `¥${Math.round(amount).toLocaleString('en-US')}`;
+        }
+
+        function formatPrice(price) {
+            if (price.min === price.max) return formatYen(price.min);
+            return `${formatYen(price.min)}–${formatYen(price.max)}`;
+        }
+
+        function googleDirectionsUrl(origin, destination, waypoints = []) {
+            const params = new URLSearchParams({
+                api: '1',
+                origin,
+                destination,
+                travelmode: 'transit'
+            });
+            if (waypoints.length) params.set('waypoints', waypoints.join('|'));
+            return `https://www.google.com/maps/dir/?${params.toString()}`;
+        }
+
+        function googlePlaceUrl(location) {
+            const params = new URLSearchParams({ api: '1', query: location });
+            return `https://www.google.com/maps/search/?${params.toString()}`;
+        }
+
+        function renderDayRouteLinks() {
+            Object.keys(itineraryData).forEach(dayKey => {
+                const stops = itineraryData[dayKey];
+                const link = document.getElementById(`day-route-${dayKey}`);
+                const origin = stops[0].location;
+                const destination = stops[stops.length - 1].location;
+                const middleStops = stops.slice(1, -1);
+                const waypoints = middleStops
+                    .filter((stop, index) =>
+                        stop.location !== origin &&
+                        stop.location !== destination &&
+                        (index === 0 || stop.location !== middleStops[index - 1].location))
+                    .map(stop => stop.location);
+                link.href = googleDirectionsUrl(origin, destination, waypoints);
+                link.setAttribute('aria-label', `在 Google 地圖查看${dayNames[dayKey]}全日大眾運輸路線`);
+                link.title = '開啟 Google 地圖會將本日行程的地點與路線傳送給 Google';
+            });
+        }
+
+        function addedOptions(dayKey) {
+            return (localStorage.getItem(`trip-options-${dayKey}`) || '').split(',').filter(Boolean);
+        }
+
+        function selectedDayItems(dayKey) {
+            const selected = new Set(addedOptions(dayKey));
+            return itineraryData[dayKey].concat(dayOptions[dayKey].filter(item => selected.has(item.id)));
+        }
+
+        function renderDaySummary(dayKey) {
+            const items = selectedDayItems(dayKey);
+            const min = items.reduce((sum, item) => sum + item.price.min, 0);
+            const max = items.reduce((sum, item) => sum + item.price.max, 0);
+            document.getElementById(`summary-${dayKey}`).innerHTML = `
+                <div><span class="block text-[11px] font-semibold uppercase tracking-wide text-slate-500">本日安排</span><span class="text-sm font-bold text-slate-800">${items.length} 個體驗 · 每人預算</span></div>
+                <div class="text-right"><span class="block text-xl font-bold text-blue-800">${formatPrice({ min, max })}</span><span class="text-[11px] text-slate-500">日圓估算 · 住宿與機票另計</span></div>`;
+        }
+
+        function renderTripBudget() {
+            const totals = Object.keys(itineraryData).reduce((sum, dayKey) => {
+                const items = selectedDayItems(dayKey);
+                sum.min += items.reduce((daySum, item) => daySum + item.price.min, 0);
+                sum.max += items.reduce((daySum, item) => daySum + item.price.max, 0);
+                return sum;
+            }, { min: 0, max: 0 });
+            document.getElementById('trip-budget').innerHTML = `<i class="fa-solid fa-wallet"></i> 五日行程預算 ${formatPrice(totals)}／人 <span class="font-normal text-amber-100/80">· 不含機票及住宿</span>`;
+        }
+
+        // Render Timelines
+        function renderDayTimeline(dayKey, containerId) {
+            const container = document.getElementById(containerId);
+            const items = selectedDayItems(dayKey);
+            
+            container.innerHTML = items.map(item => {
+                const isChecked = localStorage.getItem(item.id) === 'true';
+                const isOptional = dayOptions[dayKey].some(option => option.id === item.id);
+                const coreStops = itineraryData[dayKey];
+                const stopIndex = coreStops.findIndex(stop => stop.id === item.id);
+                const nextStop = !isOptional && stopIndex >= 0
+                    ? coreStops.slice(stopIndex + 1).find(stop => stop.location !== item.location)
+                    : null;
+                const mapsUrl = nextStop
+                    ? googleDirectionsUrl(item.location, nextStop.location)
+                    : googlePlaceUrl(item.location);
+                const mapLabel = nextStop ? '前往下一站' : '查看地點';
+                const mapDescription = nextStop
+                    ? `Google 地圖大眾運輸路線：${item.location} 至 ${nextStop.location}`
+                    : `在 Google 地圖查看 ${item.location}`;
+
+                return `
+                    <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200/80 transition hover:shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-3 ${isOptional ? 'optional-card' : ''}">
+                        <div class="flex items-start gap-3 w-full md:w-auto">
+                            <input type="checkbox" id="${item.id}" onchange="toggleCheck('${item.id}')" ${isChecked ? 'checked' : ''} class="mt-1 w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 shrink-0 cursor-pointer">
+                            <div class="${isChecked ? 'line-through text-slate-400' : ''}">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">${item.time}</span>
+                                    <span class="text-xs text-indigo-600 font-medium"><i class="fa-solid fa-van-shuttle mr-1"></i>${item.transit}</span>
+                                </div>
+                                <h3 class="font-bold text-slate-900 text-base mt-1">${item.title}</h3>
+                                <p class="text-xs text-slate-600 mt-1 leading-relaxed">${item.note}</p>
+                                <p class="text-[11px] text-slate-500 mt-2">${item.price.note}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 self-end md:self-center shrink-0">
+                            <span class="price-badge"><i class="fa-solid fa-yen-sign"></i>${formatPrice(item.price)}</span>
+                            <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" aria-label="${mapDescription}" title="${mapDescription} · 開啟後會將地點傳送給 Google 地圖" class="text-xs bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 px-3 py-1.5 rounded-lg border border-slate-200 transition flex items-center gap-1 font-medium">
+                                <i class="fa-solid ${nextStop ? 'fa-route' : 'fa-location-dot'} text-red-500"></i> ${mapLabel}
+                            </a>
+                            ${isOptional ? `<button onclick="toggleOption('${dayKey}', '${item.id}')" class="text-xs text-rose-600 hover:text-rose-800 px-2 py-1.5" aria-label="從${dayNames[dayKey]}移除此選項">移除</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderOptions(dayKey) {
+            const selected = new Set(addedOptions(dayKey));
+            document.getElementById(`options-${dayKey}`).innerHTML = dayOptions[dayKey].map(option => `
+                <article class="rounded-xl border border-indigo-100 bg-indigo-50/70 p-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <div><span class="text-[10px] font-bold uppercase tracking-wide text-indigo-600">可選體驗</span><h3 class="mt-1 text-sm font-bold text-slate-900">${option.title}</h3></div>
+                        <span class="price-badge">${formatPrice(option.price)}</span>
+                    </div>
+                    <p class="mt-2 text-xs leading-relaxed text-slate-600">${option.note}</p>
+                    <p class="mt-2 text-[11px] text-slate-500">${option.time} · ${option.price.note}</p>
+                    <button onclick="toggleOption('${dayKey}', '${option.id}')" class="mt-3 rounded-lg ${selected.has(option.id) ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-indigo-700 hover:bg-indigo-800'} px-3 py-1.5 text-xs font-semibold text-white transition">
+                        ${selected.has(option.id) ? '✓ 已加入 · 點此移除' : '+ 加入今日行程'}
+                    </button>
+                </article>`).join('');
+        }
+
+        function toggleOptions(dayKey) {
+            document.getElementById(`options-${dayKey}`).classList.toggle('hidden');
+        }
+
+        function toggleOption(dayKey, optionId) {
+            const selected = new Set(addedOptions(dayKey));
+            if (selected.has(optionId)) selected.delete(optionId);
+            else selected.add(optionId);
+            localStorage.setItem(`trip-options-${dayKey}`, [...selected].join(','));
+            initApp();
+        }
+
+        // Tab Switching Function logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.classList.remove('bg-amber-400', 'text-slate-900', 'font-bold', 'shadow');
+                btn.classList.add('bg-white/10', 'text-white');
+            });
+
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-white/10', 'text-white');
+                activeBtn.classList.add('bg-amber-400', 'text-slate-900', 'font-bold', 'shadow');
+            }
+            if (tabId.startsWith('tab-day')) window.setRouteDay?.(Number(tabId.slice(-1)) - 1);
+        }
+
+        // Local Storage Checkbox state logic
+        function toggleCheck(id) {
+            const checkbox = document.getElementById(id);
+            localStorage.setItem(id, checkbox.checked);
+            initApp();
+        }
+
+        function resetProgress() {
+            if (confirm('確定要重置所有行程打卡狀態嗎？')) {
+                Object.keys(itineraryData).forEach(key => {
+                    itineraryData[key].forEach(item => {
+                        localStorage.removeItem(item.id);
+                    });
+                    dayOptions[key].forEach(item => localStorage.removeItem(item.id));
+                    localStorage.removeItem(`trip-options-${key}`);
+                });
+                initApp();
+            }
+        }
+
+        // Initialize App Function
+        function initApp() {
+            Object.keys(itineraryData).forEach((dayKey, index) => {
+                renderDayTimeline(dayKey, `timeline-day${index + 1}`);
+                renderDaySummary(dayKey);
+                renderOptions(dayKey);
+            });
+            renderDayRouteLinks();
+            renderTripBudget();
+            window.refreshMap?.();
+        }
+
+        window.onload = initApp;
+    </script>
+    <script type="module">
+        import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js';
+
+        const canvas = document.getElementById('route-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+        camera.position.set(0, 0, 12);
+
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+        renderer.setClearColor(0x000000, 0);
+        const mapRoot = new THREE.Group();
+        scene.add(mapRoot);
+        const stage = new THREE.Mesh(
+            new THREE.PlaneGeometry(10, 4.4),
+            new THREE.MeshBasicMaterial({ color: 0x10243a, transparent: true, opacity: 0.55 })
+        );
+        stage.position.z = -0.5;
+        mapRoot.add(stage);
+
+        const dayColors = [0xffc878, 0x65d6d1, 0xb7a4ff, 0x8de0a2, 0xff9e9e];
+        const raycaster = new THREE.Raycaster();
+        const pointerNdc = new THREE.Vector2();
+        const markerEntries = [];
+        const markerLabels = [];
+        const routeObjects = [];
+        let activeDay = 0;
+        let selectedMapStop = null;
+        function stopsForDay(dayIndex) {
+            const dayKey = `day${dayIndex + 1}`;
+            const selected = new Set((localStorage.getItem(`trip-options-${dayKey}`) || '').split(',').filter(Boolean));
+            return itineraryData[dayKey].concat(dayOptions[dayKey].filter(stop => selected.has(stop.id)));
+        }
+
+        function legacyMapRenderDay(dayIndex, preserveSelection = false) {
+            activeDay = Math.max(0, Math.min(4, dayIndex));
+            routeObjects.splice(0).forEach(object => {
+                mapRoot.remove(object);
+                object.geometry?.dispose();
+                if (Array.isArray(object.material)) object.material.forEach(material => material.dispose());
+                else object.material?.dispose();
+            });
+            markerEntries.splice(0).forEach(entry => {
+                mapRoot.remove(entry.marker);
+                mapRoot.remove(entry.halo);
+                entry.marker.geometry.dispose();
+                entry.marker.material.dispose();
+                entry.halo.geometry.dispose();
+                entry.halo.material.dispose();
+            });
+            markerLabels.splice(0).forEach(label => {
+                mapRoot.remove(label);
+                label.material.map.dispose();
+                label.material.dispose();
+            });
+
+            const stops = stopsForDay(activeDay);
+            const points = stops.map(stop => toMapPoint(stop.location));
+            const routePoints = points.filter((point, index) =>
+                index === 0 || point.distanceTo(points[index - 1]) > 0.015
+            ).map(point => point.clone().setZ(0.04));
+            if (routePoints.length > 1) {
+                const routeCurve = new THREE.CatmullRomCurve3(routePoints);
+                const routeLine = new THREE.Mesh(
+                    new THREE.TubeGeometry(routeCurve, Math.max(32, routePoints.length * 16), 0.026, 8, false),
+                    new THREE.MeshBasicMaterial({ color: dayColors[activeDay], transparent: true, opacity: 1 })
+                );
+                mapRoot.add(routeLine);
+                routeObjects.push(routeLine);
+            }
+
+            const uniqueStops = [];
+            const seenCoordinates = new Set();
+            points.forEach((point, index) => {
+                const key = `${point.x.toFixed(2)},${point.y.toFixed(2)}`;
+                if (seenCoordinates.has(key)) return;
+                seenCoordinates.add(key);
+                uniqueStops.push({ stop: stops[index], index, point });
+            });
+
+            document.getElementById('map-stop-list').innerHTML = stops.map((stop, index) => `
+                <button type="button" data-map-stop-index="${index}" onclick="selectMapStop(${index})"
+                    class="rounded-full border border-white/25 bg-slate-900/60 px-2.5 py-1 text-[10px] text-white hover:bg-white/20"
+                    aria-label="選擇地圖景點：${stop.title}，${stop.time}" aria-pressed="false">${stop.title}</button>`).join('');
+
+            uniqueStops.forEach(({ stop, index, point }) => {
+                const marker = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.072, 24, 20),
+                    new THREE.MeshBasicMaterial({ color: dayColors[activeDay] })
+                );
+                marker.position.copy(point).setZ(0.15);
+                marker.userData = { stop, index, stops };
+                const halo = new THREE.Mesh(
+                    new THREE.TorusGeometry(0.115, 0.012, 6, 32),
+                    new THREE.MeshBasicMaterial({ color: dayColors[activeDay], transparent: true, opacity: 0.8 })
+                );
+                halo.position.copy(marker.position);
+                mapRoot.add(marker, halo);
+                markerEntries.push({ marker, halo, stop, index });
+
+                const badgeCanvas = document.createElement('canvas');
+                badgeCanvas.width = 128;
+                badgeCanvas.height = 128;
+                const context = badgeCanvas.getContext('2d');
+                context.beginPath();
+                context.arc(64, 64, 57, 0, Math.PI * 2);
+                context.fillStyle = '#fff';
+                context.fill();
+                context.lineWidth = 8;
+                context.strokeStyle = `#${dayColors[activeDay].toString(16).padStart(6, '0')}`;
+                context.stroke();
+                context.fillStyle = '#10243a';
+                context.font = 'bold 58px sans-serif';
+                context.textAlign = 'center';
+                context.textBaseline = 'middle';
+                context.fillText(String(index + 1), 64, 66);
+                const label = new THREE.Sprite(new THREE.SpriteMaterial({
+                    map: new THREE.CanvasTexture(badgeCanvas),
+                    transparent: true,
+                    depthTest: false
+                }));
+                const badgeOffsets = [
+                    [0.17, 0.17], [0.17, -0.17], [-0.17, 0.17], [-0.17, -0.17],
+                    [0.24, 0], [-0.24, 0], [0, 0.24]
+                ];
+                const [offsetX, offsetY] = badgeOffsets[index % badgeOffsets.length];
+                label.position.copy(marker.position).add(new THREE.Vector3(offsetX, offsetY, 0.08));
+                label.scale.set(0.19, 0.19, 1);
+                label.renderOrder = 5;
+                mapRoot.add(label);
+                markerLabels.push(label);
+            });
+
+            mapRoot.position.set(0, 0, 0);
+            camera.position.set(0, 0, 12);
+            const minX = Math.min(...points.map(point => point.x));
+            const maxX = Math.max(...points.map(point => point.x));
+            const minY = Math.min(...points.map(point => point.y));
+            const maxY = Math.max(...points.map(point => point.y));
+            const centerX = (minX + maxX) / 2;
+            const centerY = (minY + maxY) / 2;
+            mapRoot.position.set(-centerX, -centerY, 0);
+            const halfHeight = Math.max((maxY - minY) / 2 + 0.65, 0.9);
+            const halfWidth = Math.max((maxX - minX) / 2 + 0.65, 0.9);
+            const verticalDistance = halfHeight / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+            const horizontalDistance = halfWidth / (Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect);
+            camera.position.z = THREE.MathUtils.clamp(Math.max(verticalDistance, horizontalDistance) * 1.15, 3.5, 16);
+            camera.updateProjectionMatrix();
+
+            document.querySelectorAll('[data-map-day]').forEach(button => {
+                const active = Number(button.dataset.mapDay) === activeDay;
+                button.setAttribute('aria-pressed', String(active));
+                button.classList.toggle('bg-amber-300', active);
+                button.classList.toggle('text-slate-900', active);
+                button.classList.toggle('font-bold', active);
+                button.classList.toggle('bg-slate-900/60', !active);
+                button.classList.toggle('text-white', !active);
+            });
+
+            const previousSelection = preserveSelection ? selectedMapStop?.stop.id : null;
+            const selectedIndex = previousSelection
+                ? stops.findIndex(stop => stop.id === previousSelection)
+                : -1;
+            const stopIndex = selectedIndex >= 0 ? selectedIndex : 0;
+            const selected = stops[stopIndex];
+            if (selected) showSelectedStop(selected, stopIndex, stops);
+            renderer.render(scene, camera);
+        }
+
+        const railCurves = [];
+        const trainCars = [];
+        const stationPoints = [];
+        const stopStationIndices = [];
+        const animationClock = new THREE.Clock();
+        const legOverrides = {
+            "d2-2": { label: '步行／路線巴士', icon: 'fa-bus' },
+            "d2-3": { label: '熱海高速船', icon: 'fa-ferry' },
+            "d5-2": { label: '酒店接駁／計程車／巴士', icon: 'fa-bus' }
+        };
+        const rideEstimates = {
+            "d1-2": 90, "d1-3": 20, "d1-4": 25, "d1-5": 20, "d1-6": 25,
+            "d2-2": 15, "d2-3": 30, "d2-4": 30, "d2-5": 60, "d2-6": 20, "d2-7": 50,
+            "d3-2": 90, "d3-3": 35, "d3-4": 20, "d3-5": 60, "d3-6": 65,
+            "d4-1": 15, "d4-2": 20, "d4-3": 20, "d4-4": 30, "d4-5": 35, "d4-6": 30, "d4-7": 100,
+            "d5-2": 20, "d5-3": 45, "d5-4": 90, "d5-5": 60
+        };
+        const tripStartDate = { year: 2026, month: 9, day: 22 };
+        let activeJourney = null;
+        let journeyProgress = 0;
+
+        function scheduledStart(time) {
+            const match = String(time || '').match(/(\d{1,2}):(\d{2})/);
+            return match ? { hours: Number(match[1]), minutes: Number(match[2]) } : null;
+        }
+
+        function scheduledTimestamp(dayIndex, time) {
+            const start = scheduledStart(time);
+            if (!start) return null;
+            return Date.UTC(
+                tripStartDate.year,
+                tripStartDate.month,
+                tripStartDate.day + dayIndex,
+                start.hours - 9,
+                start.minutes
+            );
+        }
+
+        function updateCountdown() {
+            const value = document.getElementById('countdown-value');
+            const targetLabel = document.getElementById('countdown-target');
+            const note = document.getElementById('countdown-note');
+            if (!value || !targetLabel || !note || !selectedMapStop) return;
+
+            const { stop, index, stops } = selectedMapStop;
+            const nextIndex = stops.findIndex((item, itemIndex) =>
+                itemIndex > index && item.location !== stop.location
+            );
+            if (nextIndex < 0) {
+                value.textContent = '今日行程已完成';
+                targetLabel.textContent = '沒有下一站';
+                note.textContent = '選擇其他站點查看該段行程';
+                return;
+            }
+
+            const nextStop = stops[nextIndex];
+            const time = scheduledStart(nextStop.time);
+            const timestamp = scheduledTimestamp(activeDay, nextStop.time);
+            if (!time || timestamp === null) {
+                value.textContent = '未設定時間';
+                targetLabel.textContent = '彈性行程';
+                note.textContent = `下一站：${nextStop.title}`;
+                return;
+            }
+
+            const remainingSeconds = Math.ceil((timestamp - Date.now()) / 1000);
+            if (remainingSeconds <= 0) {
+                showSelectedStop(nextStop, nextIndex, stops);
+                return;
+            }
+
+            const days = Math.floor(remainingSeconds / 86400);
+            const hours = Math.floor((remainingSeconds % 86400) / 3600);
+            const minutes = Math.floor((remainingSeconds % 3600) / 60);
+            const seconds = remainingSeconds % 60;
+            const pad = number => String(number).padStart(2, '0');
+            value.textContent = `${days ? `${days}天 ` : ''}${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+            const date = new Date(Date.UTC(
+                tripStartDate.year,
+                tripStartDate.month,
+                tripStartDate.day + activeDay
+            )).toISOString().slice(0, 10).split('-').reverse().join('/');
+            targetLabel.textContent = `預定 ${date} ${pad(time.hours)}:${pad(time.minutes)} JST`;
+            note.textContent = `旅程出發 22/10/2026 · 倒數至「${nextStop.title}」預定時間 · 非即時交通資訊`;
+        }
+
+        function transportFor(stop) {
+            if (legOverrides[stop.id]) return legOverrides[stop.id];
+            const transit = stop.transit || '';
+            const hasRail = /JR|伊豆急行|新幹線|電車|列車/i.test(transit);
+            const hasBus = /巴士|公車|公交|bus|接駁/i.test(transit);
+            const hasWalk = /步行|徒步|walk/i.test(transit);
+            const hasBoat = /渡輪|船|ferry/i.test(transit);
+            if (hasRail && hasBus) return { label: 'JR／巴士轉乘', icon: 'fa-train-subway' };
+            if (/京急線/.test(transit)) return { label: '京急線／JR 列車轉乘', icon: 'fa-train-subway' };
+            if (/東海道新幹線|新幹線/.test(transit)) return { label: 'JR 新幹線／特急', icon: 'fa-train-subway' };
+            if (hasRail && /伊豆急行/.test(transit)) return { label: 'JR／伊豆急行線', icon: 'fa-train-subway' };
+            if (hasRail) return { label: 'JR 列車', icon: 'fa-train-subway' };
+            if (hasBus && hasWalk) return { label: '巴士＋步行', icon: 'fa-bus' };
+            if (hasBus) return { label: '路線巴士', icon: 'fa-bus' };
+            if (hasBoat) return { label: '渡輪／船', icon: 'fa-ferry' };
+            if (hasWalk) return { label: '步行', icon: 'fa-person-walking' };
+            return { label: transit || '依行程安排', icon: 'fa-route' };
+        }
+
+        function estimatedMinutes(stop, mode) {
+            if (rideEstimates[stop.id]) return rideEstimates[stop.id];
+            if (mode.label.includes('JR')) return 45;
+            if (mode.label.includes('巴士')) return 25;
+            if (mode.label.includes('渡輪')) return 30;
+            if (mode.label.includes('步行')) return 15;
+            return 20;
+        }
+
+        function disposeObject(object) {
+            object.traverse(child => {
+                child.geometry?.dispose();
+                if (Array.isArray(child.material)) child.material.forEach(material => material.dispose());
+                else child.material?.dispose();
+                if (child.material?.map) child.material.map.dispose();
+            });
+        }
+
+        function createTrain() {
+            const train = new THREE.Group();
+            const body = new THREE.Mesh(
+                new THREE.BoxGeometry(0.62, 0.2, 0.22),
+                new THREE.MeshBasicMaterial({ color: 0xf3f6f8 })
+            );
+            const stripe = new THREE.Mesh(
+                new THREE.BoxGeometry(0.63, 0.045, 0.232),
+                new THREE.MeshBasicMaterial({ color: 0xd73535 })
+            );
+            stripe.position.y = -0.035;
+            const windows = new THREE.Mesh(
+                new THREE.BoxGeometry(0.38, 0.065, 0.235),
+                new THREE.MeshBasicMaterial({ color: 0x63c7d4 })
+            );
+            windows.position.set(-0.035, 0.045, 0);
+            const front = new THREE.Mesh(
+                new THREE.BoxGeometry(0.1, 0.13, 0.24),
+                new THREE.MeshBasicMaterial({ color: 0xdfe9ed })
+            );
+            front.position.set(0.27, 0.015, 0);
+            train.add(body, stripe, windows, front);
+            [-0.19, 0.19].forEach(x => {
+                const wheel = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.045, 0.045, 0.25, 12),
+                    new THREE.MeshBasicMaterial({ color: 0x18222b })
+                );
+                wheel.rotation.x = Math.PI / 2;
+                wheel.position.set(x, -0.115, 0);
+                train.add(wheel);
+            });
+            mapRoot.add(train);
+            trainCars.push(train);
+            return train;
+        }
+
+        function showSelectedStop(stop, index, stops) {
+            selectedMapStop = { stop, index, stops, day: activeDay };
+            const nextIndex = stops.findIndex((item, itemIndex) =>
+                itemIndex > index && item.location !== stop.location
+            );
+            const nextStop = nextIndex >= 0 ? stops[nextIndex] : null;
+            const detail = document.getElementById('map-stop-detail');
+            if (nextStop) {
+                const mode = transportFor(nextStop);
+                const minutes = estimatedMinutes(nextStop, mode);
+                detail.innerHTML = `<span class="block">${dayNames[`day${activeDay + 1}`]} · ${stop.time} · ${formatPrice(stop.price)}</span>
+                    <span class="mt-1 block font-semibold text-white"><i class="fa-solid ${mode.icon} mr-1 text-cyan-200"></i>${mode.label} → ${nextStop.title}</span>
+                    <span class="mt-1 block text-amber-200">預估剩餘車程：約 ${minutes} 分鐘（非即時概算）</span>`;
+                activeJourney = {
+                    from: stopStationIndices[index],
+                    to: stopStationIndices[nextIndex]
+                };
+                journeyProgress = 0;
+                const curve = railCurves[activeJourney.from];
+                if (trainCars[0] && curve) {
+                    const point = curve.getPoint(0);
+                    const tangent = curve.getTangent(0);
+                    trainCars[0].visible = true;
+                    trainCars[0].position.copy(point).setZ(0.35);
+                    trainCars[0].rotation.z = Math.atan2(tangent.y, tangent.x);
+                }
+            } else {
+                detail.innerHTML = `<span class="block">${dayNames[`day${activeDay + 1}`]} · ${stop.time} · ${formatPrice(stop.price)}</span>
+                    <span class="mt-1 block font-semibold text-white">今日最後一站 · 行程已抵達</span>`;
+                activeJourney = null;
+                if (trainCars[0]) trainCars[0].visible = false;
+            }
+            document.getElementById('map-stop-title').textContent = stop.title;
+
+            const directions = document.getElementById('map-directions-link');
+            directions.href = nextStop
+                ? googleDirectionsUrl(stop.location, nextStop.location)
+                : googlePlaceUrl(stop.location);
+            directions.setAttribute('aria-label', nextStop
+                ? `在 Google 地圖查看從${stop.title}前往${nextStop.title}的路線`
+                : `在 Google 地圖查看${stop.title}`);
+            directions.title = '開啟 Google 地圖會將所選地點與路線傳送給 Google';
+            directions.innerHTML = `<i class="fa-solid fa-route"></i> ${nextStop ? 'Google 地圖前往下一站' : 'Google 地圖查看地點'}`;
+
+            markerEntries.forEach(entry => {
+                const isSelected = entry.index === index;
+                const isNext = entry.index === nextIndex;
+                entry.marker.scale.setScalar(isSelected || isNext ? 1.45 : 1);
+                entry.marker.material.color.set(isSelected ? 0xffffff : isNext ? 0xffd166 : dayColors[activeDay]);
+                entry.halo.material.opacity = isNext ? 1 : 0.65;
+            });
+            document.querySelectorAll('[data-map-stop-index]').forEach(button => {
+                const active = Number(button.dataset.mapStopIndex) === index;
+                button.setAttribute('aria-pressed', String(active));
+                button.classList.toggle('bg-white', active);
+                button.classList.toggle('text-slate-900', active);
+                button.classList.toggle('bg-slate-900/60', !active);
+                button.classList.toggle('text-white', !active);
+            });
+            updateCountdown();
+            renderer.render(scene, camera);
+        }
+
+        function renderRailDay(dayIndex, preserveSelection = false) {
+            activeDay = Math.max(0, Math.min(4, dayIndex));
+            routeObjects.splice(0).forEach(object => {
+                mapRoot.remove(object);
+                disposeObject(object);
+            });
+            markerEntries.splice(0).forEach(entry => {
+                mapRoot.remove(entry.marker, entry.halo);
+                disposeObject(entry.marker);
+                disposeObject(entry.halo);
+            });
+            markerLabels.splice(0).forEach(label => {
+                mapRoot.remove(label);
+                disposeObject(label);
+            });
+            trainCars.splice(0).forEach(train => {
+                mapRoot.remove(train);
+                disposeObject(train);
+            });
+            railCurves.length = 0;
+            stationPoints.length = 0;
+            stopStationIndices.length = 0;
+
+            const stops = stopsForDay(activeDay);
+            const seenLocations = new Map();
+            stops.forEach(stop => {
+                if (!seenLocations.has(stop.location)) seenLocations.set(stop.location, seenLocations.size);
+                stopStationIndices.push(seenLocations.get(stop.location));
+            });
+            const uniqueStops = [...seenLocations.entries()];
+            const count = uniqueStops.length;
+            uniqueStops.forEach(([, stationIndex], index) => {
+                const x = count === 1 ? 0 : -4.15 + index * (8.3 / (count - 1));
+                const y = Math.sin(index * 1.35) * 0.42 + (index % 2 ? -0.08 : 0.08);
+                stationPoints[stationIndex] = new THREE.Vector3(x, y, 0.08);
+            });
+
+            for (let index = 0; index < stationPoints.length - 1; index++) {
+                const start = stationPoints[index];
+                const end = stationPoints[index + 1];
+                const control = new THREE.Vector3((start.x + end.x) / 2, (start.y + end.y) / 2 + (index % 2 ? -0.25 : 0.25), 0.08);
+                const curve = new THREE.QuadraticBezierCurve3(start, control, end);
+                railCurves.push(curve);
+                const railMaterial = new THREE.MeshBasicMaterial({ color: dayColors[activeDay], transparent: true, opacity: 0.82 });
+                const rail = new THREE.Mesh(new THREE.TubeGeometry(curve, 36, 0.025, 8, false), railMaterial);
+                mapRoot.add(rail);
+                routeObjects.push(rail);
+                for (let tieIndex = 1; tieIndex < 12; tieIndex++) {
+                    const point = curve.getPoint(tieIndex / 12);
+                    const tangent = curve.getTangent(tieIndex / 12);
+                    const tie = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.075, 0.19, 0.035),
+                        new THREE.MeshBasicMaterial({ color: 0xa8b5bd })
+                    );
+                    tie.position.copy(point).setZ(0.045);
+                    tie.rotation.z = Math.atan2(tangent.y, tangent.x) + Math.PI / 2;
+                    mapRoot.add(tie);
+                    routeObjects.push(tie);
+                }
+            }
+
+            document.getElementById('map-stop-list').innerHTML = stops.map((stop, index) => `
+                <button type="button" data-map-stop-index="${index}" onclick="selectMapStop(${index})"
+                    class="rounded-full border border-white/25 bg-slate-900/60 px-2.5 py-1 text-[10px] text-white hover:bg-white/20"
+                    aria-label="選擇旅程站點：${stop.title}，${stop.time}" aria-pressed="false">${stop.title}</button>`).join('');
+
+            uniqueStops.forEach(([location, stationIndex]) => {
+                const point = stationPoints[stationIndex];
+                const stopIndex = stops.findIndex(stop => stop.location === location);
+                const stop = stops[stopIndex];
+                const marker = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.085, 20, 16),
+                    new THREE.MeshBasicMaterial({ color: dayColors[activeDay] })
+                );
+                marker.position.copy(point).setZ(0.16);
+                marker.userData = { stop, index: stopIndex, stops };
+                const halo = new THREE.Mesh(
+                    new THREE.TorusGeometry(0.14, 0.012, 6, 28),
+                    new THREE.MeshBasicMaterial({ color: dayColors[activeDay], transparent: true, opacity: 0.7 })
+                );
+                halo.position.copy(marker.position);
+                mapRoot.add(marker, halo);
+                markerEntries.push({ marker, halo, stop, index: stopIndex });
+
+                const labelCanvas = document.createElement('canvas');
+                labelCanvas.width = 512;
+                labelCanvas.height = 96;
+                const context = labelCanvas.getContext('2d');
+                context.fillStyle = 'rgba(5, 18, 32, 0.9)';
+                context.beginPath();
+                context.roundRect(4, 4, 504, 88, 18);
+                context.fill();
+                context.fillStyle = '#ffffff';
+                context.font = 'bold 30px sans-serif';
+                context.textAlign = 'center';
+                context.textBaseline = 'middle';
+                const labelText = location.length > 22 ? `${location.slice(0, 21)}…` : location;
+                context.fillText(`${stopIndex + 1}. ${labelText}`, 256, 48);
+                const label = new THREE.Sprite(new THREE.SpriteMaterial({
+                    map: new THREE.CanvasTexture(labelCanvas),
+                    transparent: true,
+                    depthTest: false
+                }));
+                label.position.copy(point).add(new THREE.Vector3(0, stationIndex % 2 ? -0.52 : 0.52, 0.2));
+                label.scale.set(1.35, 0.26, 1);
+                label.renderOrder = 5;
+                mapRoot.add(label);
+                markerLabels.push(label);
+            });
+
+            mapRoot.position.set(0, 0, 0);
+            mapRoot.rotation.set(0, 0, 0);
+            camera.position.set(0, 0, Math.max(
+                4.2,
+                4.75 / (Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * Math.max(camera.aspect, 0.5))
+            ));
+            camera.updateProjectionMatrix();
+            if (railCurves.length) createTrain();
+            stopStationIndices.length = stops.length;
+
+            document.querySelectorAll('[data-map-day]').forEach(button => {
+                const active = Number(button.dataset.mapDay) === activeDay;
+                button.setAttribute('aria-pressed', String(active));
+                button.classList.toggle('bg-amber-300', active);
+                button.classList.toggle('text-slate-900', active);
+                button.classList.toggle('font-bold', active);
+                button.classList.toggle('bg-slate-900/60', !active);
+                button.classList.toggle('text-white', !active);
+            });
+
+            const previousSelection = preserveSelection ? selectedMapStop?.stop.id : null;
+            const selectedIndex = previousSelection ? stops.findIndex(stop => stop.id === previousSelection) : -1;
+            showSelectedStop(stops[selectedIndex >= 0 ? selectedIndex : 0], selectedIndex >= 0 ? selectedIndex : 0, stops);
+            renderer.render(scene, camera);
+        }
+
+        window.selectMapDay = dayIndex => renderRailDay(dayIndex);
+        window.setRouteDay = dayIndex => renderRailDay(dayIndex, true);
+        window.refreshMap = () => renderRailDay(activeDay, true);
+        window.selectMapStop = index => {
+            const stops = stopsForDay(activeDay);
+            if (Number.isInteger(index) && index >= 0 && index < stops.length) {
+                showSelectedStop(stops[index], index, stops);
+            }
+        };
+        window.openSelectedMapStop = () => {
+            if (!selectedMapStop) return;
+            switchTab(`tab-day${selectedMapStop.day + 1}`);
+            requestAnimationFrame(() => {
+                const card = document.getElementById(selectedMapStop.stop.id);
+                card?.closest('.optional-card, .bg-white')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+        };
+
+        canvas.addEventListener('pointerdown', event => {
+            const bounds = canvas.getBoundingClientRect();
+            pointerNdc.x = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
+            pointerNdc.y = -((event.clientY - bounds.top) / bounds.height) * 2 + 1;
+            raycaster.setFromCamera(pointerNdc, camera);
+            const hit = raycaster.intersectObjects(markerEntries.map(entry => entry.marker))[0];
+            if (hit) window.selectMapStop(hit.object.userData.index);
+        });
+        canvas.addEventListener('pointermove', event => {
+            const bounds = canvas.getBoundingClientRect();
+            pointerNdc.x = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
+            pointerNdc.y = -((event.clientY - bounds.top) / bounds.height) * 2 + 1;
+            raycaster.setFromCamera(pointerNdc, camera);
+            const hovered = raycaster.intersectObjects(markerEntries.map(entry => entry.marker))[0];
+            canvas.style.cursor = hovered ? 'pointer' : 'default';
+        });
+
+        function resizeMap() {
+            const bounds = canvas.getBoundingClientRect();
+            if (!bounds.width || !bounds.height) return;
+            renderer.setSize(bounds.width, bounds.height, false);
+            camera.aspect = bounds.width / bounds.height;
+            camera.updateProjectionMatrix();
+            renderRailDay(activeDay, true);
+        }
+
+        const resizeObserver = new ResizeObserver(resizeMap);
+        resizeObserver.observe(canvas);
+        window.addEventListener('resize', resizeMap);
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        renderRailDay(0);
+        resizeMap();
+        updateCountdown();
+        window.setInterval(updateCountdown, 1000);
+
+        function animateMap() {
+            const delta = Math.min(animationClock.getDelta(), 0.05);
+            if (activeJourney && trainCars[0] && activeJourney.to > activeJourney.from) {
+                journeyProgress = (journeyProgress + delta * 0.045) % 2;
+                const progress = journeyProgress <= 1 ? journeyProgress : 2 - journeyProgress;
+                const curve = railCurves[activeJourney.from];
+                if (curve) {
+                    const point = curve.getPoint(progress);
+                    const tangent = curve.getTangent(progress);
+                    trainCars[0].position.copy(point).setZ(0.35);
+                    trainCars[0].rotation.z = Math.atan2(tangent.y, tangent.x) + (journeyProgress > 1 ? Math.PI : 0);
+                }
+            }
+            renderer.render(scene, camera);
+        }
+        if (!reduceMotion) renderer.setAnimationLoop(animateMap);
+    </script>
+</body>
+</html>
