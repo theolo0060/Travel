@@ -75,19 +75,27 @@
             width: min(390px, 42%);
         }
         @media (max-width: 767px) {
-            .trip-hero { min-height: 0; display: flex; flex-direction: column; gap: .75rem; padding-bottom: 1rem; }
-            #route-canvas { inset: 48% 0 auto; width: 100%; height: 190px; opacity: .65; }
-            .map-copy { position: relative; left: auto; width: 100%; padding: 1.5rem 1rem 0; }
-            .map-copy h2 { max-width: 100%; font-size: 2rem; }
+            .trip-hero {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr);
+                gap: 1rem;
+                min-height: 0;
+                padding: 1.25rem 1rem;
+            }
+            #route-canvas { position: relative; inset: auto; grid-row: 3; width: 100%; height: 210px; opacity: .9; }
+            .map-copy { position: relative; inset: auto; grid-row: 1; width: 100%; padding: 0; }
+            .map-copy h2 { max-width: 100%; font-size: 2.25rem; }
             .map-copy > p:nth-of-type(2) { max-width: 100%; }
-            #map-controls { position: relative; inset: auto; width: auto; margin: 0 1rem; }
-            #map-days { justify-content: flex-start; }
-            #map-stop-list { justify-content: flex-start; max-height: 84px; }
-            #map-hint { text-align: left; }
-            #map-stop-card { position: relative; inset: auto; width: auto; margin: 0 1rem; }
+            #map-controls { position: relative; inset: auto; grid-row: 2; width: 100%; }
+            #map-days, #map-stop-list { justify-content: flex-start; }
+            #map-stop-card { position: relative; inset: auto; grid-row: 4; width: 100%; }
+            .day-header { align-items: flex-start; flex-direction: column; }
+            .day-header-meta { align-items: flex-start; }
+        }
+        @media (max-width: 420px) {
             main { padding-left: .75rem !important; padding-right: .75rem !important; }
-            .day-heading { align-items: stretch; }
-            .day-heading-meta { align-items: flex-start; }
+            .day-summary { align-items: flex-start; }
+            .day-summary > div:last-child { text-align: left; }
         }
         .day-summary {
             display: flex;
@@ -182,7 +190,7 @@
             <div id="trip-budget" class="mt-4 inline-flex items-center gap-2 rounded-full border border-amber-200/30 bg-amber-300/10 px-3 py-1.5 text-xs font-semibold text-amber-100" aria-live="polite">計算五日預算中…</div>
             <details class="mt-3 max-w-md rounded-lg border border-white/15 bg-slate-950/40 px-3 py-2 text-[11px] leading-relaxed text-slate-200 pointer-events-auto">
                 <summary class="cursor-pointer font-semibold text-cyan-100">隱私與外部服務</summary>
-                <p class="mt-2">打卡、自選行程與自訂景點存於此瀏覽器的 localStorage；本頁程式不會將它們傳送出去，但第三方 JavaScript 會在本頁權限下執行。頁面會向 Tailwind、Font Awesome、jsDelivr（Three.js）請求程式／圖示，服務商可收到一般連線資料（如 IP）。開啟 Google 地圖會將所選地點與路線傳給 Google。已停用 referrer 傳送。</p>
+                <p class="mt-2">打卡與自選行程存於此瀏覽器的 localStorage；本頁程式不會將它們傳送出去，但第三方 JavaScript 會在本頁權限下執行。頁面會向 Tailwind、Font Awesome、jsDelivr（Three.js）請求程式／圖示，服務商可收到一般連線資料（如 IP）。開啟 Google 地圖會將所選地點與路線傳給 Google。已停用 referrer 傳送。</p>
             </details>
         </div>
         <div id="map-controls">
@@ -217,35 +225,6 @@
 
     <!-- Main Content Area -->
     <main class="max-w-5xl mx-auto px-4 py-6">
-        <details class="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <summary class="cursor-pointer list-none font-bold text-slate-900"><i class="fa-solid fa-circle-plus mr-2 text-blue-600"></i>新增自訂景點</summary>
-            <form class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2" onsubmit="addCustomSpot(event)">
-                <label class="text-xs font-semibold text-slate-700">加入日期
-                    <select name="day" class="mt-1 block min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm" required>
-                        <option value="day1">Day 1（週四）</option><option value="day2">Day 2（週五）</option><option value="day3">Day 3（週六）</option><option value="day4">Day 4（週日）</option><option value="day5">Day 5（週一）</option>
-                    </select>
-                </label>
-                <label class="text-xs font-semibold text-slate-700">景點名稱
-                    <input name="title" maxlength="80" class="mt-1 block min-h-11 w-full rounded-lg border border-slate-300 px-3 text-sm" placeholder="例如：熱海梅園" required>
-                </label>
-                <label class="text-xs font-semibold text-slate-700">地點（供地圖搜尋）
-                    <input name="location" maxlength="120" class="mt-1 block min-h-11 w-full rounded-lg border border-slate-300 px-3 text-sm" placeholder="例如：Atami Plum Garden" required>
-                </label>
-                <label class="text-xs font-semibold text-slate-700">時間
-                    <input name="time" maxlength="30" class="mt-1 block min-h-11 w-full rounded-lg border border-slate-300 px-3 text-sm" placeholder="例如：14:00 - 15:30">
-                </label>
-                <label class="text-xs font-semibold text-slate-700">交通方式
-                    <input name="transit" maxlength="60" class="mt-1 block min-h-11 w-full rounded-lg border border-slate-300 px-3 text-sm" placeholder="例如：步行 / 巴士">
-                </label>
-                <label class="text-xs font-semibold text-slate-700">預算（日圓）
-                    <input name="price" type="number" min="0" max="1000000" step="100" value="0" class="mt-1 block min-h-11 w-full rounded-lg border border-slate-300 px-3 text-sm" inputmode="numeric">
-                </label>
-                <label class="text-xs font-semibold text-slate-700 sm:col-span-2">備註
-                    <textarea name="note" maxlength="300" rows="2" class="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="補充說明（選填）"></textarea>
-                </label>
-                <button type="submit" class="min-h-11 rounded-lg bg-blue-700 px-4 text-sm font-bold text-white hover:bg-blue-800 sm:col-span-2"><i class="fa-solid fa-plus mr-1"></i>加入行程</button>
-            </form>
-        </details>
 
         <!-- TAB: Strategy & Tickets -->
         <section id="tab-strategy" class="tab-content">
@@ -326,17 +305,18 @@
 
         <!-- TAB: Day 1 -->
         <section id="tab-day1" class="tab-content hidden">
-            <div class="day-heading flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
-                <div class="min-w-0">
+            <div class="day-header flex items-center justify-between mb-4">
+                <div>
                     <h2 class="text-lg font-bold text-slate-900">Day 1（週四）：羽田機場 ➔ 熱海海洋風情與溫泉老街</h2>
                     <p class="text-xs text-slate-500">亮點：熱海海鮮丼、熱海布丁、來宮神社神木、MOA美術館</p>
                 </div>
-                <div class="day-heading-meta flex flex-col items-start gap-2 sm:items-end">
+                <div class="day-header-meta flex flex-col items-end gap-2">
                     <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">宿：熱海來宮之湯松月日式旅館</span>
                     <a id="day-route-day1" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-route mr-1"></i>Google 地圖一日路線</a>
                 </div>
             </div>
             <div class="day-summary" id="summary-day1" aria-live="polite"></div>
+            <div id="custom-stop-form-day1" class="mb-4"></div>
             <div class="flex justify-end mb-3"><button onclick="toggleOptions('day1')" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-circle-plus mr-1"></i>探索更多玩法</button></div>
             <div class="space-y-4" id="timeline-day1">
                 <!-- Items populated dynamically or static cards with interactive checkboxes -->
@@ -346,17 +326,18 @@
 
         <!-- TAB: Day 2 -->
         <section id="tab-day2" class="tab-content hidden">
-            <div class="day-heading flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
-                <div class="min-w-0">
+            <div class="day-header flex items-center justify-between mb-4">
+                <div>
                     <h2 class="text-lg font-bold text-slate-900">Day 2（週五）：初島離島巡禮 & 大室山火山口散策</h2>
                     <p class="text-xs text-slate-500">亮點：初島海鮮食堂街、伊豆高原、大室山登山纜車與火山口步道</p>
                 </div>
-                <div class="day-heading-meta flex flex-col items-start gap-2 sm:items-end">
+                <div class="day-header-meta flex flex-col items-end gap-2">
                     <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">宿：熱海來宮之湯松月日式旅館</span>
                     <a id="day-route-day2" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-route mr-1"></i>Google 地圖一日路線</a>
                 </div>
             </div>
             <div class="day-summary" id="summary-day2" aria-live="polite"></div>
+            <div id="custom-stop-form-day2" class="mb-4"></div>
             <div class="flex justify-end mb-3"><button onclick="toggleOptions('day2')" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-circle-plus mr-1"></i>探索更多玩法</button></div>
             <div class="space-y-4" id="timeline-day2"></div>
             <div class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 gap-3" id="options-day2"></div>
@@ -364,17 +345,18 @@
 
         <!-- TAB: Day 3 -->
         <section id="tab-day3" class="tab-content hidden">
-            <div class="day-heading flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
-                <div class="min-w-0">
+            <div class="day-header flex items-center justify-between mb-4">
+                <div>
                     <h2 class="text-lg font-bold text-slate-900">Day 3（週六）：熱海 ➔ 城崎海岸、伊豆高原、下田</h2>
                     <p class="text-xs text-slate-500">亮點：城崎海岸門脇吊橋、伊豆高原散策、沿海列車風景</p>
                 </div>
-                <div class="day-heading-meta flex flex-col items-start gap-2 sm:items-end">
+                <div class="day-header-meta flex flex-col items-end gap-2">
                     <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">Day 3 晚住宿：下田海濱酒店</span>
                     <a id="day-route-day3" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-route mr-1"></i>Google 地圖一日路線</a>
                 </div>
             </div>
             <div class="day-summary" id="summary-day3" aria-live="polite"></div>
+            <div id="custom-stop-form-day3" class="mb-4"></div>
             <div class="flex justify-end mb-3"><button onclick="toggleOptions('day3')" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-circle-plus mr-1"></i>探索更多玩法</button></div>
             <div class="space-y-4" id="timeline-day3"></div>
             <div class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 gap-3" id="options-day3"></div>
@@ -382,17 +364,18 @@
 
         <!-- TAB: Day 4 -->
         <section id="tab-day4" class="tab-content hidden">
-            <div class="day-heading flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
-                <div class="min-w-0">
+            <div class="day-header flex items-center justify-between mb-4">
+                <div>
                     <h2 class="text-lg font-bold text-slate-900">Day 4（週日）：下田與南伊豆海岸巡禮</h2>
                     <p class="text-xs text-slate-500">亮點：佩里之路、下田公園、白濱海岸、龍宮窟；傍晚返回熱海住宿</p>
                 </div>
-                <div class="day-heading-meta flex flex-col items-start gap-2 sm:items-end">
+                <div class="day-header-meta flex flex-col items-end gap-2">
                     <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">Day 4 晚住宿：熱海大野屋酒店</span>
                     <a id="day-route-day4" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-route mr-1"></i>Google 地圖一日路線</a>
                 </div>
             </div>
             <div class="day-summary" id="summary-day4" aria-live="polite"></div>
+            <div id="custom-stop-form-day4" class="mb-4"></div>
             <div class="flex justify-end mb-3"><button onclick="toggleOptions('day4')" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-circle-plus mr-1"></i>探索更多玩法</button></div>
             <div class="space-y-4" id="timeline-day4"></div>
             <div class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 gap-3" id="options-day4"></div>
@@ -400,17 +383,18 @@
 
         <!-- TAB: Day 5 -->
         <section id="tab-day5" class="tab-content hidden">
-            <div class="day-heading flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
-                <div class="min-w-0">
+            <div class="day-header flex items-center justify-between mb-4">
+                <div>
                     <h2 class="text-lg font-bold text-slate-900">Day 5（週一）：熱海 ➔ 成田機場（NRT）返程</h2>
                     <p class="text-xs text-slate-500">早上先在熱海站周邊購物，再經東京前往成田；建議預訂 18:00 後航班</p>
                 </div>
-                <div class="day-heading-meta flex flex-col items-start gap-2 sm:items-end">
+                <div class="day-header-meta flex flex-col items-end gap-2">
                     <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full">班機：建議 18:00 後起飛</span>
                     <a id="day-route-day5" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-route mr-1"></i>Google 地圖一日路線</a>
                 </div>
             </div>
             <div class="day-summary" id="summary-day5" aria-live="polite"></div>
+            <div id="custom-stop-form-day5" class="mb-4"></div>
             <div class="flex justify-end mb-3"><button onclick="toggleOptions('day5')" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-circle-plus mr-1"></i>探索更多玩法</button></div>
             <div class="space-y-4" id="timeline-day5"></div>
             <div class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 gap-3" id="options-day5"></div>
@@ -551,16 +535,15 @@
             return `¥${Math.round(amount).toLocaleString('en-US')}`;
         }
 
+        function formatPrice(price) {
+            if (price.min === price.max) return formatYen(price.min);
+            return `${formatYen(price.min)}–${formatYen(price.max)}`;
+        }
+
         function escapeHtml(value) {
             return String(value ?? '').replace(/[&<>"']/g, character => ({
                 '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
             })[character]);
-        }
-        window.escapeHtml = escapeHtml;
-
-        function formatPrice(price) {
-            if (price.min === price.max) return formatYen(price.min);
-            return `${formatYen(price.min)}–${formatYen(price.max)}`;
         }
 
         function googleDirectionsUrl(origin, destination, waypoints = []) {
@@ -602,10 +585,10 @@
             return (localStorage.getItem(`trip-options-${dayKey}`) || '').split(',').filter(Boolean);
         }
 
-        function customSpots(dayKey) {
+        function customStops(dayKey) {
             try {
-                const spots = JSON.parse(localStorage.getItem(`trip-custom-${dayKey}`) || '[]');
-                return Array.isArray(spots) ? spots : [];
+                const stops = JSON.parse(localStorage.getItem(`trip-custom-stops-${dayKey}`) || '[]');
+                return Array.isArray(stops) ? stops.filter(stop => stop && stop.custom === true) : [];
             } catch {
                 return [];
             }
@@ -615,9 +598,68 @@
             const selected = new Set(addedOptions(dayKey));
             return itineraryData[dayKey]
                 .concat(dayOptions[dayKey].filter(item => selected.has(item.id)))
-                .concat(customSpots(dayKey));
+                .concat(customStops(dayKey));
         }
-        window.selectedDayItems = selectedDayItems;
+
+        function renderCustomStopForm(dayKey) {
+            const container = document.getElementById(`custom-stop-form-${dayKey}`);
+            if (!container) return;
+            container.innerHTML = `
+                <details class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                    <summary class="cursor-pointer font-bold text-sm text-slate-800"><i class="fa-solid fa-circle-plus mr-2 text-emerald-600"></i>新增自訂景點</summary>
+                    <form class="mt-4 space-y-3" data-custom-stop-form="${dayKey}">
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="col-span-2 text-xs font-semibold text-slate-600 sm:col-span-1">景點名稱
+                                <input name="title" required maxlength="80" class="mt-1 w-full min-w-0 rounded-lg border border-slate-300 px-3 py-2 text-base text-slate-800" placeholder="例如：海邊咖啡館">
+                            </label>
+                            <label class="col-span-2 text-xs font-semibold text-slate-600 sm:col-span-1">地圖搜尋地點
+                                <input name="location" required maxlength="120" class="mt-1 w-full min-w-0 rounded-lg border border-slate-300 px-3 py-2 text-base text-slate-800" placeholder="地址或 Google 地圖可搜尋的名稱">
+                            </label>
+                            <label class="text-xs font-semibold text-slate-600">時間
+                                <input name="time" maxlength="30" value="彈性安排" class="mt-1 w-full min-w-0 rounded-lg border border-slate-300 px-3 py-2 text-base text-slate-800">
+                            </label>
+                            <label class="text-xs font-semibold text-slate-600">交通方式
+                                <input name="transit" maxlength="40" value="步行／自行安排" class="mt-1 w-full min-w-0 rounded-lg border border-slate-300 px-3 py-2 text-base text-slate-800">
+                            </label>
+                            <label class="text-xs font-semibold text-slate-600">最低預算（日圓）
+                                <input name="min" type="number" min="0" max="1000000" step="1" value="0" inputmode="numeric" class="mt-1 w-full min-w-0 rounded-lg border border-slate-300 px-3 py-2 text-base text-slate-800">
+                            </label>
+                            <label class="text-xs font-semibold text-slate-600">最高預算（日圓）
+                                <input name="max" type="number" min="0" max="1000000" step="1" value="0" inputmode="numeric" class="mt-1 w-full min-w-0 rounded-lg border border-slate-300 px-3 py-2 text-base text-slate-800">
+                            </label>
+                            <label class="col-span-2 text-xs font-semibold text-slate-600">備註
+                                <textarea name="note" maxlength="280" rows="2" class="mt-1 w-full min-w-0 resize-y rounded-lg border border-slate-300 px-3 py-2 text-base text-slate-800" placeholder="營業時間、預約資訊或提醒（選填）"></textarea>
+                            </label>
+                        </div>
+                        <button type="submit" class="inline-flex min-h-11 items-center gap-2 rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800"><i class="fa-solid fa-plus"></i>加入今日行程</button>
+                    </form>
+                </details>`;
+            container.querySelector('form').addEventListener('submit', event => {
+                event.preventDefault();
+                const form = event.currentTarget;
+                const values = new FormData(form);
+                const min = Number(values.get('min')) || 0;
+                const max = Number(values.get('max')) || 0;
+                if (max < min) {
+                    form.elements.max.setCustomValidity('最高預算不可低於最低預算');
+                    form.elements.max.reportValidity();
+                    form.elements.max.addEventListener('input', () => form.elements.max.setCustomValidity(''), { once: true });
+                    return;
+                }
+                const stop = {
+                    id: `custom-${dayKey}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+                    custom: true,
+                    time: String(values.get('time')).trim() || '彈性安排',
+                    title: String(values.get('title')).trim(),
+                    transit: String(values.get('transit')).trim() || '自行安排',
+                    note: String(values.get('note')).trim() || '自訂景點',
+                    location: String(values.get('location')).trim(),
+                    price: { min, max, note: '自訂預算估算' }
+                };
+                localStorage.setItem(`trip-custom-stops-${dayKey}`, JSON.stringify(customStops(dayKey).concat(stop)));
+                initApp();
+            });
+        }
 
         function renderDaySummary(dayKey) {
             const items = selectedDayItems(dayKey);
@@ -646,11 +688,10 @@
             container.innerHTML = items.map(item => {
                 const isChecked = localStorage.getItem(item.id) === 'true';
                 const isOptional = dayOptions[dayKey].some(option => option.id === item.id);
-                const isCustom = customSpots(dayKey).some(spot => spot.id === item.id);
-                const coreStops = itineraryData[dayKey];
-                const stopIndex = coreStops.findIndex(stop => stop.id === item.id);
-                const nextStop = !isOptional && stopIndex >= 0
-                    ? coreStops.slice(stopIndex + 1).find(stop => stop.location !== item.location)
+                const isCustom = item.custom === true;
+                const stopIndex = items.findIndex(stop => stop.id === item.id);
+                const nextStop = stopIndex >= 0
+                    ? items.slice(stopIndex + 1).find(stop => stop.location !== item.location)
                     : null;
                 const mapsUrl = nextStop
                     ? googleDirectionsUrl(item.location, nextStop.location)
@@ -662,25 +703,25 @@
 
                 return `
                     <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200/80 transition hover:shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-3 ${isOptional || isCustom ? 'optional-card' : ''}">
-                        <div class="flex items-start gap-3 w-full md:w-auto">
-                            <input type="checkbox" id="${item.id}" onchange="toggleCheck('${item.id}')" ${isChecked ? 'checked' : ''} class="mt-1 w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 shrink-0 cursor-pointer">
-                            <div class="${isChecked ? 'line-through text-slate-400' : ''}">
-                                <div class="flex items-center gap-2">
+                        <div class="flex min-w-0 items-start gap-3 w-full md:w-auto">
+                            <input type="checkbox" id="${escapeHtml(item.id)}" onchange="toggleCheck('${escapeHtml(item.id)}')" ${isChecked ? 'checked' : ''} class="mt-1 w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 shrink-0 cursor-pointer">
+                            <div class="min-w-0 ${isChecked ? 'line-through text-slate-400' : ''}">
+                                <div class="flex flex-wrap items-center gap-2">
                                     <span class="text-xs font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">${escapeHtml(item.time)}</span>
                                     <span class="text-xs text-indigo-600 font-medium"><i class="fa-solid fa-van-shuttle mr-1"></i>${escapeHtml(item.transit)}</span>
                                 </div>
-                                <h3 class="font-bold text-slate-900 text-base mt-1">${escapeHtml(item.title)}</h3>
-                                <p class="text-xs text-slate-600 mt-1 leading-relaxed">${escapeHtml(item.note)}</p>
+                                <h3 class="break-words font-bold text-slate-900 text-base mt-1">${escapeHtml(item.title)}</h3>
+                                <p class="break-words text-xs text-slate-600 mt-1 leading-relaxed">${escapeHtml(item.note)}</p>
                                 <p class="text-[11px] text-slate-500 mt-2">${escapeHtml(item.price.note)}</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2 self-end md:self-center shrink-0">
+                        <div class="flex flex-wrap items-center justify-end gap-2 self-stretch md:self-center shrink-0">
                             <span class="price-badge"><i class="fa-solid fa-yen-sign"></i>${formatPrice(item.price)}</span>
-                            <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" aria-label="${mapDescription}" title="${mapDescription} · 開啟後會將地點傳送給 Google 地圖" class="text-xs bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 px-3 py-1.5 rounded-lg border border-slate-200 transition flex items-center gap-1 font-medium">
+                            <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(mapDescription)}" title="${escapeHtml(mapDescription)} · 開啟後會將地點傳送給 Google 地圖" class="text-xs bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 px-3 py-1.5 rounded-lg border border-slate-200 transition flex items-center gap-1 font-medium">
                                 <i class="fa-solid ${nextStop ? 'fa-route' : 'fa-location-dot'} text-red-500"></i> ${mapLabel}
                             </a>
-                            ${isOptional ? `<button onclick="toggleOption('${dayKey}', '${item.id}')" class="min-h-11 px-2 text-xs text-rose-600 hover:text-rose-800" aria-label="從${dayNames[dayKey]}移除此選項">移除</button>` : ''}
-                            ${isCustom ? `<button onclick="removeCustomSpot('${dayKey}', '${item.id}')" class="min-h-11 px-2 text-xs text-rose-600 hover:text-rose-800" aria-label="從${dayNames[dayKey]}移除此自訂景點">移除</button>` : ''}
+                            ${isOptional ? `<button onclick="toggleOption('${dayKey}', '${item.id}')" class="min-h-11 px-2 py-1.5 text-xs text-rose-600 hover:text-rose-800" aria-label="從${dayNames[dayKey]}移除此選項">移除</button>` : ''}
+                            ${isCustom ? `<button onclick="removeCustomStop('${dayKey}', '${escapeHtml(item.id)}')" class="min-h-11 px-2 py-1.5 text-xs text-rose-600 hover:text-rose-800" aria-label="從${dayNames[dayKey]}移除此自訂景點">移除</button>` : ''}
                         </div>
                     </div>
                 `;
@@ -715,40 +756,10 @@
             initApp();
         }
 
-        function addCustomSpot(event) {
-            event.preventDefault();
-            const form = event.currentTarget;
-            const values = new FormData(form);
-            const dayKey = values.get('day');
-            const title = String(values.get('title') || '').trim();
-            const location = String(values.get('location') || '').trim();
-            if (!itineraryData[dayKey] || !title || !location) return;
-            const amount = Math.max(0, Math.round(Number(values.get('price')) || 0));
-            const spot = {
-                id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-                time: String(values.get('time') || '').trim() || '彈性安排',
-                title,
-                transit: String(values.get('transit') || '').trim() || '依行程安排',
-                note: String(values.get('note') || '').trim(),
-                location,
-                price: { min: amount, max: amount, note: '自訂預算' }
-            };
-            try {
-                localStorage.setItem(`trip-custom-${dayKey}`, JSON.stringify([...customSpots(dayKey), spot]));
-            } catch {
-                alert('無法儲存景點，請確認瀏覽器的本機儲存空間。');
-                return;
-            }
-            form.reset();
-            switchTab(`tab-${dayKey}`);
-            initApp();
-        }
-
-        function removeCustomSpot(dayKey, spotId) {
-            localStorage.setItem(`trip-custom-${dayKey}`, JSON.stringify(
-                customSpots(dayKey).filter(spot => spot.id !== spotId)
-            ));
-            localStorage.removeItem(spotId);
+        function removeCustomStop(dayKey, stopId) {
+            const stops = customStops(dayKey).filter(stop => stop.id !== stopId);
+            localStorage.setItem(`trip-custom-stops-${dayKey}`, JSON.stringify(stops));
+            localStorage.removeItem(stopId);
             initApp();
         }
 
@@ -784,8 +795,7 @@
                         localStorage.removeItem(item.id);
                     });
                     dayOptions[key].forEach(item => localStorage.removeItem(item.id));
-                    customSpots(key).forEach(item => localStorage.removeItem(item.id));
-                    localStorage.removeItem(`trip-custom-${key}`);
+                    customStops(key).forEach(item => localStorage.removeItem(item.id));
                     localStorage.removeItem(`trip-options-${key}`);
                 });
                 initApp();
@@ -795,6 +805,7 @@
         // Initialize App Function
         function initApp() {
             Object.keys(itineraryData).forEach((dayKey, index) => {
+                renderCustomStopForm(dayKey);
                 renderDayTimeline(dayKey, `timeline-day${index + 1}`);
                 renderDaySummary(dayKey);
                 renderOptions(dayKey);
@@ -836,7 +847,7 @@
         let selectedMapStop = null;
         function stopsForDay(dayIndex) {
             const dayKey = `day${dayIndex + 1}`;
-            return window.selectedDayItems(dayKey);
+            return selectedDayItems(dayKey);
         }
 
         function legacyMapRenderDay(dayIndex, preserveSelection = false) {
@@ -888,7 +899,7 @@
             document.getElementById('map-stop-list').innerHTML = stops.map((stop, index) => `
                 <button type="button" data-map-stop-index="${index}" onclick="selectMapStop(${index})"
                     class="rounded-full border border-white/25 bg-slate-900/60 px-2.5 py-1 text-[10px] text-white hover:bg-white/20"
-                    aria-label="選擇地圖景點：${window.escapeHtml(stop.title)}，${window.escapeHtml(stop.time)}" aria-pressed="false">${window.escapeHtml(stop.title)}</button>`).join('');
+                    aria-label="選擇地圖景點：${escapeHtml(stop.title)}，${escapeHtml(stop.time)}" aria-pressed="false">${escapeHtml(stop.title)}</button>`).join('');
 
             uniqueStops.forEach(({ stop, index, point }) => {
                 const marker = new THREE.Mesh(
@@ -1143,8 +1154,8 @@
             if (nextStop) {
                 const mode = transportFor(nextStop);
                 const minutes = estimatedMinutes(nextStop, mode);
-                detail.innerHTML = `<span class="block">${dayNames[`day${activeDay + 1}`]} · ${window.escapeHtml(stop.time)} · ${formatPrice(stop.price)}</span>
-                    <span class="mt-1 block font-semibold text-white"><i class="fa-solid ${mode.icon} mr-1 text-cyan-200"></i>${window.escapeHtml(mode.label)} → ${window.escapeHtml(nextStop.title)}</span>
+                detail.innerHTML = `<span class="block">${dayNames[`day${activeDay + 1}`]} · ${escapeHtml(stop.time)} · ${formatPrice(stop.price)}</span>
+                    <span class="mt-1 block font-semibold text-white"><i class="fa-solid ${mode.icon} mr-1 text-cyan-200"></i>${escapeHtml(mode.label)} → ${escapeHtml(nextStop.title)}</span>
                     <span class="mt-1 block text-amber-200">預估剩餘車程：約 ${minutes} 分鐘（非即時概算）</span>`;
                 activeJourney = {
                     from: stopStationIndices[index],
@@ -1160,7 +1171,7 @@
                     trainCars[0].rotation.z = Math.atan2(tangent.y, tangent.x);
                 }
             } else {
-                detail.innerHTML = `<span class="block">${dayNames[`day${activeDay + 1}`]} · ${window.escapeHtml(stop.time)} · ${formatPrice(stop.price)}</span>
+                detail.innerHTML = `<span class="block">${dayNames[`day${activeDay + 1}`]} · ${escapeHtml(stop.time)} · ${formatPrice(stop.price)}</span>
                     <span class="mt-1 block font-semibold text-white">今日最後一站 · 行程已抵達</span>`;
                 activeJourney = null;
                 if (trainCars[0]) trainCars[0].visible = false;
@@ -1260,7 +1271,7 @@
             document.getElementById('map-stop-list').innerHTML = stops.map((stop, index) => `
                 <button type="button" data-map-stop-index="${index}" onclick="selectMapStop(${index})"
                     class="rounded-full border border-white/25 bg-slate-900/60 px-2.5 py-1 text-[10px] text-white hover:bg-white/20"
-                    aria-label="選擇旅程站點：${window.escapeHtml(stop.title)}，${window.escapeHtml(stop.time)}" aria-pressed="false">${window.escapeHtml(stop.title)}</button>`).join('');
+                    aria-label="選擇旅程站點：${escapeHtml(stop.title)}，${escapeHtml(stop.time)}" aria-pressed="false">${escapeHtml(stop.title)}</button>`).join('');
 
             uniqueStops.forEach(([location, stationIndex]) => {
                 const point = stationPoints[stationIndex];
