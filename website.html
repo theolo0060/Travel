@@ -1,1256 +1,1157 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
+<!doctype html>
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="referrer" content="no-referrer">
-    <title>熱海 & 伊豆 5天4夜深度遊 | 互動行程 App</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background-color: #f8fafc;
-        }
-        html { scroll-behavior: smooth; }
-        .hide-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .hide-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        .trip-hero {
-            position: relative;
-            min-height: 720px;
-            overflow: hidden;
-            isolation: isolate;
-            background: radial-gradient(ellipse at 78% 55%, #185981 0, #122c50 35%, #0b172c 78%);
-        }
-        #route-canvas {
-            position: absolute;
-            inset: 205px 0 185px 34%;
-            z-index: 1;
-            width: 66%;
-            height: calc(100% - 390px);
-            opacity: .95;
-            cursor: default;
-            touch-action: manipulation;
-        }
-        .map-copy {
-            position: absolute;
-            z-index: 2;
-            top: 0;
-            left: clamp(1rem, 4vw, 3.5rem);
-            width: min(34%, 410px);
-            padding: 4rem 1.25rem;
-            pointer-events: none;
-        }
-        .map-copy a, .map-copy button { pointer-events: auto; }
-        #map-controls {
-            position: absolute;
-            z-index: 3;
-            inset: 1.25rem 1.25rem auto auto;
-            width: min(540px, 56%);
-            pointer-events: none;
-        }
-        #map-controls button, #map-stop-card, #map-hint { pointer-events: auto; }
-        #map-stop-list {
-            max-height: 92px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            padding: .4rem;
-            border: 1px solid rgb(255 255 255 / 14%);
-            border-radius: .85rem;
-            background: rgb(2 12 27 / 55%);
-            backdrop-filter: blur(8px);
-        }
-        #map-stop-card {
-            position: absolute;
-            z-index: 3;
-            right: 1.25rem;
-            bottom: 1.25rem;
-            width: min(390px, 42%);
-        }
-        @media (max-width: 767px) {
-            .trip-hero {
-                display: grid;
-                grid-template-columns: minmax(0, 1fr);
-                gap: 1rem;
-                min-height: 0;
-                padding: 1.25rem 1rem;
-            }
-            #route-canvas { position: relative; inset: auto; grid-row: 3; width: 100%; height: 210px; opacity: .9; }
-            .map-copy { position: relative; inset: auto; grid-row: 1; width: 100%; padding: 0; }
-            .map-copy h2 { max-width: 100%; font-size: 2.25rem; }
-            .map-copy > p:nth-of-type(2) { max-width: 100%; }
-            #map-controls { position: relative; inset: auto; grid-row: 2; width: 100%; }
-            #map-days, #map-stop-list { justify-content: flex-start; }
-            #map-stop-card { position: relative; inset: auto; grid-row: 4; width: 100%; }
-            .day-header { align-items: flex-start; flex-direction: column; }
-            .day-header-meta { align-items: flex-start; }
-        }
-        @media (max-width: 420px) {
-            main { padding-left: .75rem !important; padding-right: .75rem !important; }
-            .day-summary { align-items: flex-start; }
-            .day-summary > div:last-child { text-align: left; }
-        }
-        .day-summary {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: .75rem;
-            margin: 1rem 0;
-            padding: .85rem 1rem;
-            border: 1px solid #dbeafe;
-            border-radius: 1rem;
-            background: linear-gradient(110deg, #eff6ff, #fff 70%);
-        }
-        .price-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: .35rem;
-            padding: .25rem .6rem;
-            border-radius: 999px;
-            color: #075985;
-            background: #e0f2fe;
-            font-size: .75rem;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-        .optional-card { border-style: dashed !important; }
-        @media (prefers-reduced-motion: reduce) {
-            html { scroll-behavior: auto; }
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#eaf6f5">
+  <meta name="description" content="冲绳那霸两日互动行程：时间轴、路线、预算和出行提醒。">
+  <title>冲绳那霸 · 两日行程</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #123b4a;
+      --muted: #587982;
+      --paper: #edf7f6;
+      --card: #fbffff;
+      --line: #d3e8e8;
+      --green: #087e8b;
+      --green-soft: #dff2ef;
+      --coral: #e98263;
+      --sand: #e1f1ef;
+      --yellow: #f1c96b;
+      --shadow: 0 12px 32px rgb(15 70 82 / 8%);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-synthesis: none;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--paper); color: var(--ink); }
+    button, a { font: inherit; }
+    a { color: inherit; }
+    button:focus-visible, a:focus-visible, input:focus-visible + span {
+      outline: 3px solid #23aeb1;
+      outline-offset: 3px;
+    }
+    .shell { max-width: 1320px; margin: auto; padding: 28px 36px 64px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 30px; }
+    .brand { display: flex; gap: 12px; align-items: center; font-weight: 760; letter-spacing: -.03em; }
+    .brand-mark { width: 38px; height: 38px; display: grid; place-items: center; background: linear-gradient(145deg, #11a6a8, #08718b); color: white; border-radius: 13px; }
+    .top-links { display: flex; gap: 22px; color: var(--muted); font-size: 13px; }
+    .top-links a { text-decoration: none; }
+    .hero { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(300px, .75fr); gap: 22px; align-items: stretch; margin-bottom: 18px; }
+    .hero-main { min-height: 270px; padding: 38px 42px; border-radius: 26px; position: relative; overflow: hidden; color: white; background: linear-gradient(115deg, #103f58 0%, #087e8b 55%, #32b9b1 100%); }
+    .hero-main::after { content: ""; position: absolute; width: 330px; height: 330px; right: 12%; top: -190px; border: 1px solid rgb(255 255 255 / 18%); border-radius: 50%; box-shadow: 0 0 0 34px rgb(255 255 255 / 6%), 0 0 0 70px rgb(255 255 255 / 5%); }
+    .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: .16em; font-weight: 750; opacity: .76; }
+    h1 { font-size: clamp(32px, 4vw, 52px); line-height: 1.1; letter-spacing: -.055em; margin: 18px 0 12px; }
+    .hero-main p { max-width: 520px; line-height: 1.7; color: rgb(255 255 255 / 83%); font-size: 14px; margin: 0; }
+    .hero-meta { position: absolute; bottom: 28px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .pill { font-size: 11px; font-weight: 650; padding: 8px 11px; border-radius: 99px; background: rgb(255 255 255 / 13%); border: 1px solid rgb(255 255 255 / 18%); }
+    .clock-card, .panel, .stat-card, .timeline-card { border: 1px solid var(--line); background: var(--card); box-shadow: var(--shadow); }
+    .clock-card { border-radius: 26px; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; }
+    .card-label { color: var(--muted); font-size: 11px; font-weight: 750; letter-spacing: .09em; text-transform: uppercase; }
+    .clock-day { font-size: 12px; color: var(--muted); margin-top: 21px; }
+    .clock-time { font-variant-numeric: tabular-nums; font-size: clamp(29px, 4vw, 40px); font-weight: 760; letter-spacing: -.04em; margin: 3px 0 1px; }
+    .clock-status { min-height: 20px; color: var(--muted); font-size: 12px; }
+    .clock-actions { display: flex; gap: 8px; margin-top: 18px; }
+    .button { border: 0; border-radius: 11px; padding: 10px 13px; cursor: pointer; font-size: 12px; font-weight: 700; }
+    .button-primary { background: var(--green); color: #fff; }
+    .button-quiet { background: #e6f2f2; color: var(--ink); }
+    .notice { margin: 0 0 26px; border: 1px solid #b9dfe1; background: #e5f4f5; color: #315d69; padding: 13px 16px; border-radius: 14px; display: flex; gap: 10px; align-items: flex-start; font-size: 12px; line-height: 1.65; }
+    .notice strong { color: #174e60; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 13px; margin-bottom: 27px; }
+    .stat-card { box-shadow: none; border-radius: 17px; padding: 17px 18px; }
+    .stat-title { font-size: 11px; color: var(--muted); }
+    .stat-value { font-size: 17px; font-weight: 760; margin: 7px 0 3px; letter-spacing: -.03em; }
+    .stat-foot { font-size: 10px; color: var(--muted); }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 15px; margin: 33px 0 14px; }
+    .section-heading h2 { font-size: 20px; letter-spacing: -.04em; margin: 0; }
+    .section-heading p { color: var(--muted); font-size: 11px; margin: 5px 0 0; }
+    .day-switch { display: flex; background: #dceceb; border-radius: 12px; padding: 4px; gap: 3px; }
+    .day-tab { border: 0; background: transparent; padding: 9px 13px; border-radius: 9px; color: var(--muted); cursor: pointer; font-size: 11px; font-weight: 720; }
+    .day-tab[aria-selected="true"] { color: var(--ink); background: white; box-shadow: 0 2px 6px rgb(0 0 0 / 7%); }
+    .day-progress { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; margin: 0 0 13px; }
+    .progress-track { height: 6px; background: #dcebea; overflow: hidden; border-radius: 20px; margin-bottom: 21px; }
+    .progress-bar { height: 100%; width: 0; background: var(--green); border-radius: inherit; transition: width .25s ease; }
+    .timeline { position: relative; }
+    .timeline::before { content: ""; position: absolute; width: 1px; background: #b7d8d9; top: 14px; bottom: 14px; left: 78px; }
+    .timeline-row { display: grid; grid-template-columns: 61px 1fr; gap: 34px; position: relative; padding-bottom: 15px; }
+    .time-label { font-variant-numeric: tabular-nums; font-size: 11px; font-weight: 750; text-align: right; padding-top: 20px; color: var(--muted); }
+    .timeline-card { border-radius: 17px; box-shadow: none; padding: 17px 19px; transition: border-color .2s, transform .2s, box-shadow .2s; }
+    .timeline-row.is-current .timeline-card { border-color: #42afb2; box-shadow: 0 0 0 3px #d8f0ee; }
+    .timeline-row.is-done .timeline-card { background: #f0f8f7; }
+    .timeline-row.is-done .item-title { color: #728078; text-decoration: line-through; text-decoration-color: #9db1a4; }
+    .dot { position: absolute; width: 11px; height: 11px; left: 73px; top: 21px; border: 2px solid var(--paper); border-radius: 50%; background: #8bb9bb; z-index: 1; }
+    .is-current .dot { background: #19a7ad; box-shadow: 0 0 0 4px #d8f0ee; }
+    .card-top { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; }
+    .item-title { font-size: 14px; font-weight: 760; letter-spacing: -.02em; }
+    .item-place { color: var(--muted); font-size: 11px; margin-top: 5px; line-height: 1.55; }
+    .item-address { color: #78959a; font-size: 10px; margin-top: 3px; }
+    .item-icon { width: 34px; height: 34px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 11px; background: var(--green-soft); font-size: 15px; }
+    .item-details { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 13px; }
+    .detail-chip { display: inline-flex; gap: 5px; align-items: center; background: #edf6f5; padding: 6px 8px; border-radius: 8px; color: #42636b; font-size: 10px; }
+    .item-note { margin-top: 10px; font-size: 10px; line-height: 1.6; color: #8a6743; }
+    .item-footer { margin-top: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .map-link { display: inline-flex; align-items: center; gap: 5px; text-decoration: none; color: var(--green); font-size: 10px; font-weight: 760; }
+    .check-label { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: 10px; cursor: pointer; }
+    .check-label input { accent-color: var(--green); width: 15px; height: 15px; margin: 0; }
+    .lower-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 17px; margin-top: 28px; }
+    .panel { border-radius: 20px; padding: 22px; box-shadow: none; }
+    .panel h3 { font-size: 15px; margin: 0; letter-spacing: -.03em; }
+    .panel-sub { color: var(--muted); font-size: 10px; margin: 6px 0 17px; }
+    .route-flow { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; padding: 8px 0; }
+    .route-node { background: #e3f2f1; color: #155668; border-radius: 10px; padding: 9px 10px; font-size: 10px; font-weight: 720; }
+    .route-arrow { color: #82aeb2; font-size: 12px; }
+    .route-flow + .route-flow { border-top: 1px solid #e3eeee; }
+    .legend { color: var(--muted); font-size: 9px; margin-top: 13px; }
+    .budget-row { display: grid; grid-template-columns: 104px 1fr 100px; gap: 9px; align-items: center; margin: 13px 0; font-size: 10px; }
+    .budget-name { color: #3d6069; }
+    .budget-line { height: 7px; border-radius: 9px; background: #e5f0ef; overflow: hidden; }
+    .budget-line span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #39b9b1, #087e8b); }
+    .budget-amount { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+    .budget-total { display: flex; justify-content: space-between; border-top: 1px solid var(--line); margin-top: 15px; padding-top: 13px; font-size: 11px; font-weight: 760; }
+    .budget-foot { color: var(--muted); font-size: 9px; line-height: 1.6; margin-top: 11px; }
+    .reminders { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11px; margin-top: 16px; }
+    .reminder { background: #fff; border: 1px solid var(--line); border-radius: 15px; padding: 14px; }
+    .reminder-icon { font-size: 17px; }
+    .reminder h4 { font-size: 11px; margin: 8px 0 5px; }
+    .reminder p { font-size: 10px; line-height: 1.6; color: var(--muted); margin: 0; }
+    details.emergency { margin-top: 17px; border: 1px solid var(--line); border-radius: 16px; background: white; overflow: hidden; }
+    details.emergency summary { cursor: pointer; padding: 16px 18px; font-size: 12px; font-weight: 750; }
+    .emergency-body { padding: 0 18px 17px; color: #4d6c73; font-size: 11px; line-height: 1.75; }
+    .emergency-body ul { margin: 0; padding-left: 18px; }
+    .footer { margin-top: 28px; color: var(--muted); font-size: 10px; text-align: center; line-height: 1.7; }
+    .mobile-bar { display: none; }
+    [hidden] { display: none !important; }
+    .game-panel { margin: 0 0 30px; border-radius: 26px; padding: 22px; background: linear-gradient(145deg, #e0f2f1, #edf8f7); border: 1px solid #c6e4e3; overflow: hidden; }
+    .game-heading { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; margin: 2px 2px 16px; }
+    .game-heading h2 { font-size: 21px; letter-spacing: -.045em; margin: 0; }
+    .game-heading p { color: #52777c; font-size: 11px; line-height: 1.6; margin: 6px 0 0; }
+    .game-badge { background: #f7ffff; border: 1px solid #c6e4e3; color: #176275; border-radius: 99px; padding: 8px 11px; font-size: 10px; font-weight: 720; white-space: nowrap; }
+    .game-layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(260px, .75fr); gap: 14px; align-items: stretch; }
+    .scene-wrap { position: relative; min-height: 390px; overflow: hidden; background: #56b8d0; border: 4px solid #123f55; border-radius: 10px; box-shadow: inset 0 0 0 3px #a8e0db, 0 8px 0 #b7d9d7; }
+    #okinawa-scene { display: block; width: 100%; height: 100%; min-height: 390px; touch-action: none; image-rendering: pixelated; outline-offset: -6px; }
+    .scene-hint { position: absolute; top: 13px; left: 14px; padding: 7px 10px; border: 2px solid #123f55; border-radius: 4px; background: #e6f8f6; color: #123f55; font-size: 10px; font-weight: 720; box-shadow: 3px 3px 0 rgb(18 63 85 / 20%); }
+    .scene-hint strong { color: #087e8b; }
+    .scene-hud { position: absolute; top: 13px; right: 14px; padding: 7px 10px; border: 2px solid #123f55; border-radius: 4px; background: #e6f8f6; color: #123f55; font: 700 10px ui-monospace, monospace; box-shadow: 3px 3px 0 rgb(18 63 85 / 20%); }
+    .scene-interact { position: absolute; bottom: 76px; left: 50%; transform: translateX(-50%); border: 2px solid #123f55; border-radius: 4px; padding: 8px 12px; background: #e6f8f6; color: #123f55; font-size: 10px; font-weight: 800; box-shadow: 3px 3px 0 rgb(18 63 85 / 24%); cursor: pointer; touch-action: manipulation; }
+    .scene-interact:disabled { opacity: .7; cursor: not-allowed; }
+    .scene-interact:not(:disabled) { background: #9de0d8; }
+    .scene-controls { position: absolute; bottom: 13px; left: 50%; transform: translateX(-50%); display: flex; gap: 7px; padding: 6px; background: #d7f0ed; border: 3px solid #123f55; border-radius: 5px; box-shadow: 4px 4px 0 rgb(18 63 85 / 28%); }
+    .scene-controls button { border: 2px solid #123f55; border-radius: 4px; padding: 9px 13px; background: #a9dfd9; color: #123f55; font-size: 11px; font-weight: 800; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+    .scene-controls button:hover, .scene-controls button:active { background: #5fc2bd; transform: translateY(2px); }
+    .scene-error { position: absolute; inset: auto 14px 60px; padding: 10px 12px; background: rgb(255 255 255 / 90%); border-radius: 11px; font-size: 10px; color: #6b796f; }
+    .spot-card { position: relative; padding: 22px; border: 1px solid #cfe5e4; border-radius: 20px; background: #fbffff; display: flex; flex-direction: column; min-height: 360px; }
+    .spot-card.spot-pop { animation: spot-pop .32s cubic-bezier(.2,.8,.2,1); }
+    @keyframes spot-pop { 0% { opacity: .55; transform: translateY(9px) scale(.985); } 75% { transform: translateY(-2px) scale(1.005); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+    @media (prefers-reduced-motion: reduce) { .spot-card.spot-pop { animation: none; } }
+    .spot-kicker { font-size: 10px; font-weight: 760; color: #65888d; text-transform: uppercase; letter-spacing: .12em; }
+    .spot-card h3 { font-size: 20px; letter-spacing: -.04em; margin: 8px 0 2px; }
+    .spot-jp { font-size: 11px; color: var(--muted); }
+    .spot-summary { color: #45666d; font-size: 12px; line-height: 1.85; margin: 17px 0 12px; }
+    .spot-why { background: #eaf5f3; padding: 12px; border-radius: 12px; font-size: 11px; line-height: 1.7; color: #42666d; margin-top: auto; }
+    .spot-why strong { display: block; color: #116579; margin-bottom: 4px; }
+    .spot-status { margin-top: 11px; font-size: 10px; color: #658286; }
+    .spot-card .map-link { margin-top: 13px; }
+    .game-caption { color: #5c7e83; font-size: 9px; margin: 10px 3px 0; line-height: 1.6; }
+    .timeline-card[data-place] { cursor: help; }
+    .timeline-card[data-place]:hover { border-color: #83c4c3; }
+    @media (max-width: 860px) {
+      .game-layout { grid-template-columns: 1fr; }
+      .spot-card { min-height: 0; }
+      .spot-why { margin-top: 8px; }
+    }
+    @media (max-width: 860px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-main { min-height: 280px; }
+      .clock-card { min-height: 220px; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .lower-grid { grid-template-columns: 1fr; }
+      .reminders { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px) {
+      .shell { padding: 18px 15px 95px; }
+      .topbar { margin-bottom: 18px; }
+      .top-links { display: none; }
+      .hero-main { padding: 28px 24px; min-height: 290px; }
+      .hero-meta { bottom: 20px; }
+      .clock-card { padding: 20px; }
+      .notice { font-size: 11px; }
+      .stats { gap: 9px; }
+      .stat-card { padding: 13px; }
+      .stat-value { font-size: 15px; }
+      .section-heading { align-items: flex-start; flex-direction: column; }
+      .timeline::before { left: 57px; }
+      .timeline-row { grid-template-columns: 43px 1fr; gap: 22px; }
+      .time-label { font-size: 10px; }
+      .dot { left: 52px; }
+      .timeline-card { padding: 14px; }
+      .card-top { gap: 8px; }
+      .item-title { font-size: 12px; }
+      .item-footer { align-items: flex-start; flex-direction: column; }
+      .budget-row { grid-template-columns: 92px 1fr 82px; }
+      .reminders { gap: 8px; }
+      .reminder { padding: 11px; }
+      .game-panel { padding: 13px; border-radius: 19px; }
+      .game-heading { flex-direction: column; }
+      .game-heading h2 { font-size: 18px; }
+      .game-badge { white-space: normal; }
+      .scene-wrap, #okinawa-scene { min-height: 310px; }
+      .scene-hint { top: 9px; left: 9px; right: 9px; max-width: none; font-size: 9px; text-align: center; }
+      .scene-hud { top: 48px; left: 9px; right: auto; font-size: 9px; }
+      .scene-interact { bottom: 72px; min-height: 40px; font-size: 11px; }
+      .scene-controls { bottom: 9px; gap: 6px; padding: 5px; }
+      .scene-controls button { padding: 12px 10px; min-width: 68px; min-height: 48px; font-size: 12px; }
+      .spot-card { padding: 17px; }
+      .spot-summary { font-size: 11px; }
+      .mobile-bar { display: grid; grid-template-columns: repeat(3, 1fr); position: fixed; z-index: 5; bottom: 0; left: 0; right: 0; padding: 9px 10px max(9px, env(safe-area-inset-bottom)); background: rgb(255 255 255 / 94%); border-top: 1px solid var(--line); backdrop-filter: blur(12px); }
+      .mobile-bar a, .mobile-bar button { border: 0; background: transparent; text-align: center; color: var(--muted); text-decoration: none; font-size: 10px; padding: 5px; cursor: pointer; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+    @media print {
+      body { background: white; }
+      .shell { max-width: none; padding: 0; }
+      .topbar, .clock-actions, .day-switch, .check-label, .mobile-bar, .print-button { display: none !important; }
+      .hero-main, .clock-card, .panel, .stat-card, .timeline-card, .reminder { box-shadow: none; break-inside: avoid; }
+      .timeline-card { border-color: #ddd; }
+      .game-panel, .game-panel * { display: none !important; }
+      .timeline-row[hidden] { display: grid !important; }
+      a { text-decoration: none; }
+    }
+  </style>
 </head>
-<body class="text-slate-800 antialiased pb-20 md:pb-10">
-
-    <!-- Header / Navbar -->
-    <header class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white sticky top-0 z-50 shadow-md">
-        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-3">
-            <div class="flex items-center space-x-3">
-                <div class="bg-amber-400 text-slate-900 p-2.5 rounded-xl font-bold text-xl shadow">
-                    <i class="fa-solid fa-route"></i>
-                </div>
-                <div>
-                    <h1 class="text-xl md:text-2xl font-bold tracking-tight">熱海 & 伊豆半島深度遊</h1>
-                    <p class="text-xs text-slate-300">5 天 4 夜行程手冊 • 溫泉海岸、火山地景與南伊豆</p>
-                </div>
-            </div>
-            
-            <!-- App Quick Tools -->
-            <div class="flex items-center space-x-2 text-xs">
-                <button onclick="resetProgress()" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg backdrop-blur transition flex items-center gap-1.5 border border-white/10">
-                    <i class="fa-solid fa-rotate-right"></i> 重置打卡
-                </button>
-                <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer" class="bg-amber-400 hover:bg-amber-300 text-slate-900 font-semibold px-3 py-1.5 rounded-lg shadow transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-map-location-dot"></i> 開啟地圖
-                </a>
-            </div>
-        </div>
-
-        <!-- Scrollable Navigation Tabs -->
-        <div class="max-w-5xl mx-auto px-4 mt-2 overflow-x-auto hide-scrollbar border-t border-white/10">
-            <div class="flex space-x-2 py-2 min-w-max" id="tab-container">
-                <button onclick="switchTab('tab-strategy')" id="btn-tab-strategy" class="nav-tab active bg-amber-400 text-slate-900 font-bold px-4 py-2 rounded-lg text-sm transition shadow flex items-center gap-2">
-                    <i class="fa-solid fa-ticket"></i> 交通與票券策略
-                </button>
-                <button onclick="switchTab('tab-day1')" id="btn-tab-day1" class="nav-tab bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
-                    <i class="fa-solid fa-calendar-day"></i> Day 1 (週四) 熱海
-                </button>
-                <button onclick="switchTab('tab-day2')" id="btn-tab-day2" class="nav-tab bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
-                    <i class="fa-solid fa-calendar-day"></i> Day 2 (週五) 初島/熱海
-                </button>
-                <button onclick="switchTab('tab-day3')" id="btn-tab-day3" class="nav-tab bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
-                    <i class="fa-solid fa-calendar-day"></i> Day 3 (週六) 城崎海岸/伊豆高原
-                </button>
-                <button onclick="switchTab('tab-day4')" id="btn-tab-day4" class="nav-tab bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
-                    <i class="fa-solid fa-calendar-day"></i> Day 4 (週日) 下田/南伊豆
-                </button>
-                <button onclick="switchTab('tab-day5')" id="btn-tab-day5" class="nav-tab bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
-                    <i class="fa-solid fa-plane-departure"></i> Day 5 (週一) 返程/成田
-                </button>
-                <button onclick="switchTab('tab-stay')" id="btn-tab-stay" class="nav-tab bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
-                    <i class="fa-solid fa-suitcase"></i> 住宿與行李策略
-                </button>
-            </div>
-        </div>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="冲绳行程首页">
+        <span class="brand-mark" aria-hidden="true">沖</span>
+        <span>旅程手册 <span style="color:#8aaeb0;font-weight:500">/ OKINAWA</span></span>
+      </a>
+      <nav class="top-links" aria-label="页面导航">
+        <a href="#itinerary">行程时间轴</a><a href="#route">路线概览</a><a href="#budget">预算计划</a><a href="#reminders">出行提醒</a>
+      </nav>
+      <button class="button button-quiet print-button" onclick="window.print()">打印 / 保存 PDF</button>
     </header>
 
-    <section class="trip-hero text-white" aria-label="互動式旅程路線">
-        <canvas id="route-canvas" aria-label="行程站點與路線示意"></canvas>
-        <div class="map-copy">
-            <p class="text-xs uppercase tracking-[.28em] text-cyan-200 font-bold">A FIVE-DAY JAPAN RAIL JOURNEY</p>
-            <h2 class="mt-3 max-w-xl text-3xl md:text-5xl font-bold leading-tight">探索每日旅程</h2>
-            <p class="mt-3 max-w-md text-sm text-slate-200">選擇日期或站點，查看行程安排與交通方式；Google 地圖連結可查實際路線。</p>
-            <div id="trip-budget" class="mt-4 inline-flex items-center gap-2 rounded-full border border-amber-200/30 bg-amber-300/10 px-3 py-1.5 text-xs font-semibold text-amber-100" aria-live="polite">計算五日預算中…</div>
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero-main">
+        <div class="eyebrow">Naha · Okinawa · 2 days</div>
+        <h1 id="page-title">海风、市场与<br>一段慢旅行。</h1>
+        <p>从那霸机场开始，沿着海鲜早市、波上宫与 Outlet，逐站走进冲绳。路线与营业信息请出发前再次确认。</p>
+        <div class="hero-meta">
+          <span class="pill">📅 11月13日—14日，2026</span>
+          <span class="pill">👥 2位旅人</span>
+          <span class="pill">🚆 公共交通</span>
+          <span class="pill">🏨 Loisir Hotel Naha</span>
         </div>
-        <div id="map-controls">
-            <div id="map-days" class="flex flex-wrap justify-end gap-1.5" aria-label="選擇旅程日期">
-                <button type="button" data-map-day="0" onclick="selectMapDay(0)" class="rounded-full border border-white/25 bg-amber-300 px-3 py-1.5 text-xs font-bold text-slate-900">Day 1</button>
-                <button type="button" data-map-day="1" onclick="selectMapDay(1)" class="rounded-full border border-white/25 bg-slate-900/60 px-3 py-1.5 text-xs text-white">Day 2</button>
-                <button type="button" data-map-day="2" onclick="selectMapDay(2)" class="rounded-full border border-white/25 bg-slate-900/60 px-3 py-1.5 text-xs text-white">Day 3</button>
-                <button type="button" data-map-day="3" onclick="selectMapDay(3)" class="rounded-full border border-white/25 bg-slate-900/60 px-3 py-1.5 text-xs text-white">Day 4</button>
-                <button type="button" data-map-day="4" onclick="selectMapDay(4)" class="rounded-full border border-white/25 bg-slate-900/60 px-3 py-1.5 text-xs text-white">Day 5</button>
-            </div>
-            <div id="map-stop-list" class="mt-2 flex flex-wrap justify-end gap-1.5" aria-label="選擇旅程站點"></div>
-            <p id="map-hint" class="mt-2 rounded-lg bg-slate-950/60 px-2.5 py-1.5 text-right text-[10px] leading-relaxed text-slate-100 drop-shadow">路線為行程示意 · 點選 Google 地圖查看當日路線</p>
+      </div>
+      <aside class="clock-card" aria-label="行程计时器">
+        <div>
+          <div class="card-label">YOUR TRIP TIMER</div>
+          <div class="clock-day" id="clock-day">行程状态</div>
+          <div class="clock-time" id="clock-time" aria-live="polite">--:--:--</div>
+          <div class="clock-status" id="clock-status">正在读取本地时间…</div>
         </div>
-        <div id="map-stop-card" class="rounded-2xl border border-white/20 bg-slate-950/75 p-4 shadow-xl backdrop-blur-md" aria-live="polite">
-            <p class="text-[10px] font-bold uppercase tracking-widest text-cyan-200">INTERACTIVE ITINERARY</p>
-            <h3 id="map-stop-title" class="mt-1 text-base font-bold text-white">載入景點中…</h3>
-            <p id="map-stop-detail" class="mt-1 text-xs leading-relaxed text-slate-200">選取站點，查看交通方式與行程預算。</p>
-            <div class="mt-3 flex flex-wrap gap-2">
-                <a id="map-directions-link" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 rounded-lg bg-amber-300 px-3 py-2 text-xs font-bold text-slate-900 hover:bg-amber-200"><i class="fa-solid fa-route"></i> Google 地圖路線</a>
-                <button id="map-view-itinerary" type="button" onclick="openSelectedMapStop()" class="rounded-lg border border-white/25 px-3 py-2 text-xs font-semibold text-white hover:bg-white/10">查看行程</button>
-            </div>
+        <div class="clock-actions">
+          <button class="button button-primary" id="timer-toggle" type="button">开始计时</button>
+          <button class="button button-quiet" id="timer-reset" type="button">重置</button>
         </div>
+      </aside>
     </section>
 
-    <!-- Main Content Area -->
-    <main class="max-w-5xl mx-auto px-4 py-6">
+    <div class="notice" role="note">
+      <span aria-hidden="true">ⓘ</span>
+      <span><strong>出行信息说明：</strong>路线、距离、车程与公交换乘均为规划估算，无法实时核验；不是实时班次或路况。鞋品牌/型号、营业时间、库存、市场摊位及预算上限仍待确认。请在出发当天检查 Google Maps 和店家公告。</span>
+    </div>
 
-        <!-- TAB: Strategy & Tickets -->
-        <section id="tab-strategy" class="tab-content">
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 mb-6">
-                <h2 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-compass text-blue-600"></i> 導遊核心交通與票券規劃
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    
-                    <!-- Izu rail and transfer planning -->
-                    <div class="bg-slate-50 rounded-xl p-5 border border-slate-200 relative overflow-hidden flex flex-col justify-between">
-                        <div class="absolute top-0 right-0 bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg">伊豆移動</div>
-                        <div>
-                            <div class="flex items-center gap-2 mb-2">
-                                <i class="fa-solid fa-train-subway text-blue-600 text-xl"></i>
-                                <h3 class="font-bold text-slate-900">熱海・伊豆急行線交通</h3>
-                            </div>
-                            <p class="text-xs text-slate-600 mb-3">Day 3 由熱海沿東岸南下至伊豆高原、下田；Day 4 遊覽南伊豆後返回熱海住宿，Day 5 從熱海前往成田。</p>
-                            <ul class="text-xs space-y-1.5 text-slate-700 mb-4">
-                                <li><i class="fa-solid fa-check text-emerald-500 mr-1.5"></i><b>Day 3</b>：搭 JR 伊東線／伊豆急行線前往城崎海岸、伊豆高原及下田；依上車站及目的地購買車票。</li>
-                                <li><i class="fa-solid fa-yen-sign text-emerald-500 mr-1.5"></i><b>交通預算</b>：熱海至下田單程列車約 ¥2,000–¥3,000；特急券、座席與列車種類會影響票價。</li>
-                                <li><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1.5"></i><b>Day 4–5</b>：南伊豆行程後搭車回熱海住宿；Day 5 從熱海經東京轉往成田，需預留轉乘緩衝並核對當日班次。</li>
-                            </ul>
-                            <p class="text-[11px] text-slate-500 mb-3">行程不預設購買周遊券；票價為概算，出發前請查看伊豆急行及 JR 官方資訊。</p>
-                        </div>
-                        <a href="https://www.izukyu.co.jp/" target="_blank" rel="noopener noreferrer" class="block text-center bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs py-2 rounded-lg transition">
-                            <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> 伊豆急行列車與乘車資訊
-                        </a>
-                    </div>
+    <section class="stats" aria-label="行程概览">
+      <article class="stat-card"><div class="stat-title">行程跨度</div><div class="stat-value">1晚 · 2天</div><div class="stat-foot">周五抵达 / 周六游玩</div></article>
+      <article class="stat-card"><div class="stat-title">交通方式</div><div class="stat-value">公共交通为主</div><div class="stat-foot">视班次与天气搭配出租车</div></article>
+      <article class="stat-card"><div class="stat-title">基础预算 · 两人</div><div class="stat-value">约 ¥19,000–38,000</div><div class="stat-foot">估算，不含鞋与购物</div></article>
+      <article class="stat-card"><div class="stat-title">待确认</div><div class="stat-value">鞋品牌 / 预算</div><div class="stat-foot">On 昂跑 ≠ Onitsuka Tiger</div></article>
+    </section>
 
-                    <!-- Regional Tickets -->
-                    <div class="bg-slate-50 rounded-xl p-5 border border-slate-200 flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center gap-2 mb-2">
-                                <i class="fa-solid fa-bus text-indigo-600 text-xl"></i>
-                                <h3 class="font-bold text-slate-900">分段實用票券 & 交通推薦</h3>
-                            </div>
-                            <ul class="text-xs space-y-2.5 text-slate-700 mb-4">
-                                <li class="bg-white p-2.5 rounded-lg border border-slate-150">
-                                    <span class="font-bold text-indigo-700 block mb-0.5">Day 1：羽田機場 ➔ 熱海</span>
-                                    搭乘京急空港線至品川，轉乘 JR 東海道新幹線/東海道本線（刷 IC 卡/現場購票即可）。
-                                </li>
-                                <li class="bg-white p-2.5 rounded-lg border border-slate-150">
-                                    <span class="font-bold text-indigo-700 block mb-0.5">Day 3-4：伊豆東岸／南伊豆巴士</span>
-                                    城崎海岸、伊豆高原、下田與南伊豆景點之間可搭乘伊豆急行及東海巴士；單段車資約 ¥200–¥1,500，班次及周遊券適用範圍請按日期確認。
-                                </li>
-                            </ul>
-                        </div>
-                        <a href="https://www.tokaibus.jp/" target="_blank" rel="noopener noreferrer" class="block text-center bg-slate-800 hover:bg-slate-900 text-white font-medium text-xs py-2 rounded-lg transition">
-                            <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> 查看東海巴士路線與時刻表
-                        </a>
-                    </div>
-                </div>
-            </div>
+    <section class="game-panel" aria-labelledby="game-title">
+      <div class="game-heading">
+        <div><h2 id="game-title">冲绳冒险岛 · 横版闯关</h2><p>左右移动、跳过海湾、收集贝壳；到达每站后按 E 或点互动按钮，解锁该地点介绍。</p></div>
+        <span class="game-badge">THREE.JS · RETRO SIDE-SCROLLER</span>
+      </div>
+      <div class="game-layout">
+        <div class="scene-wrap">
+          <canvas id="okinawa-scene" tabindex="0" role="application" aria-label="冲绳横版平台跳跃游戏，方向键移动，空格跳跃"></canvas>
+          <div class="scene-hint"><strong>触屏按住左右键移动</strong> · 点“跳跃”起跳；到站后互动看介绍</div>
+          <div class="scene-hud" id="scene-hud" aria-live="polite">贝壳 00 / 10 · 检查点 01 / 10</div>
+          <button class="scene-interact" id="scene-interact" type="button" aria-label="到达地点后互动查看介绍" disabled>到达平台后互动查看介绍 · E</button>
+          <div class="scene-controls">
+            <button type="button" id="scene-prev" aria-label="按住向左移动">◀ 左移</button>
+            <button type="button" id="scene-jump" aria-label="跳跃">▲ 跳跃</button>
+            <button type="button" id="scene-next" aria-label="按住向右移动">右移 ▶</button>
+          </div>
+          <div class="scene-error" id="scene-error" hidden>3D 场景暂不可用；地点介绍和下方行程仍可正常使用。</div>
+        </div>
+        <aside class="spot-card" id="spot-card" aria-live="polite">
+          <div class="spot-kicker" id="spot-kicker">互动导览 · 旅程地点</div>
+          <h3 id="spot-title">准备出发</h3>
+          <div class="spot-jp" id="spot-subtitle">抵达地点后即可解锁介绍</div>
+          <p class="spot-summary" id="spot-summary">先操控旅人走上机场平台。到站后，按键盘 E 或点击游戏画面中的“互动”按钮，即可查看那一站的介绍、路线意义和出发前提醒。继续前进并在每个地点平台落地，逐站解锁导览。</p>
+          <div class="spot-why"><strong>怎么玩</strong><span id="spot-why">按住左右键移动，点“跳跃”跨过海湾；必须落在地点平台上，互动按钮才会启用。</span></div>
+          <div class="spot-status" id="spot-status">电脑：方向键 / 空格 / E　·　iPhone：按住方向按钮并点触屏按钮</div>
+          <a class="map-link" id="spot-map" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Naha+Airport" hidden>↗ 在 Google Maps 查看地点</a>
+        </aside>
+      </div>
+      <p class="game-caption">原创冲绳主题横版跳跃玩法，不含任天堂角色或游戏素材。iPhone 可用触控操作；请在 Safari 打开可访问的网页链接并保持联网以加载 Three.js，电脑上的 file:// 地址不会自动同步到手机。地点介绍是旅行规划摘要，不代表实时营业或交通核实。</p>
+    </section>
 
-            <!-- Useful Quick Links -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80">
-                <h3 class="font-bold text-slate-900 mb-3 text-sm"><i class="fa-solid fa-link text-indigo-500 mr-2"></i>行前必備實用連結</h3>
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs">
-                    <a href="https://www.ataminews.gr.jp/" target="_blank" rel="noopener noreferrer" class="p-3 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 rounded-xl border border-slate-200 transition text-center font-medium">
-                        <i class="fa-solid fa-umbrella-beach block text-lg mb-1 text-blue-500"></i> 熱海觀光協會官網
-                    </a>
-                    <a href="https://www.shimoda-city.info/" target="_blank" rel="noopener noreferrer" class="p-3 bg-slate-50 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 rounded-xl border border-slate-200 transition text-center font-medium">
-                        <i class="fa-solid fa-umbrella-beach block text-lg mb-1 text-emerald-500"></i> 下田觀光協會
-                    </a>
-                    <a href="https://izugeopark.org/" target="_blank" rel="noopener noreferrer" class="p-3 bg-slate-50 hover:bg-teal-50 text-slate-700 hover:text-teal-700 rounded-xl border border-slate-200 transition text-center font-medium">
-                        <i class="fa-solid fa-mountain-sun block text-lg mb-1 text-teal-500"></i> 伊豆半島地質公園
-                    </a>
-                    <a href="https://www.kuronekoyamato.co.jp/ytc/en/" target="_blank" rel="noopener noreferrer" class="p-3 bg-slate-50 hover:bg-amber-50 text-slate-700 hover:text-amber-700 rounded-xl border border-slate-200 transition text-center font-medium">
-                        <i class="fa-solid fa-box block text-lg mb-1 text-amber-500"></i> 黑貓宅急便 luggage
-                    </a>
-                    <a href="https://www.jma.go.jp/jma/index.html" target="_blank" rel="noopener noreferrer" class="p-3 bg-slate-50 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 rounded-xl border border-slate-200 transition text-center font-medium">
-                        <i class="fa-solid fa-cloud-sun block text-lg mb-1 text-indigo-500"></i> 日本氣象廳天氣預報
-                    </a>
-                </div>
-            </div>
-        </section>
+    <section id="itinerary" aria-labelledby="itinerary-title">
+      <div class="section-heading">
+        <div><h2 id="itinerary-title">行程时间轴</h2><p>逐段安排，预留门到门与候车缓冲</p></div>
+        <div class="day-switch" role="tablist" aria-label="选择行程日期">
+          <button class="day-tab" role="tab" id="tab-night" aria-selected="true" aria-controls="day-night">第一晚 · 11.13</button>
+          <button class="day-tab" role="tab" id="tab-day" aria-selected="false" aria-controls="day-day">第二天 · 11.14</button>
+        </div>
+      </div>
+      <div class="day-progress"><span id="progress-label">第一晚完成进度</span><span id="progress-count">0 / 5</span></div>
+      <div class="progress-track" role="progressbar" aria-label="当日行程完成比例" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-bar"></div></div>
 
-        <!-- TAB: Day 1 -->
-        <section id="tab-day1" class="tab-content hidden">
-            <div class="day-header flex items-center justify-between mb-4">
-                <div>
-                    <h2 class="text-lg font-bold text-slate-900">Day 1（週四）：羽田機場 ➔ 熱海海洋風情與溫泉老街</h2>
-                    <p class="text-xs text-slate-500">亮點：熱海海鮮丼、熱海布丁、來宮神社神木、MOA美術館</p>
-                </div>
-                <div class="day-header-meta flex flex-col items-end gap-2">
-                    <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">宿：熱海來宮之湯松月日式旅館</span>
-                    <a id="day-route-day1" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-route mr-1"></i>Google 地圖一日路線</a>
-                </div>
-            </div>
-            <div class="day-summary" id="summary-day1" aria-live="polite"></div>
-            <div id="custom-stop-form-day1" class="mb-4"></div>
-            <div class="flex justify-end mb-3"><button onclick="toggleOptions('day1')" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-circle-plus mr-1"></i>探索更多玩法</button></div>
-            <div class="space-y-4" id="timeline-day1">
-                <!-- Items populated dynamically or static cards with interactive checkboxes -->
-            </div>
-            <div class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 gap-3" id="options-day1"></div>
-        </section>
+      <div class="timeline" id="day-night" role="tabpanel" aria-labelledby="tab-night">
+        <article class="timeline-row" data-start="2026-11-13T19:00:00+09:00" data-end="2026-11-13T20:30:00+09:00">
+          <div class="time-label">19:00</div><span class="dot"></span>
+          <div class="timeline-card">
+            <div class="card-top"><div><div class="item-title">抵达冲绳 · 那霸机场</div><div class="item-place">下机、入境（如适用）、取行李</div></div><div class="item-icon">✈️</div></div>
+            <div class="item-details"><span class="detail-chip">⏱ 预留 90 分钟</span><span class="detail-chip">🧳 国际航班需更多缓冲</span></div>
+            <div class="item-note">航班、入境或行李延误时，不要按落地时刻直接赶餐厅；先联系酒店及餐厅确认可否延后。</div>
+            <div class="item-footer"><span></span><label class="check-label"><input type="checkbox" data-id="n1"><span>标记完成</span></label></div>
+          </div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-13T20:30:00+09:00" data-end="2026-11-13T21:15:00+09:00">
+          <div class="time-label">20:30</div><span class="dot"></span>
+          <div class="timeline-card">
+            <div class="card-top"><div><div class="item-title">前往酒店 · 办理入住 / 寄存行李</div><div class="item-place">Loisir Hotel Naha · 那霸市西3-2-1</div><div class="item-address">Nishi, Naha, Okinawa 900-0036</div></div><div class="item-icon">🏨</div></div>
+            <div class="item-details"><span class="detail-chip">🚆 单轨 + 步行</span><span class="detail-chip">📍 约 4–5 km</span><span class="detail-chip">⏱ 门到门约 35–50 分钟</span></div>
+            <div class="item-note">估算路线：机场站至旭桥站后步行约1公里；行李多、延误或错过班次时可改乘出租车，约15–25分钟估算。</div>
+            <div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Naha+Airport&amp;destination=Loisir+Hotel+Naha&amp;travelmode=transit">↗ Google Maps 路线</a><label class="check-label"><input type="checkbox" data-id="n2"><span>标记完成</span></label></div>
+          </div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-13T21:15:00+09:00" data-end="2026-11-13T22:20:00+09:00">
+          <div class="time-label">21:15</div><span class="dot"></span>
+          <div class="timeline-card">
+            <div class="card-top"><div><div class="item-title">牛肉晚餐 · Steak House 88 国際通り西口店</div><div class="item-place">冲绳牛排老字号分店 · 那霸市松尾1-4-3 永昇商事ビル2F</div><div class="item-address">Matsuo, Naha, Okinawa 900-0014</div></div><div class="item-icon">🥩</div></div>
+            <div class="item-details"><span class="detail-chip">🚕 建议出租车约10–15分钟</span><span class="detail-chip">📍 约2.5–3 km</span><span class="detail-chip">🍽 预留排队与用餐</span></div>
+            <div class="item-note">搜索到的店铺信息显示约11:00–23:00、最后点单约22:00；请出发当天向门店确认。建议从酒店直接打车前往，避免公交候车耽误最后点单；这是估算，并非实时营业核验。</div>
+            <div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Loisir+Hotel+Naha&amp;destination=Steak+House+88+Kokusai-dori+Nishiguchi%2C+Naha&amp;travelmode=driving">↗ 出租车路线</a><label class="check-label"><input type="checkbox" data-id="n3"><span>标记完成</span></label></div>
+          </div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-13T22:20:00+09:00" data-end="2026-11-13T23:20:00+09:00">
+          <div class="time-label">22:20</div><span class="dot"></span>
+          <div class="timeline-card">
+            <div class="card-top"><div><div class="item-title">一杯小酌 · Bar “Planete”</div><div class="item-place">Loisir Spa Tower Naha · 酒店区域，具体入口问前台</div><div class="item-address">Nishi 3-2-1, Naha, Okinawa 900-0036</div></div><div class="item-icon">🍸</div></div>
+            <div class="item-details"><span class="detail-chip">🚶 步行约 3–8 分钟</span><span class="detail-chip">⏱ 预留 1 小时</span></div>
+            <div class="item-note">当前营业状态与时间待确认；若未营业，改去酒店附近当天确认营业的酒吧，不跨区奔波。</div>
+            <div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Steak+House+88+Kokusai-dori+Nishiguchi%2C+Naha&amp;destination=Bar+Planete%2C+Loisir+Spa+Tower+Naha&amp;travelmode=transit">↗ 餐厅 → 酒吧</a><label class="check-label"><input type="checkbox" data-id="n4"><span>标记完成</span></label></div>
+          </div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-13T23:20:00+09:00" data-end="2026-11-13T23:30:00+09:00">
+          <div class="time-label">23:20</div><span class="dot"></span>
+          <div class="timeline-card">
+            <div class="card-top"><div><div class="item-title">回房休息</div><div class="item-place">Loisir Hotel Naha · 酒店内步行 / 电梯约3–5分钟</div></div><div class="item-icon">🌙</div></div>
+            <div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Bar+Planete%2C+Loisir+Spa+Tower+Naha&amp;destination=Loisir+Hotel+Naha&amp;travelmode=walking">↗ 酒吧 → 住宿</a><label class="check-label"><input type="checkbox" data-id="n5"><span>标记完成</span></label></div>
+          </div>
+        </article>
+      </div>
 
-        <!-- TAB: Day 2 -->
-        <section id="tab-day2" class="tab-content hidden">
-            <div class="day-header flex items-center justify-between mb-4">
-                <div>
-                    <h2 class="text-lg font-bold text-slate-900">Day 2（週五）：初島離島巡禮 & 大室山火山口散策</h2>
-                    <p class="text-xs text-slate-500">亮點：初島海鮮食堂街、伊豆高原、大室山登山纜車與火山口步道</p>
-                </div>
-                <div class="day-header-meta flex flex-col items-end gap-2">
-                    <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">宿：熱海來宮之湯松月日式旅館</span>
-                    <a id="day-route-day2" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-route mr-1"></i>Google 地圖一日路線</a>
-                </div>
-            </div>
-            <div class="day-summary" id="summary-day2" aria-live="polite"></div>
-            <div id="custom-stop-form-day2" class="mb-4"></div>
-            <div class="flex justify-end mb-3"><button onclick="toggleOptions('day2')" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-circle-plus mr-1"></i>探索更多玩法</button></div>
-            <div class="space-y-4" id="timeline-day2"></div>
-            <div class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 gap-3" id="options-day2"></div>
-        </section>
+      <div class="timeline" id="day-day" role="tabpanel" aria-labelledby="tab-day" hidden>
+        <article class="timeline-row" data-start="2026-11-14T08:00:00+09:00" data-end="2026-11-14T09:00:00+09:00">
+          <div class="time-label">08:00</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">起床、整理 · 退房或寄存行李</div><div class="item-place">Loisir Hotel Naha</div></div><div class="item-icon">🧳</div></div><div class="item-note">先确认酒店寄存服务及退房安排。</div><div class="item-footer"><span></span><label class="check-label"><input type="checkbox" data-id="d1"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-14T09:00:00+09:00" data-end="2026-11-14T09:40:00+09:00">
+          <div class="time-label">09:00</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">前往泊いゆまち海鲜市场</div><div class="item-place">Tomari Iyumachi · 那霸市港町1-1-18</div></div><div class="item-icon">🚌</div></div><div class="item-details"><span class="detail-chip">📍 约 2–3 km</span><span class="detail-chip">🚶 步行约30–40分钟</span><span class="detail-chip">🚕 出租车约10–15分钟</span></div><div class="item-note">估算时间；公交站点/班次未核验。下雨或行李较多时可考虑出租车。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Loisir+Hotel+Naha&amp;destination=Tomari+Iyumachi%2C+Naha&amp;travelmode=transit">↗ Google Maps 路线</a><label class="check-label"><input type="checkbox" data-id="d2"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-14T09:40:00+09:00" data-end="2026-11-14T10:40:00+09:00">
+          <div class="time-label">09:40</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">海鲜早餐 / 早午餐 · 泊いゆまち</div><div class="item-place">市场内摊位 · 那霸市港町</div></div><div class="item-icon">🐟</div></div><div class="item-details"><span class="detail-chip">🍽 预留排队时间</span><span class="detail-chip">⏱ 约 1 小时</span></div><div class="item-note">市场营业时间与各摊位周六开摊时间不同，出发前确认目标摊位。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Tomari+Iyumachi+Market+Naha">↗ 市场地图</a><label class="check-label"><input type="checkbox" data-id="d3"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-14T10:40:00+09:00" data-end="2026-11-14T11:30:00+09:00">
+          <div class="time-label">10:40</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">前往波上宫</div><div class="item-place">Naminoue Shrine（波上宫）· 那霸市若狭1-25-11</div><div class="item-address">Wakasa, Naha, Okinawa 900-0031</div></div><div class="item-icon">⛩️</div></div><div class="item-details"><span class="detail-chip">📍 约 2–3 km（估算）</span><span class="detail-chip">🚶 步行或公交 / 出租车</span><span class="detail-chip">⏱ 约 15–35 分钟估算</span></div><div class="item-note">市场与神社相距不远；公交班次未实时核验，可按当天地图选择步行、公交或短程出租车。路线另留候车/步行缓冲。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Tomari+Iyumachi%2C+Naha&amp;destination=Naminoue+Shrine%2C+Naha&amp;travelmode=transit">↗ Google Maps 路线</a><label class="check-label"><input type="checkbox" data-id="d4"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-14T11:30:00+09:00" data-end="2026-11-14T13:00:00+09:00">
+          <div class="time-label">11:30</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">参拜与海边散步 · 波上宫</div><div class="item-place">波上宫（Naminoue Shrine）· 那霸市若狭1-25-11</div></div><div class="item-icon">⛩️</div></div><div class="item-details"><span class="detail-chip">⏱ 停留约 1小时30分</span><span class="detail-chip">🎟 神社境内参拜；授与品自选</span></div><div class="item-note">神社境内开放时间、祭事安排及海边通道情况请出发前核对；尊重参拜礼仪，不进入限制区域。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Naminoue+Shrine%2C+Naha">↗ 波上宫地图</a><label class="check-label"><input type="checkbox" data-id="d5"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-14T13:00:00+09:00" data-end="2026-11-14T13:45:00+09:00">
+          <div class="time-label">13:00</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">前往鞋店 · 先确认品牌与门店</div><div class="item-place">On 昂跑候选：Sports Depo 天久店 · 那霸市天久1-2-1</div></div><div class="item-icon">👟</div></div><div class="item-details"><span class="detail-chip">📍 约 5–7 km（估算）</span><span class="detail-chip">🚌 公交 / 出租车接驳</span><span class="detail-chip">⏱ 估算 30–50 分钟</span></div><div class="item-note">门店是否经营 On、指定款和尺码库存均未确认。若你选的是 Onitsuka Tiger（鬼塚虎），不能把这家店当作目标门店。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Naminoue+Shrine%2C+Naha&amp;destination=Sports+Depo+Ameku%2C+Naha&amp;travelmode=transit">↗ 候选路线</a><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Onitsuka+Tiger+store+Naha+Okinawa">↗ 搜索鬼塚虎门店</a><label class="check-label"><input type="checkbox" data-id="d6"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-14T13:45:00+09:00" data-end="2026-11-14T14:30:00+09:00">
+          <div class="time-label">13:45</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">试穿与购鞋 · 品牌待确认</div><div class="item-place">门店未最终确认；以用户指定品牌、店址和库存为准</div></div><div class="item-icon">🛍️</div></div><div class="item-details"><span class="detail-chip">⏱ 预留 45 分钟</span><span class="detail-chip">📞 先电话确认尺码</span></div><div class="item-note">为高尔夫用品店预留时段，购鞋时间小幅压缩；项目顺序仍是景点→买鞋→高尔夫用品店→Outlet。如无库存，先确认同品牌可行门店。</div><div class="item-footer"><label class="check-label"><input type="checkbox" data-id="d7"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-14T14:30:00+09:00" data-end="2026-11-14T15:45:00+09:00">
+          <div class="time-label">14:30</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">前往 Golf5 丰崎店</div><div class="item-place">丰崎 Lifestyle Center TOMITON · 丰见城市丰崎1-411</div></div><div class="item-icon">🚌</div></div><div class="item-details"><span class="detail-chip">🚌 公共交通换乘待核</span><span class="detail-chip">⏱ 估算 60–80 分钟</span></div><div class="item-note">路线未实时核验；请在 Google Maps 以当天时间确认交通方式、候车和换乘缓冲。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Sports+Depo+Ameku%2C+Naha&amp;destination=Golf5+Toyosaki%2C+Tomigusuku&amp;travelmode=transit">↗ Google Maps 路线</a><label class="check-label"><input type="checkbox" data-id="d8"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-14T15:45:00+09:00" data-end="2026-11-14T16:30:00+09:00">
+          <div class="time-label">15:45</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">高尔夫用品采购 · Golf5 丰崎店</div><div class="item-place">Golf5 Toyosaki · TOMITON内 · 丰见城市丰崎1-411</div></div><div class="item-icon">⛳</div></div><div class="item-details"><span class="detail-chip">🕙 店铺资料列示约10:00–21:00</span><span class="detail-chip">⏱ 预留 45 分钟</span></div><div class="item-note">位于 Outlet Mall ASHIBINAA 斜对面；店铺地址和营业时间请查看官方门店页并在出发当天再次确认。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Golf5+Toyosaki+Store+Tomigusuku">↗ Golf5 地图</a><label class="check-label"><input type="checkbox" data-id="d14"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-14T16:30:00+09:00" data-end="2026-11-14T16:45:00+09:00">
+          <div class="time-label">16:30</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">步行前往 Outlet Mall ASHIBINAA</div><div class="item-place">Golf5 丰崎店（TOMITON）→ ASHIBINAA · 丰见城市丰崎</div></div><div class="item-icon">🚶</div></div><div class="item-details"><span class="detail-chip">📍 斜对面，约0.3–0.6 km估算</span><span class="detail-chip">⏱ 步行约5–10分钟，含过街缓冲预留15分钟</span></div><div class="item-note">实际出口、步行入口及安全过街路线请用地图现场确认。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Golf5+Toyosaki%2C+Tomigusuku&amp;destination=Okinawa+Outlet+Mall+Ashibinaa&amp;travelmode=walking">↗ Golf5 → Outlet</a><label class="check-label"><input type="checkbox" data-id="d15"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-14T16:45:00+09:00" data-end="2026-11-14T18:15:00+09:00">
+          <div class="time-label">16:45</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">Outlet 购物 · ASHIBINAA</div><div class="item-place">Okinawa Outlet Mall ASHIBINAA · 丰见城市丰崎1-188</div></div><div class="item-icon">🛒</div></div><div class="item-details"><span class="detail-chip">⏱ 预留 1小时30分</span><span class="detail-chip">🕙 店铺营业时间需确认</span></div><div class="item-note">为新增高尔夫用品店，Outlet停留从2小时调整为1小时30分。预算未设上限；当天确认商场和目标店铺营业时间。若购物优先级高，可减少Golf5停留而非挤压晚餐及返程。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Okinawa+Outlet+Mall+Ashibinaa">↗ 商场地图</a><label class="check-label"><input type="checkbox" data-id="d9"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-14T18:15:00+09:00" data-end="2026-11-14T19:15:00+09:00">
+          <div class="time-label">18:15</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">晚餐 · やっぱりステーキ 5th Ashibina</div><div class="item-place">ASHIBINAA 2楼 · 丰见城市丰崎</div></div><div class="item-icon">🍽️</div></div><div class="item-details"><span class="detail-chip">🚶 商场内约3–8分钟</span><span class="detail-chip">⏱ 预留排队及用餐</span></div><div class="item-note">分店营业时间与最后点单时间需确认；建议不晚于18:30入店。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Okinawa+Outlet+Mall+Ashibinaa&amp;destination=Yappari+Steak+5th+Ashibina&amp;travelmode=walking">↗ Outlet 内步行</a><label class="check-label"><input type="checkbox" data-id="d10"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-14T19:15:00+09:00" data-end="2026-11-14T20:45:00+09:00">
+          <div class="time-label">19:15</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">公共交通返回那霸酒店区域</div><div class="item-place">ASHIBINAA → Loisir Hotel Naha</div></div><div class="item-icon">🚍</div></div><div class="item-details"><span class="detail-chip">📍 约 14–16 km</span><span class="detail-chip">⏱ 估算 55–80 分钟</span><span class="detail-chip">🕒 预留候车/换乘缓冲</span></div><div class="item-note">确认返回方向末班与班次；若延误，按需乘出租车。酒后不得驾驶。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Yappari+Steak+5th+Ashibina&amp;destination=Loisir+Hotel+Naha&amp;travelmode=transit">↗ Google Maps 路线</a><label class="check-label"><input type="checkbox" data-id="d11"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-14T20:45:00+09:00" data-end="2026-11-14T21:45:00+09:00">
+          <div class="time-label">20:45</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">酒吧 · Bar “Planete”</div><div class="item-place">Loisir Spa Tower Naha · 酒店区域</div></div><div class="item-icon">🍹</div></div><div class="item-details"><span class="detail-chip">🚶 步行约3–8分钟</span><span class="detail-chip">营业状态待确认</span></div><div class="item-note">若不营业，选择酒店附近已确认营业的酒吧；不跨区追店。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Loisir+Hotel+Naha&amp;destination=Bar+Planete%2C+Loisir+Spa+Tower+Naha&amp;travelmode=walking">↗ 酒店 → 酒吧</a><label class="check-label"><input type="checkbox" data-id="d12"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-14T21:45:00+09:00" data-end="2026-11-14T22:00:00+09:00">
+          <div class="time-label">21:45</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">返回住宿 · 行程结束</div><div class="item-place">Loisir Hotel Naha · 酒店内步行约3–5分钟</div></div><div class="item-icon">🌙</div></div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Bar+Planete%2C+Loisir+Spa+Tower+Naha&amp;destination=Loisir+Hotel+Naha&amp;travelmode=walking">↗ 酒吧 → 住宿</a><label class="check-label"><input type="checkbox" data-id="d13"><span>标记完成</span></label></div></div>
+        </article>
+      </div>
+    </section>
 
-        <!-- TAB: Day 3 -->
-        <section id="tab-day3" class="tab-content hidden">
-            <div class="day-header flex items-center justify-between mb-4">
-                <div>
-                    <h2 class="text-lg font-bold text-slate-900">Day 3（週六）：熱海 ➔ 城崎海岸、伊豆高原、下田</h2>
-                    <p class="text-xs text-slate-500">亮點：城崎海岸門脇吊橋、伊豆高原散策、沿海列車風景</p>
-                </div>
-                <div class="day-header-meta flex flex-col items-end gap-2">
-                    <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">Day 3 晚住宿：下田海濱酒店</span>
-                    <a id="day-route-day3" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-route mr-1"></i>Google 地圖一日路線</a>
-                </div>
-            </div>
-            <div class="day-summary" id="summary-day3" aria-live="polite"></div>
-            <div id="custom-stop-form-day3" class="mb-4"></div>
-            <div class="flex justify-end mb-3"><button onclick="toggleOptions('day3')" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-circle-plus mr-1"></i>探索更多玩法</button></div>
-            <div class="space-y-4" id="timeline-day3"></div>
-            <div class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 gap-3" id="options-day3"></div>
-        </section>
+    <div class="lower-grid">
+      <section class="panel" id="route" aria-labelledby="route-title">
+        <h3 id="route-title">一路向南 · 路线示意</h3>
+        <p class="panel-sub">按行程顺序连接 · 公交路段请点时间轴逐段核对</p>
+        <div class="route-flow" aria-label="第一晚路线示意">
+          <span class="route-node">✈ 那霸机场</span><span class="route-arrow">→</span><span class="route-node">🏨 Loisir</span><span class="route-arrow">→</span><span class="route-node">🥩 Steak House 88</span><span class="route-arrow">→</span><span class="route-node">🍸 Planete</span>
+        </div>
+        <div class="route-flow" aria-label="第二天路线示意">
+          <span class="route-node">🐟 泊いゆまち</span><span class="route-arrow">→</span><span class="route-node">⛩ 波上宫</span><span class="route-arrow">→</span><span class="route-node">👟 鞋店待确认</span><span class="route-arrow">→</span><span class="route-node">⛳ Golf5 丰崎</span><span class="route-arrow">→</span><span class="route-node">🛍 ASHIBINAA</span>
+        </div>
+        <div class="route-flow" aria-label="第二天晚间路线示意">
+          <span class="route-node">🛍 Outlet</span><span class="route-arrow">→</span><span class="route-node">🍽 晚餐</span><span class="route-arrow">→</span><span class="route-node">🍹 酒吧</span><span class="route-arrow">→</span><span class="route-node">🏨 住宿</span>
+        </div>
+        <div class="legend">示意图，非比例地图。所有线路、距离、公交班次与时间均待出发前核验。</div>
+      </section>
 
-        <!-- TAB: Day 4 -->
-        <section id="tab-day4" class="tab-content hidden">
-            <div class="day-header flex items-center justify-between mb-4">
-                <div>
-                    <h2 class="text-lg font-bold text-slate-900">Day 4（週日）：下田與南伊豆海岸巡禮</h2>
-                    <p class="text-xs text-slate-500">亮點：佩里之路、下田公園、白濱海岸、龍宮窟；傍晚返回熱海住宿</p>
-                </div>
-                <div class="day-header-meta flex flex-col items-end gap-2">
-                    <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">Day 4 晚住宿：熱海大野屋酒店</span>
-                    <a id="day-route-day4" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-route mr-1"></i>Google 地圖一日路線</a>
-                </div>
-            </div>
-            <div class="day-summary" id="summary-day4" aria-live="polite"></div>
-            <div id="custom-stop-form-day4" class="mb-4"></div>
-            <div class="flex justify-end mb-3"><button onclick="toggleOptions('day4')" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-circle-plus mr-1"></i>探索更多玩法</button></div>
-            <div class="space-y-4" id="timeline-day4"></div>
-            <div class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 gap-3" id="options-day4"></div>
-        </section>
+      <section class="panel" id="budget" aria-labelledby="budget-title">
+        <h3 id="budget-title">预算速览 <span style="font-weight:500;color:#78999e">/ JPY</span></h3>
+        <p class="panel-sub">两人估算 · 非实时价格 · 购物弹性自定</p>
+        <div class="budget-row"><span class="budget-name">牛肉晚餐</span><div class="budget-line"><span style="width:28%"></span></div><span class="budget-amount">¥5k–9k</span></div>
+        <div class="budget-row"><span class="budget-name">海鲜早餐</span><div class="budget-line"><span style="width:18%"></span></div><span class="budget-amount">¥2k–4k</span></div>
+        <div class="budget-row"><span class="budget-name">波上宫</span><div class="budget-line"><span style="width:4%"></span></div><span class="budget-amount">参拜免费*</span></div>
+        <div class="budget-row"><span class="budget-name">公共交通</span><div class="budget-line"><span style="width:23%"></span></div><span class="budget-amount">¥3k–7k</span></div>
+        <div class="budget-row"><span class="budget-name">Outlet 晚餐</span><div class="budget-line"><span style="width:18%"></span></div><span class="budget-amount">¥3k–6k</span></div>
+        <div class="budget-row"><span class="budget-name">两晚酒吧</span><div class="budget-line"><span style="width:29%"></span></div><span class="budget-amount">¥6k–12k</span></div>
+        <div class="budget-total"><span>基础开支参考</span><span>约 ¥19,000–38,000</span></div>
+        <p class="budget-foot">不含鞋、Outlet购物与出租车额外费用。*神社境内参拜通常不收门票；御守、御朱印等授与品另计。鞋约¥12,000–25,000/双（估算）；两人各买一双另加约¥24,000–50,000。Outlet购物上限待你设定。</p>
+      </section>
+    </div>
 
-        <!-- TAB: Day 5 -->
-        <section id="tab-day5" class="tab-content hidden">
-            <div class="day-header flex items-center justify-between mb-4">
-                <div>
-                    <h2 class="text-lg font-bold text-slate-900">Day 5（週一）：熱海 ➔ 成田機場（NRT）返程</h2>
-                    <p class="text-xs text-slate-500">早上先在熱海站周邊購物，再經東京前往成田；建議預訂 18:00 後航班</p>
-                </div>
-                <div class="day-header-meta flex flex-col items-end gap-2">
-                    <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full">班機：建議 18:00 後起飛</span>
-                    <a id="day-route-day5" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-route mr-1"></i>Google 地圖一日路線</a>
-                </div>
-            </div>
-            <div class="day-summary" id="summary-day5" aria-live="polite"></div>
-            <div id="custom-stop-form-day5" class="mb-4"></div>
-            <div class="flex justify-end mb-3"><button onclick="toggleOptions('day5')" class="text-xs font-semibold text-blue-700 hover:text-blue-900"><i class="fa-solid fa-circle-plus mr-1"></i>探索更多玩法</button></div>
-            <div class="space-y-4" id="timeline-day5"></div>
-            <div class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 gap-3" id="options-day5"></div>
-        </section>
+    <section id="reminders" aria-labelledby="reminder-title">
+      <div class="section-heading"><div><h2 id="reminder-title">出发前确认清单</h2><p>这几项会直接影响当天路线是否衔接</p></div></div>
+      <div class="reminders">
+        <article class="reminder"><div class="reminder-icon">👟</div><h4>确认鞋品牌与尺码</h4><p>请在 On 昂跑、Onitsuka Tiger 或其他品牌中明确选择，并电话查指定款和库存。</p></article>
+        <article class="reminder"><div class="reminder-icon">🕘</div><h4>核对营业时间</h4><p>市场摊位、牛排店、鞋店、Golf5、Outlet、晚餐店和酒吧均需核对当日营业状态。</p></article>
+        <article class="reminder"><div class="reminder-icon">🚌</div><h4>查看公交换乘</h4><p>重点核对市场→波上宫、波上宫→鞋店、鞋店→丰崎 Golf5、Outlet→那霸的周六班次。</p></article>
+        <article class="reminder"><div class="reminder-icon">💴</div><h4>设置预算上限</h4><p>现有总额不包括鞋、购物或可能产生的出租车费；按个人预算预留弹性。</p></article>
+      </div>
+      <details class="emergency">
+        <summary>打开应急方案 · 延误 / 下雨 / 缺货</summary>
+        <div class="emergency-body">
+          <ul>
+            <li><strong>航班延误：</strong>先入住或寄存行李，优先保留就近牛肉餐；缩短酒吧时间，不跨区赶店。临近最后入店时间，先致电餐厅。</li>
+            <li><strong>下雨：</strong>酒店到市场可改乘出租车；波上宫境内与海边散步视雨势缩短。路线顺序不变。</li>
+            <li><strong>鞋店关门/缺货：</strong>先确认同品牌可买的门店或库存；保持“景点→买鞋→Outlet”的先后，不擅自替换品牌。</li>
+            <li><strong>交通延误：</strong>波上宫与 Outlet 已分别预留约90分钟；优先缩短 Golf5 停留，不要压缩晚餐或错过返程班次。需要时打车回那霸并预留费用。</li>
+            <li><strong>酒后不要驾驶。</strong>选择公共交通、步行或出租车。</li>
+          </ul>
+        </div>
+      </details>
+    </section>
 
-        <!-- TAB: Stay & Luggage -->
-        <section id="tab-stay" class="tab-content hidden">
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 mb-6">
-                <h2 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-hotel text-indigo-600"></i> 住宿區域選擇策略
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-blue-50/60 p-4 rounded-xl border border-blue-100">
-                        <h3 class="font-bold text-blue-900 text-sm mb-2"><i class="fa-solid fa-spa mr-1.5"></i>熱海住宿（Day 1 - Day 2、Day 4）</h3>
-                        <p class="text-xs text-slate-700 mb-2"><b>Day 1–2：</b>熱海來宮之湯松月日式旅館。<b>Day 4：</b>熱海大野屋酒店；請分別確認訂房、入住時間與餐食安排。</p>
-                        <ul class="text-xs text-slate-600 space-y-1">
-                            <li>• 抵達熱海後，確認旅館行李寄放及前往旅館的交通方式。</li>
-                            <li>• Day 3 早上退房前往伊豆；Day 4 返回後入住大野屋酒店，Day 5 由酒店前往熱海站及成田。</li>
-                        </ul>
-                    </div>
-                    <div class="bg-emerald-50/60 p-4 rounded-xl border border-emerald-100">
-                        <h3 class="font-bold text-emerald-900 text-sm mb-2"><i class="fa-solid fa-mountain mr-1.5"></i>下田住宿（Day 3）</h3>
-                        <p class="text-xs text-slate-700 mb-2"><b>Day 3 晚指定住宿：下田海濱酒店，入住一晚。</b>Day 4 白天遊覽南伊豆，傍晚退房後搭車返回熱海，不在下田續住。</p>
-                        <ul class="text-xs text-slate-600 space-y-1">
-                            <li>• 請依訂房確認資料核對酒店地址、往返伊豆急下田站的交通及行李寄存安排。</li>
-                            <li>• Day 4 晚離開下田返回熱海，入住大野屋酒店。</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+    <footer class="footer">冲绳那霸两日行程 · 行程信息为规划估算；路线链接打开 Google Maps 后请重新核对日期、交通方式与实时班次。<br>营业时间、票价、库存、预算和个人偏好仍需出发前确认。</footer>
+  </main>
+  <nav class="mobile-bar" aria-label="快捷导航">
+    <a href="#itinerary">◷ 行程</a><a href="#route">⌖ 路线</a><a href="#reminders">✓ 提醒</a>
+  </nav>
+  <script type="module">
+    const places = [
+      {
+        id: "airport", name: "那霸机场", subtitle: "Naha Airport · 那霸市鏡水",
+        map: "https://www.google.com/maps/search/?api=1&query=Naha+Airport",
+        summary: "那霸机场是冲绳本岛主要门户，抵达后需要预留下机、入境和取行李时间。这里是整趟旅程的起点，先不要把航班落地时间当作可以离开机场的时间。若当日有国际航班入境、人流较多或托运行李，实际出航站楼时间可能更晚。离开前确认交通卡、网络和酒店地址，能减少初到冲绳时找路的压力。",
+        why: "从这里直接前往那霸市区住宿，先入住或寄存行李，再就近吃饭，不安排落地后跨区奔波。",
+        status: "入境与取行李时间按航班和现场情况留缓冲。"
+      },
+      {
+        id: "hotel", name: "Loisir Hotel Naha", subtitle: "ロワジールホテル那覇 · 那霸市西3-2-1",
+        map: "https://www.google.com/maps/search/?api=1&query=Loisir+Hotel+Naha",
+        summary: "Loisir Hotel Naha 位于那霸市西侧，是这两晚行程的固定据点。先办理入住或寄存行李，再前往周边用餐，可避免带着行李赶路。它也让夜间的酒吧安排有一个明确返程终点。机场至酒店的公共交通与步行接驳需要按行李量、抵达时段和当天班次选择；若航班延误或行李较多，出租车是更直接但费用较高的替代方式。",
+        why: "第一晚和第二晚都回同一住宿，减少搬运行李；夜间活动后无需再跨区返回。",
+        status: "酒店入住、寄存和夜间设施请以预订与酒店确认信息为准。"
+      },
+      {
+        id: "beef", name: "Steak House 88 国際通り西口店", subtitle: "那霸市松尾1-4-3 · 永昇商事ビル2F",
+        map: "https://www.google.com/maps/search/?api=1&query=Steak+House+88+Kokusai-dori+Nishiguchi+Naha",
+        summary: "Steak House 88 是冲绳具有代表性的牛排店品牌，国際通り西口店位于那霸市松尾，店内提供牛排等肉类料理。与酒店不是同一片街区，因此抵达当晚建议先确认航班出关时间和门店最后点单，再决定是否前往。相比在落地后临时搜索远处餐馆，这家店地址明确、地图容易定位，也适合作为冲绳牛排体验的候选。店铺忙碌时仍可能排队，最好预留缓冲并确认营业安排。",
+        why: "是冲绳牛排体验的明确候选，且地址在那霸市区；从酒店搭出租车前往比晚间赶公交更稳妥。",
+        status: "搜索信息列示约11:00–23:00、最后点单约22:00；须当天确认。"
+      },
+      {
+        id: "bar", name: "Bar “Planete”", subtitle: "Loisir Spa Tower Naha · 那霸市西3-2-1",
+        map: "https://www.google.com/maps/search/?api=1&query=Bar+Planete+Loisir+Spa+Tower+Naha",
+        summary: "Bar “Planete” 与 Loisir Spa Tower Naha 同属酒店区域，适合作为晚餐后的轻松收尾候选。酒店内或近酒店活动的优势是饮酒后不需要再安排开车，也不必为了寻找夜生活跨越那霸多个街区。当前酒吧是否营业、营业到几点以及住客是否需要预约都还需直接确认。若当晚未开放，应选择酒店周边已确认营业的场所，并把返回住宿作为优先事项。",
+        why: "位置与住宿相邻，适合按原计划“晚餐→酒吧→回房”，并降低夜间交通复杂度。",
+        status: "营业状态及时间未核实；饮酒后不要驾驶。"
+      },
+      {
+        id: "market", name: "泊いゆまち海鲜市场", subtitle: "Tomari Iyumachi · 那霸市港町1-1-18",
+        map: "https://www.google.com/maps/search/?api=1&query=Tomari+Iyumachi+Market+Naha",
+        summary: "泊いゆまちは那霸泊港一带的海鲜市场，可把它作为第二天早上的海鲜早餐或早午餐站。市场型场所的体验重点在当日摊位与渔获，选择比固定菜单餐厅更灵活，也能先用一顿轻松的早饭开启当天路线。需要注意市场整体开放不代表每个摊位都营业，周六开摊时间、可堂食区域与付款方式应提前确认。建议早点到并给排队、点餐和找座位留出时间。",
+        why: "早餐市场放在当天第一站，之后向波上宫移动，顺序自然且避免先跑远处景点。",
+        status: "市场及摊位的周六营业时段请出发前核实。"
+      },
+      {
+        id: "shrine", name: "波上宫", subtitle: "Naminoue Shrine · 那霸市若狭1-25-11",
+        map: "https://www.google.com/maps/search/?api=1&query=Naminoue+Shrine+Naha",
+        summary: "波上宫是那霸代表性的神社之一，坐落在临海高地，可在同一站完成参拜与海边散步。它与首里城不同，是轻量、安静的文化体验；参拜无需安排复杂的长距离园区动线，适合放在早市之后、继续前往鞋店之前。到访时请遵守神社参拜礼仪，留意祭事、天气和海边通道状况，不进入限制区域。若下雨或行程延误，可缩短停留，但保持景点在鞋店之前的顺序。",
+        why: "景点在那霸市内，较适合这次短行程，也能与泊港早市衔接，不需要安排跨岛长途交通。",
+        status: "境内活动、祭事及海边通道情况请出发前核对。"
+      },
+      {
+        id: "shoes", name: "指定品牌鞋店 · 待确认", subtitle: "On 昂跑 / Onitsuka Tiger / 其他品牌",
+        map: "https://www.google.com/maps/search/?api=1&query=shoe+store+Naha+Okinawa",
+        summary: "购鞋站目前仍是待确认项目：On 昂跑与 Onitsuka Tiger（鬼塚虎）是不同品牌，不能用一家店或一个搜索结果代替另一个。Sports Depo 天久店只是 On 昂跑方向的候选经销商，品牌、指定型号、尺码与现货均未确认；若目标是鬼塚虎，需要先找到对应门店并致电核库存。把这站放在波上宫之后、Golf5 与 Outlet 之前，既保留用户要求的顺序，也能先处理特定款缺货的风险。",
+        why: "提前明确品牌与尺码，避免到店才发现买错品牌或无货；在前往丰崎购物区前解决购鞋任务。",
+        status: "先确认品牌、门店地址、营业时间、型号与库存。"
+      },
+      {
+        id: "golf", name: "Golf5 丰崎店", subtitle: "ゴルフ5豊崎店 · TOMITON · 丰见城市丰崎1-411",
+        map: "https://www.google.com/maps/search/?api=1&query=Golf5+Toyosaki+Store+Tomigusuku",
+        summary: "Golf5 丰崎店位于丰崎 Lifestyle Center TOMITON 内，是采购高尔夫球杆、球、服饰与配件的专业体育用品店候选。它与 ASHIBINAA Outlet Mall 在丰崎同一购物区域，地址资料显示相距不远，因此把高尔夫采购插在购鞋之后、Outlet 之前，可以减少重复往返。是否有特定品牌、型号或球杆服务仍需向门店确认。前往时留意商场入口、过街路线和携带大件商品的便利性，步行距离为估算。",
+        why: "与 Outlet 相邻，顺路完成高尔夫购物；不用为了买装备专门安排一次跨城往返。",
+        status: "店铺资料列示约10:00–21:00；营业时间与库存仍需当天确认。"
+      },
+      {
+        id: "outlet", name: "Outlet Mall ASHIBINAA", subtitle: "Okinawa Outlet Mall · 丰见城市丰崎1-188",
+        map: "https://www.google.com/maps/search/?api=1&query=Okinawa+Outlet+Mall+Ashibinaa",
+        summary: "ASHIBINAA 是丰见城市丰崎的大型奥特莱斯购物中心，安排在鞋店和 Golf5 之后，可以集中处理服饰、运动用品与伴手礼购物。行程目前给它约90分钟，属于紧凑但仍可执行的逛店时长；若想慢慢购物，应优先延长这里并缩短 Golf5 停留，而不是压缩晚餐或回程交通缓冲。商场和各店营业时间可能不同，且回那霸依赖公交接驳，购物结束前要先确认返程班次与候车位置。",
+        why: "与 Golf5 位于同一丰崎购物片区，连续安排可减少折返；保留晚餐和返那霸时间更稳妥。",
+        status: "商场营业时间、目标店铺和返那霸交通请当天核实。"
+      },
+      {
+        id: "dinner", name: "やっぱりステーキ 5th Ashibina", subtitle: "ASHIBINAA 2F · 丰见城市丰崎",
+        map: "https://www.google.com/maps/search/?api=1&query=Yappari+Steak+5th+Ashibina",
+        summary: "やっぱりステーキ 5th Ashibina 是位于 ASHIBINAA 商场内的牛排晚餐候选，购物后无需再到其他区域找餐厅，可直接在同一商场用餐。这个安排对依赖公共交通的一天尤其有帮助：先在 Outlet 购物，再就近吃饭，避免为了晚餐额外转车。具体分店营业时间、最后点单、当天排队和餐点供应仍需确认；建议不要把购物拖到关门前才开始用餐，给晚饭和返程都留出足够余量。",
+        why: "晚餐与购物地点相邻，减少晚上额外移动；之后再按确认好的公交班次返回那霸。",
+        status: "分店最后点单与周六营业状态须出发前确认。"
+      }
+    ];
 
-            <!-- Luggage Strategy -->
-            <div class="bg-amber-50/80 border border-amber-200/80 rounded-2xl p-6 shadow-sm">
-                <h2 class="text-lg font-bold text-amber-900 mb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-truck-ramp-box text-amber-600"></i> 導遊行李移動「黃金解法」
-                </h2>
-                <div class="text-xs text-slate-700 space-y-3 leading-relaxed">
-                    <div class="flex items-start gap-2.5">
-                        <div class="bg-amber-200 text-amber-900 font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">1</div>
-                        <p><b>移動策略：</b>Day 3 由熱海沿伊豆東岸前往下田；Day 4 退房後寄存或攜帶行李，搭乘路線巴士遊覽南伊豆，並預留傍晚由下田返回熱海的鐵路時間。</p>
-                    </div>
-                    <div class="flex items-start gap-2.5">
-                        <div class="bg-amber-200 text-amber-900 font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">2</div>
-                        <p><b>行李建議：</b>Day 3 從熱海前往下田時攜帶過夜用品；Day 4 離開下田前可向旅館確認寄存服務，並安排取回行李後搭車回熱海。Day 5 從熱海前往成田，請攜帶行李並預留轉乘時間。</p>
-                    </div>
-                    <div class="flex items-start gap-2.5">
-                        <div class="bg-amber-200 text-amber-900 font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">3</div>
-                        <p><b>隨身裝備：</b>海岸步道可能有階梯、坡道及濕滑路面，建議穿防滑步行鞋、攜帶飲水與防曬用品；出海或海岸活動依天候及現場公告調整。</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+    const spotTitle = document.querySelector("#spot-title");
+    const spotSubtitle = document.querySelector("#spot-subtitle");
+    const spotSummary = document.querySelector("#spot-summary");
+    const spotWhy = document.querySelector("#spot-why");
+    const spotKicker = document.querySelector("#spot-kicker");
+    const spotStatus = document.querySelector("#spot-status");
+    const spotMap = document.querySelector("#spot-map");
+    const spotCard = document.querySelector("#spot-card");
+    let activeIndex = 0;
+    let jumpAction = () => {};
 
-    </main>
+    function showPlace(index) {
+      activeIndex = (index + places.length) % places.length;
+      const place = places[activeIndex];
+      spotCard.classList.remove("spot-pop");
+      requestAnimationFrame(() => spotCard.classList.add("spot-pop"));
+      spotKicker.textContent = `旅程地点 · ${String(activeIndex + 1).padStart(2, "0")} / ${String(places.length).padStart(2, "0")}`;
+      spotTitle.textContent = place.name;
+      spotSubtitle.textContent = place.subtitle;
+      spotSummary.textContent = place.summary;
+      spotWhy.textContent = place.why;
+      spotStatus.textContent = place.status;
+      spotMap.href = place.map;
+      spotMap.hidden = false;
+      spotMap.setAttribute("aria-label", `在 Google Maps 查看${place.name}`);
+      jumpAction(activeIndex);
+    }
 
-    <!-- Data & Script Logic -->
-    <script>
-        // Itinerary Data
-        const itineraryData = {
-            day1: [
-                { id: "d1-1", time: "08:00 - 09:30", title: "羽田機場 (HND) 入境與準備", transit: "機場手續", note: "辦理入境手續、領取行李、購買/綁定 Suica 或 Pasmo IC 卡。", location: "Haneda Airport", price: { min: 0, max: 0, note: "入境與領行李" } },
-                { id: "d1-2", time: "09:30 - 11:00", title: "羽田機場 ➔ 熱海車站", transit: "京急線 ➔ 東海道新幹線/特急", note: "車程約 75-90 分鐘。到達後將大行李寄存在車站置物櫃或送至飯店。", location: "Atami Station", price: { min: 1500, max: 4500, note: "轉乘車資估算" } },
-                { id: "d1-3", time: "11:30 - 13:00", title: "平和通商店街 & 熱海銀座散策", transit: "步行", note: "【午餐推薦】享用熱海海鮮丼（如: 魚主 或 圍莊），飯後必吃「熱海布丁」。", location: "Atami Ginza Shopping Street", price: { min: 1500, max: 3500, note: "午餐與甜點預算" } },
-                { id: "d1-4", time: "13:30 - 15:30", title: "來宮神社 (Kinomiya Shrine)", transit: "JR 伊東線 / 步行 15 分鐘", note: "參拜 2000 年樹齡「大楠神木」，於神社內『茶寮 報鼓』享用抹茶與和菓子。", location: "Kinomiya Shrine", price: { min: 0, max: 1200, note: "參拜免費；茶點另計" } },
-                { id: "d1-5", time: "16:00 - 18:00", title: "MOA 美術館 (MOA Museum of Art)", transit: "公車 (熱海站8號月台)", note: "坐落山頂擁絕美相模灣框架窗景，巨型萬花筒影音大廳不容錯過。", location: "MOA Museum of Art", price: { min: 1600, max: 2000, note: "門票與接駁車估算" } },
-                { id: "d1-6", time: "18:30+", title: "入住：熱海來宮之湯松月日式旅館", transit: "依旅館指引前往", note: "Day 1–2 住宿。確認入住時間、晚餐供應與接駁安排；若房價已含晚餐，請勿重複計算餐費。", location: "熱海來宮之湯松月日式旅館", price: { min: 0, max: 5000, note: "晚餐預算；住宿另計" } }
-            ],
-            day2: [
-                { id: "d2-1", time: "08:30 - 09:30", title: "熱海來宮之湯松月日式旅館早餐", transit: "旅館內", note: "於指定住宿享用早餐，確認訂房方案是否含餐；用餐後出發前往熱海港搭船。", location: "熱海來宮之湯松月日式旅館", price: { min: 0, max: 1500, note: "早餐預算；依房價是否含餐而定" } },
-                { id: "d2-2", time: "09:00 - 09:30", title: "熱海港 ➔ 初島 (Hatsushima)", transit: "首都圈高速船 (約 30 分鐘)", note: "搭乘渡輪前往靜岡縣唯一離島，遠眺富士山與南國度假風情。為銜接下午大室山，請預先確認去回程船班並選擇較早出發的班次。", location: "Atami Port", price: { min: 2800, max: 3200, note: "初島來回船票估算" } },
-                { id: "d2-3", time: "09:30 - 12:30", title: "初島島嶼漫遊 & 海鮮午餐", transit: "島上步行", note: "漫步島上步道及海景花園，於「初島食堂街」享用當日新鮮海鮮。預留時間搭乘早一班回熱海的船，避免錯過大室山末班交通。", location: "Hatsushima", price: { min: 1500, max: 4000, note: "午餐與園區活動預算" } },
-                { id: "d2-4", time: "12:30 - 13:00", title: "初島 ➔ 返回熱海港", transit: "高速船", note: "為銜接伊豆高原交通，建議搭乘中午前後的回程船班；船班依季節與天候調整，請查詢當日官方時刻表。", location: "Atami Port", price: { min: 0, max: 0, note: "已計入初島來回船票" } },
-                { id: "d2-5", time: "13:00 - 14:30", title: "熱海港 ➔ 伊豆高原 ➔ 大室山", transit: "步行 / JR 伊東線・伊豆急行線 / 路線巴士", note: "由熱海港前往熱海站，搭列車至伊豆高原，再轉巴士上山。轉乘時間依當日船班與列車銜接而異，請預留緩衝並先確認末班巴士。", location: "Mount Omuro", price: { min: 2000, max: 3000, note: "伊豆高原往返列車與巴士交通估算" } },
-                { id: "d2-6", time: "14:30 - 16:30", title: "大室山登山纜車 & 火山口步道", transit: "大室山登山纜車 / 環山步道", note: "搭乘吊椅登頂，沿火山口步道漫步，眺望伊豆半島與相模灣。登山纜車可能因強風停駛，營運日期、末班時間及當日狀況請以官方公告為準；若交通延誤或停駛，改留在熱海。", location: "Mount Omuro", price: { min: 1000, max: 1500, note: "大室山登山纜車票價估算" } },
-                { id: "d2-7", time: "18:00+", title: "返回熱海市區晚餐 & 溫泉舒壓", transit: "路線巴士 / 伊豆急行線・JR 伊東線", note: "預留返回熱海及轉乘時間，再享用市區晚餐；返回列車與巴士班次請先查詢，避免錯過末班車。", location: "Atami Station", price: { min: 2000, max: 4000, note: "晚餐預算；住宿另計" } }
-            ],
-            day3: [
-                { id: "d3-1", time: "07:30 - 08:00", title: "熱海來宮之湯松月日式旅館退房", transit: "步行 / 旅館接駁", note: "確認退房及早餐安排，前往熱海站。若要寄送行李至下田住宿，先確認旅館是否代辦、收件時限及預計送達日期；不確定時請自行攜帶。", location: "熱海來宮之湯松月日式旅館", price: { min: 0, max: 2500, note: "行李寄送費估算；依尺寸及服務而異" } },
-                { id: "d3-2", time: "08:00 - 09:30", title: "熱海 ➔ 城崎海岸站", transit: "JR 伊東線 ➔ 伊豆急行線", note: "沿伊豆東岸南下，在城崎海岸站下車。車種、轉乘及所需時間依當日班次而異，出發前查看路線與票價。", location: "Jogasaki-Kaigan Station", price: { min: 1200, max: 2500, note: "熱海至城崎海岸單程車資估算" } },
-                { id: "d3-3", time: "09:30 - 12:00", title: "城崎海岸步道與門脇吊橋", transit: "步行", note: "沿海岸步道前往門脇吊橋及燈塔周邊觀景。步道有坡度、階梯及不平路面；遇風雨或路況不佳時縮短步行，並預留回車站時間。", location: "Jogasaki Coast", price: { min: 0, max: 500, note: "步道免費；飲品等個人消費" } },
-                { id: "d3-4", time: "12:00 - 13:30", title: "伊豆高原午餐與休息", transit: "伊豆急行線 / 步行", note: "搭車至伊豆高原站用午餐，可選海鮮或在地餐館；用餐後依時間前往車站周邊短暫散策。", location: "Izu Kogen Station", price: { min: 1200, max: 3000, note: "午餐與飲品預算" } },
-                { id: "d3-5", time: "13:30 - 15:00", title: "伊豆高原 ➔ 伊豆急下田", transit: "伊豆急行線", note: "搭乘伊豆急行線前往下田辦理入住或寄放行李。列車停站、班距及車資依所搭列車而異；勿將概算視為時刻表。", location: "Izukyu-Shimoda Station", price: { min: 1000, max: 2500, note: "伊豆高原至下田單程車資估算" } },
-                { id: "d3-6", time: "15:00 - 17:30", title: "入住下田海濱酒店（僅住一晚）", transit: "依酒店指引前往", note: "今晚入住指定的下田海濱酒店。請依訂房確認資料核對酒店地址及從伊豆急下田站前往方式；Day 4 退房遊覽南伊豆後返回熱海。若要寄放行李，請先向酒店確認。", location: "下田海濱酒店", price: { min: 0, max: 1500, note: "住宿另計；飲品與小食預算" } },
-                { id: "d3-7", time: "18:00+", title: "下田晚餐", transit: "步行 / 酒店內", note: "可在下田海濱酒店或附近享用金目鯛料理、海鮮；若住宿方案包含晚餐，請從餐費預算扣除。", location: "下田海濱酒店", price: { min: 2000, max: 5000, note: "晚餐預算；住宿另計" } }
-            ],
-            day4: [
-                { id: "d4-0", time: "08:00 - 08:30", title: "下田海濱酒店退房／寄存行李", transit: "酒店櫃檯 / 步行", note: "辦理退房並向酒店確認行李寄存；若無法寄存，請先安排可行的行李寄放方式再出發遊覽。傍晚需返回下田站取行李並搭車前往熱海。", location: "下田海濱酒店", price: { min: 0, max: 500, note: "行李寄存與個人消費估算" } },
-                { id: "d4-1", time: "08:30 - 09:00", title: "佩里之路與下田港散策", transit: "步行", note: "從下田市區沿平緩街道走訪佩里之路、歷史街區與港邊；依天氣調整步行時間。", location: "Perry Road", price: { min: 0, max: 500, note: "步行免費；飲品等個人消費" } },
-                { id: "d4-2", time: "09:00 - 11:00", title: "下田公園與下田港景觀", transit: "步行", note: "登下田公園俯瞰港灣及市區。園區有坡道與階梯；紫陽花花期因年份不同，請以當季資訊為準。", location: "Shimoda Park", price: { min: 0, max: 500, note: "公園免費；飲品等個人消費" } },
-                { id: "d4-3", time: "11:00 - 12:30", title: "下田市區午餐", transit: "步行 / 路線巴士", note: "回市區享用金目鯛、海鮮或日式定食；如要搭巴士至白濱，先查看班次及站點。", location: "Izukyu-Shimoda Station", price: { min: 1500, max: 3500, note: "午餐預算" } },
-                { id: "d4-4", time: "12:30 - 14:00", title: "白濱海岸散步", transit: "東海巴士 / 步行", note: "前往白濱大濱海岸欣賞海景與白色沙灘。游泳只限指定季節及開放海灘，請留意海況、救生員與現場公告。", location: "Shirahama Beach", price: { min: 500, max: 1800, note: "巴士來回及個人消費估算" } },
-                { id: "d4-5", time: "14:00 - 16:00", title: "龍宮窟與田牛海岸", transit: "東海巴士 / 步行", note: "視巴士銜接前往龍宮窟及田牛周邊海岸。步道及洞窟可能因潮汐、風浪或安全管制關閉；請以現場公告為準，預留返回下田的時間。", location: "Ryugu Cave", price: { min: 500, max: 2000, note: "巴士車資與個人消費估算" } },
-                { id: "d4-6", time: "16:00 - 17:00", title: "返回伊豆急下田站並領取行李", transit: "東海巴士 / 步行", note: "由田牛／龍宮窟一帶搭巴士返回下田，領取寄存行李並前往車站。南伊豆巴士班距可能較長，請按當日班次調整景點停留時間。", location: "Izukyu-Shimoda Station", price: { min: 500, max: 1500, note: "巴士車資估算" } },
-                { id: "d4-7", time: "17:00 - 20:00", title: "伊豆急下田 ➔ 熱海，前往大野屋酒店", transit: "伊豆急行線 / JR 伊東線 / 計程車或巴士", note: "搭乘北上列車返回熱海，再前往熱海大野屋酒店。酒店接駁服務、發車時間及預約方式請先向酒店確認；列車與接駁時間依當日班次為準。", location: "熱海大野屋酒店", price: { min: 2000, max: 5000, note: "下田至熱海單程車資及市區接駁估算；住宿另計" } },
-                { id: "d4-8", time: "20:00+", title: "入住熱海大野屋酒店", transit: "酒店接駁 / 計程車 / 步行", note: "Day 4 晚入住熱海大野屋酒店。請確認當晚訂房、最晚入住時間，以及晚餐是否須事先預約或包含於房價。", location: "熱海大野屋酒店", price: { min: 1500, max: 5000, note: "晚餐預算；住宿另計" } }
-            ],
-            day5: [
-                { id: "d5-1", time: "07:00 - 08:00", title: "大野屋酒店退房，前往熱海站", transit: "酒店接駁 / 計程車 / 巴士", note: "由熱海大野屋酒店退房，攜帶行李前往熱海站。酒店接駁班次與預約方式請事先確認；若航班較早，應考慮前一晚住東京或成田。", location: "熱海大野屋酒店", price: { min: 0, max: 1500, note: "早餐或前往車站交通預算" } },
-                { id: "d5-2", time: "08:00 - 09:00", title: "熱海站周邊早晨購物與伴手禮採買", transit: "步行", note: "在熱海站商店街購買伴手禮、點心或補給後出發。各店開門時間不同，請事先查營業時間；若店舖尚未營業，改至便利商店或咖啡店，不要因此錯過預定列車。", location: "Atami Station", price: { min: 1000, max: 5000, note: "伴手禮與早餐預算" } },
-                { id: "d5-3", time: "09:00 - 11:00", title: "熱海 ➔ 東京轉乘", transit: "JR 東海道線 / 新幹線", note: "依實際車票和班次選擇列車前往東京；此為規劃時段而非保證班次，預留轉乘緩衝，不要依最短銜接時間安排行程。", location: "Tokyo Station", price: { min: 2000, max: 5000, note: "熱海至東京單程車資估算" } },
-                { id: "d5-4", time: "11:00 - 13:00", title: "東京 ➔ 成田機場（NRT）", transit: "JR 成田特快 / 機場巴士 / 京成線", note: "按當日班次與車票選擇合適交通方式前往成田。以上為概略規劃時段，實際時間及車資依路線、列車與轉乘等候而異。", location: "Narita Airport", price: { min: 1500, max: 4000, note: "東京至成田單程交通估算" } },
-                { id: "d5-5", time: "13:00+", title: "成田機場報到、用餐與候機", transit: "步行", note: "抵達後預留充足時間辦理報到、託運及安檢，並依航班航廈安排用餐與候機。建議航班 18:00 後起飛。", location: "Narita Airport", price: { min: 1000, max: 2500, note: "餐飲預算；航班與購物未計" } }
-            ]
-        };
+    const placeByKeyword = [
+      [/机场|取行李/, "airport"],
+      [/酒店|住宿|寄存行李|回房|返回住宿/, "hotel"],
+      [/Steak House 88|牛肉晚餐/, "beef"],
+      [/Planete|酒吧/, "bar"],
+      [/泊いゆまち|海鲜早餐|海鲜市场/, "market"],
+      [/波上宫|Naminoue/, "shrine"],
+      [/鞋店|购鞋|试穿/, "shoes"],
+      [/Golf5|高尔夫用品/, "golf"],
+      [/Outlet|ASHIBINAA/, "outlet"],
+      [/やっぱりステーキ|晚餐/, "dinner"]
+    ];
+    document.querySelectorAll(".timeline-card").forEach((card) => {
+      const title = card.querySelector(".item-title")?.textContent || "";
+      const match = placeByKeyword.find(([pattern]) => pattern.test(title));
+      if (match) card.dataset.place = match[1];
+      card.addEventListener("mouseenter", () => {
+        const index = places.findIndex((place) => place.id === card.dataset.place);
+        if (index >= 0) showPlace(index);
+      });
+      card.addEventListener("focusin", () => {
+        const index = places.findIndex((place) => place.id === card.dataset.place);
+        if (index >= 0) showPlace(index);
+      });
+      card.addEventListener("click", (event) => {
+        if (event.target.closest("a, input, label, button")) return;
+        const index = places.findIndex((place) => place.id === card.dataset.place);
+        if (index >= 0) showPlace(index);
+      });
+    });
 
-        const dayOptions = {
-            day1: [
-                { id: "d1-alt1", time: "彈性加選", title: "熱海梅園漫步", transit: "巴士 / 步行", note: "在溪流與庭園間放慢腳步；花季以外也適合散步，出發前確認開園資訊。", location: "Atami Plum Garden", price: { min: 0, max: 1000, note: "入園及接駁車估算" } },
-                { id: "d1-alt2", time: "彈性加選", title: "Sun Beach 海岸夕陽", transit: "步行 / 巴士", note: "把海灘散步排進抵達日，天氣晴朗時欣賞相模灣日落。", location: "Atami Sun Beach", price: { min: 0, max: 600, note: "步行免費；市區交通另計" } }
-            ],
-            day2: [
-                { id: "d2-alt1", time: "彈性加選", title: "初島海上運動體驗", transit: "島上步行", note: "依天氣及營業狀況選擇海上活動或島上休閒設施，請先查詢營運資訊。", location: "Hatsushima Island", price: { min: 1000, max: 3500, note: "活動票價預算，依項目而異" } },
-                { id: "d2-alt2", time: "雨天／交通備案", title: "熱海纜車與熱海城", transit: "熱海市區巴士 / 纜車", note: "若初島船班、列車銜接或大室山纜車因天候不適合，改在熱海搭纜車登錦浦山，視時間加訪熱海城。營業時間及票價請行前確認。", location: "Atami Ropeway", price: { min: 700, max: 2500, note: "纜車與可選熱海城門票" } }
-            ],
-            day3: [
-                { id: "d3-alt1", time: "彈性加選", title: "伊豆高原站周邊咖啡與足湯", transit: "步行", note: "若城崎海岸步行時間較短，可在伊豆高原站附近安排咖啡或足湯休息；依設施營業時間與現場狀況調整。", location: "Izu Kogen Station", price: { min: 300, max: 1500, note: "飲品與設施費用估算" } },
-                { id: "d3-alt2", time: "彈性加選", title: "伊豆仙人掌動物公園", transit: "路線巴士", note: "適合喜歡動物與植物園的旅客；此選項會增加移動時間，建議取代伊豆高原長時間休息，並先確認營業資訊。", location: "Izu Shaboten Zoo", price: { min: 2500, max: 3500, note: "門票與接駁交通估算" } }
-            ],
-            day4: [
-                { id: "d4-alt1", time: "彈性加選", title: "下田海中水族館", transit: "步行 / 路線巴士", note: "以水族展示及海豚活動為主，可替代一段市區散步；查看當日開館時間與活動安排。", location: "Shimoda Aquarium", price: { min: 2000, max: 3000, note: "門票與市區交通估算" } },
-                { id: "d4-alt2", time: "彈性加選", title: "石廊崎與南伊豆海岸", transit: "東海巴士", note: "若想把海岸行程延伸至南伊豆，可選擇石廊崎取代白濱或龍宮窟；巴士班距較疏，先確認往返班次。", location: "Cape Irozaki", price: { min: 1000, max: 2500, note: "巴士車資與個人消費估算" } }
-            ],
-            day5: [
-                { id: "d5-alt1", time: "機場彈性安排", title: "成田機場午餐與補給", transit: "步行", note: "到機場後再安排用餐與購物；此選項不可作為延後離開熱海的理由，請以航班報到時間為優先。", location: "Narita Airport", price: { min: 1000, max: 2500, note: "餐飲預算" } },
-                { id: "d5-alt2", time: "機場彈性安排", title: "成田機場觀景台", transit: "機場接駁 / 步行", note: "若已完成報到且時間充裕，可至航廈觀景台短暫休息；先依航班確認所在航廈及觀景台開放狀況。", location: "Narita Airport", price: { min: 0, max: 500, note: "免費；飲品等個人消費" } }
-            ]
-        };
+    try {
+      const THREE = await import("https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js");
+      const canvas = document.querySelector("#okinawa-scene");
+      const host = canvas.parentElement;
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color("#73cfe0");
+      const camera = new THREE.OrthographicCamera(-8, 8, 4.5, -4.5, 0.1, 100);
+      camera.position.set(0, 1.1, 24);
+      camera.lookAt(0, 1.1, 0);
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false });
+      renderer.setPixelRatio(1);
+      renderer.shadowMap.enabled = false;
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.NoToneMapping;
+      scene.add(new THREE.AmbientLight("#ffffff", 2.2));
+      const sun = new THREE.DirectionalLight("#fff1c8", 1.5);
+      sun.position.set(-5, 10, 8);
+      scene.add(sun);
 
-        const dayNames = {
-            day1: "Day 1 熱海抵達",
-            day2: "Day 2 初島海島",
-            day3: "Day 3 城崎海岸・伊豆高原・下田",
-            day4: "Day 4 下田・南伊豆",
-            day5: "Day 5 成田返程"
-        };
+      const cloudGroups = [];
+      for (let i = 0; i < 8; i++) {
+        const x = i * 15 - 10;
+        const cloud = new THREE.Group();
+        [[0,0,0],[.7,.2,0],[1.3,0,0],[-.65,.05,0]].forEach(([dx,dy,dz]) => {
+          const puff = new THREE.Mesh(new THREE.BoxGeometry(1.05, .55, .4), new THREE.MeshLambertMaterial({ color: "#fffaf0" }));
+          puff.position.set(dx,dy,dz);
+          cloud.add(puff);
+        });
+        cloud.position.set(x, 3.9 + (i % 3) * .45, -2);
+        scene.add(cloud);
+        cloudGroups.push(cloud);
+      }
+      for (let i = 0; i < 12; i++) {
+        const hill = new THREE.Mesh(new THREE.SphereGeometry(2.4 + (i % 3) * .45, 8, 6), new THREE.MeshLambertMaterial({ color: i % 2 ? "#2e9c91" : "#56b9a8", flatShading: true }));
+        hill.scale.y = .38;
+        hill.position.set(i * 9 - 5, -2.3, -5);
+        scene.add(hill);
+      }
+      const sea = new THREE.Mesh(new THREE.PlaneGeometry(200, 80), new THREE.MeshLambertMaterial({ color: "#168fb0" }));
+      sea.position.set(45, -3.15, -3);
+      scene.add(sea);
 
-        function formatYen(amount) {
-            return `¥${Math.round(amount).toLocaleString('en-US')}`;
+      const stageX = places.map((_, index) => index * 8);
+      const stageTop = [-1.35, -.55, -1.05, -.3, -1.25, -.45, -1.2, -.35, -1.1, -.4];
+      const platforms = [];
+      const markerMeshes = [];
+      const collectibles = [];
+      const goldMaterial = new THREE.MeshLambertMaterial({ color: "#b7f2e7", emissive: "#155a70" });
+      const platformTopMaterial = new THREE.MeshLambertMaterial({ color: "#39aaa3" });
+      const platformSideMaterial = new THREE.MeshLambertMaterial({ color: "#266f82" });
+      const labelNames = ["机场","酒店","牛排","酒吧","海鲜市场","波上宫","鞋店","Golf5","Outlet","晚餐"];
+      const makeLabel = (text) => {
+        const labelCanvas = document.createElement("canvas");
+        labelCanvas.width = 256;
+        labelCanvas.height = 64;
+        const ctx = labelCanvas.getContext("2d");
+        ctx.fillStyle = "#e7f8f6";
+        ctx.fillRect(0, 0, 256, 64);
+        ctx.strokeStyle = "#123f55";
+        ctx.lineWidth = 6;
+        ctx.strokeRect(3, 3, 250, 58);
+        ctx.fillStyle = "#123f55";
+        ctx.font = "bold 30px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, 128, 33);
+        const texture = new THREE.CanvasTexture(labelCanvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true }));
+        sprite.scale.set(2.3, .58, 1);
+        return sprite;
+      };
+
+      places.forEach((place, index) => {
+        const x = stageX[index];
+        const top = stageTop[index];
+        const platform = new THREE.Group();
+        const soil = new THREE.Mesh(new THREE.BoxGeometry(6.15, .78, 1.8), platformSideMaterial);
+        soil.position.set(x, top - .39, 0);
+        platform.add(soil);
+        const turf = new THREE.Mesh(new THREE.BoxGeometry(6.25, .22, 1.9), platformTopMaterial);
+        turf.position.set(x, top - .11, 0);
+        platform.add(turf);
+        for (let tile = 0; tile < 5; tile++) {
+          const tileMesh = new THREE.Mesh(new THREE.BoxGeometry(1.18, .16, 1.84), new THREE.MeshLambertMaterial({ color: tile % 2 ? "#5fc2bd" : "#80d7cb" }));
+          tileMesh.position.set(x - 2.48 + tile * 1.24, top - .08, 0);
+          platform.add(tileMesh);
         }
+        scene.add(platform);
+        platforms.push({ x, top, half: 3.12 });
 
-        function formatPrice(price) {
-            if (price.min === price.max) return formatYen(price.min);
-            return `${formatYen(price.min)}–${formatYen(price.max)}`;
+        const pole = new THREE.Mesh(new THREE.BoxGeometry(.12, 1.65, .12), new THREE.MeshLambertMaterial({ color: "#17566c" }));
+        pole.position.set(x, top + .95, -.2);
+        scene.add(pole);
+        const flag = new THREE.Mesh(new THREE.BoxGeometry(.95, .48, .1), new THREE.MeshLambertMaterial({ color: index % 2 ? "#48bdb7" : "#c2eee4" }));
+        flag.position.set(x + .47, top + 1.47, -.2);
+        scene.add(flag);
+        const label = makeLabel(labelNames[index]);
+        label.position.set(x, top + 2.05, -.3);
+        scene.add(label);
+
+        const group = new THREE.Group();
+        group.position.set(x, top, .75);
+        const marker = new THREE.Mesh(new THREE.BoxGeometry(.46, .46, .2), new THREE.MeshLambertMaterial({ color: "#22a9ad" }));
+        marker.position.y = .4;
+        marker.userData.placeIndex = index;
+        group.add(marker);
+        markerMeshes.push(marker);
+        const shell = new THREE.Mesh(new THREE.TorusGeometry(.23, .1, 4, 8), goldMaterial);
+        shell.position.set(index % 2 ? 1.55 : -1.55, top + 1.7, 0);
+        shell.userData.placeIndex = index;
+        scene.add(shell);
+        collectibles.push({ mesh: shell, collected: false, baseY: top + 1.7 });
+        scene.add(group);
+      });
+
+      const avatar = new THREE.Group();
+      const shirt = new THREE.Mesh(new THREE.BoxGeometry(.7,.68,.55), new THREE.MeshLambertMaterial({ color: "#087e8b" }));
+      shirt.position.y = .8;
+      avatar.add(shirt);
+      const face = new THREE.Mesh(new THREE.BoxGeometry(.56,.55,.52), new THREE.MeshLambertMaterial({ color: "#f2bd88" }));
+      face.position.y = 1.42;
+      avatar.add(face);
+      const hair = new THREE.Mesh(new THREE.BoxGeometry(.66,.2,.56), new THREE.MeshLambertMaterial({ color: "#123f55" }));
+      hair.position.y = 1.79;
+      avatar.add(hair);
+      const backpack = new THREE.Mesh(new THREE.BoxGeometry(.22,.55,.48), new THREE.MeshLambertMaterial({ color: "#59c8bf" }));
+      backpack.position.set(-.42,.84,.04);
+      avatar.add(backpack);
+      const legs = [-.2,.2].map((x) => {
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(.24,.38,.35), new THREE.MeshLambertMaterial({ color: "#28788a" }));
+        leg.position.set(x,.26,0);
+        avatar.add(leg);
+        return leg;
+      });
+      avatar.position.set(stageX[0], stageTop[0], .2);
+      scene.add(avatar);
+      const enemies = [2,5,7].map((index) => {
+        const enemy = new THREE.Group();
+        const shell = new THREE.Mesh(new THREE.BoxGeometry(.65,.46,.54), new THREE.MeshLambertMaterial({ color: "#c85f51" }));
+        shell.position.y = .25;
+        enemy.add(shell);
+        const eye = new THREE.Mesh(new THREE.BoxGeometry(.12,.12,.08), new THREE.MeshLambertMaterial({ color: "#fff9e8" }));
+        eye.position.set(.13,.35,.3);
+        enemy.add(eye);
+        enemy.position.set(stageX[index] + 1.2, stageTop[index] + .25, .35);
+        scene.add(enemy);
+        return { mesh: enemy, origin: stageX[index] + 1.2, platform: index };
+      });
+
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+      const keys = new Set();
+      const hud = document.querySelector("#scene-hud");
+      let hovered = -1;
+      let verticalSpeed = 0;
+      let onGround = true;
+      let jumpQueued = false;
+      let checkpointIndex = 0;
+      let currentPlatform = 0;
+      let shellCount = 0;
+      let facing = 1;
+      let elapsedTotal = 0;
+      const gravity = 22;
+      const jumpSpeed = 9.2;
+      const walkSpeed = 7.3;
+      const setMove = (key, active) => {
+        if (active) keys.add(key);
+        else keys.delete(key);
+      };
+      const interactButton = document.querySelector("#scene-interact");
+      const updateInteractionPrompt = () => {
+        const canInteract = currentPlatform >= 0 && onGround;
+        interactButton.disabled = !canInteract;
+        interactButton.textContent = canInteract ? "互动查看本站介绍 · E" : "到达地点平台后可互动";
+        interactButton.setAttribute("aria-label", canInteract
+          ? `互动查看${places[currentPlatform].name}介绍`
+          : "到达地点平台后互动查看介绍");
+      };
+      const interactAtCurrentPlatform = () => {
+        if (currentPlatform >= 0 && onGround) showPlace(currentPlatform);
+      };
+      const bindHold = (element, key) => {
+        element.addEventListener("pointerdown", (event) => {
+          event.preventDefault();
+          element.setPointerCapture?.(event.pointerId);
+          setMove(key, true);
+        });
+        element.addEventListener("click", (event) => {
+          if (event.detail !== 0) return;
+          setMove(key, true);
+          setTimeout(() => setMove(key, false), 180);
+        });
+        const release = () => setMove(key, false);
+        element.addEventListener("pointerup", release);
+        element.addEventListener("pointercancel", release);
+        element.addEventListener("lostpointercapture", release);
+      };
+      bindHold(document.querySelector("#scene-prev"), "left");
+      bindHold(document.querySelector("#scene-next"), "right");
+      document.querySelector("#scene-jump").addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        jumpQueued = true;
+      });
+      document.querySelector("#scene-jump").addEventListener("click", (event) => {
+        if (event.detail === 0) jumpQueued = true;
+      });
+      interactButton.addEventListener("click", interactAtCurrentPlatform);
+      window.addEventListener("keydown", (event) => {
+        if (event.target.closest("input, textarea, select, button, a")) return;
+        if (["ArrowRight", "ArrowLeft", "Space", "ArrowUp"].includes(event.code) || ["ArrowRight", "ArrowLeft"].includes(event.key)) event.preventDefault();
+        if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") setMove("right", true);
+        if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") setMove("left", true);
+        if (event.code === "Space" || event.key === "ArrowUp" || event.key.toLowerCase() === "w") jumpQueued = true;
+        if (event.key.toLowerCase() === "e") interactAtCurrentPlatform();
+      });
+      window.addEventListener("keyup", (event) => {
+        if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") setMove("right", false);
+        if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") setMove("left", false);
+      });
+      window.addEventListener("blur", () => keys.clear());
+      jumpAction = (_index, jump = false) => {
+        if (jump) jumpQueued = true;
+      };
+      const updateHud = () => {
+        hud.textContent = `贝壳 ${String(shellCount).padStart(2, "0")} / ${String(collectibles.length).padStart(2, "0")} · 检查点 ${String(checkpointIndex + 1).padStart(2, "0")} / ${String(places.length).padStart(2, "0")}`;
+      };
+      updateHud();
+      updateInteractionPrompt();
+
+      canvas.addEventListener("pointermove", (event) => {
+        const rect = canvas.getBoundingClientRect();
+        pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(pointer, camera);
+        const hit = raycaster.intersectObjects(markerMeshes, false)[0];
+        const nextHover = hit ? hit.object.userData.placeIndex : -1;
+        canvas.style.cursor = nextHover >= 0 ? "pointer" : "default";
+        if (nextHover >= 0 && nextHover !== hovered) {
+          hovered = nextHover;
         }
+      });
+      canvas.addEventListener("pointerleave", () => {
+        hovered = -1;
+        canvas.style.cursor = "default";
+      });
+      canvas.addEventListener("pointerdown", () => canvas.focus({ preventScroll: true }));
 
-        function escapeHtml(value) {
-            return String(value ?? '').replace(/[&<>"']/g, character => ({
-                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-            })[character]);
+      const resize = () => {
+        const width = Math.max(280, host.clientWidth);
+        const height = Math.max(270, host.clientHeight);
+        renderer.setSize(width, height, false);
+        const viewHeight = 9;
+        const viewWidth = viewHeight * width / height;
+        camera.left = -viewWidth / 2;
+        camera.right = viewWidth / 2;
+        camera.top = viewHeight / 2;
+        camera.bottom = -viewHeight / 2;
+        camera.updateProjectionMatrix();
+      };
+      new ResizeObserver(resize).observe(host);
+      resize();
+      const clock = new THREE.Clock();
+      const animate = () => {
+        requestAnimationFrame(animate);
+        const delta = Math.min(clock.getDelta(), 0.04);
+        elapsedTotal += delta;
+        const moveDirection = (keys.has("right") ? 1 : 0) - (keys.has("left") ? 1 : 0);
+        if (moveDirection) {
+          avatar.position.x += moveDirection * walkSpeed * delta;
+          facing = moveDirection;
         }
-
-        function googleDirectionsUrl(origin, destination, waypoints = []) {
-            const params = new URLSearchParams({
-                api: '1',
-                origin,
-                destination,
-                travelmode: 'transit'
-            });
-            if (waypoints.length) params.set('waypoints', waypoints.join('|'));
-            return `https://www.google.com/maps/dir/?${params.toString()}`;
+        if (jumpQueued && onGround) {
+          verticalSpeed = jumpSpeed;
+          onGround = false;
+          currentPlatform = -1;
+          updateInteractionPrompt();
         }
+        jumpQueued = false;
 
-        function googlePlaceUrl(location) {
-            const params = new URLSearchParams({ api: '1', query: location });
-            return `https://www.google.com/maps/search/?${params.toString()}`;
+        const previousY = avatar.position.y;
+        if (!onGround) {
+          verticalSpeed -= gravity * delta;
+          avatar.position.y += verticalSpeed * delta;
         }
-
-        function renderDayRouteLinks() {
-            Object.keys(itineraryData).forEach(dayKey => {
-                const stops = selectedDayItems(dayKey);
-                const link = document.getElementById(`day-route-${dayKey}`);
-                const origin = stops[0].location;
-                const destination = stops[stops.length - 1].location;
-                const middleStops = stops.slice(1, -1);
-                const waypoints = middleStops
-                    .filter((stop, index) =>
-                        stop.location !== origin &&
-                        stop.location !== destination &&
-                        (index === 0 || stop.location !== middleStops[index - 1].location))
-                    .map(stop => stop.location);
-                link.href = googleDirectionsUrl(origin, destination, waypoints);
-                link.setAttribute('aria-label', `在 Google 地圖查看${dayNames[dayKey]}全日大眾運輸路線`);
-                link.title = '開啟 Google 地圖會將本日行程的地點與路線傳送給 Google';
-            });
-        }
-
-        function addedOptions(dayKey) {
-            return (localStorage.getItem(`trip-options-${dayKey}`) || '').split(',').filter(Boolean);
-        }
-
-        function customStops(dayKey) {
-            try {
-                const stops = JSON.parse(localStorage.getItem(`trip-custom-stops-${dayKey}`) || '[]');
-                return Array.isArray(stops) ? stops.filter(stop => stop && stop.custom === true) : [];
-            } catch {
-                return [];
+        let landedOn = -1;
+        if (verticalSpeed <= 0) {
+          platforms.forEach((platform, index) => {
+            const withinX = Math.abs(avatar.position.x - platform.x) <= platform.half - .34;
+            if (withinX && previousY >= platform.top && avatar.position.y <= platform.top) {
+              if (landedOn < 0 || platform.top > platforms[landedOn].top) landedOn = index;
             }
+          });
         }
-
-        function selectedDayItems(dayKey) {
-            const selected = new Set(addedOptions(dayKey));
-            return itineraryData[dayKey]
-                .concat(dayOptions[dayKey].filter(item => selected.has(item.id)))
-                .concat(customStops(dayKey));
+        if (landedOn >= 0) {
+          avatar.position.y = platforms[landedOn].top;
+          verticalSpeed = 0;
+          onGround = true;
+          if (currentPlatform !== landedOn) {
+            currentPlatform = landedOn;
+            updateInteractionPrompt();
+          }
+          if (landedOn > checkpointIndex) {
+            checkpointIndex = landedOn;
+            updateHud();
+          }
+        } else {
+          onGround = false;
+          if (currentPlatform >= 0) {
+            currentPlatform = -1;
+            updateInteractionPrompt();
+          }
         }
-
-        function renderCustomStopForm(dayKey) {
-            const container = document.getElementById(`custom-stop-form-${dayKey}`);
-            if (!container) return;
-            container.innerHTML = `
-                <details class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                    <summary class="cursor-pointer font-bold text-sm text-slate-800"><i class="fa-solid fa-circle-plus mr-2 text-emerald-600"></i>新增自訂景點</summary>
-                    <form class="mt-4 space-y-3" data-custom-stop-form="${dayKey}">
-                        <div class="grid grid-cols-2 gap-3">
-                            <label class="col-span-2 text-xs font-semibold text-slate-600 sm:col-span-1">景點名稱
-                                <input name="title" required maxlength="80" class="mt-1 w-full min-w-0 rounded-lg border border-slate-300 px-3 py-2 text-base text-slate-800" placeholder="例如：海邊咖啡館">
-                            </label>
-                            <label class="col-span-2 text-xs font-semibold text-slate-600 sm:col-span-1">地圖搜尋地點
-                                <input name="location" required maxlength="120" class="mt-1 w-full min-w-0 rounded-lg border border-slate-300 px-3 py-2 text-base text-slate-800" placeholder="地址或 Google 地圖可搜尋的名稱">
-                            </label>
-                            <label class="text-xs font-semibold text-slate-600">時間
-                                <input name="time" maxlength="30" value="彈性安排" class="mt-1 w-full min-w-0 rounded-lg border border-slate-300 px-3 py-2 text-base text-slate-800">
-                            </label>
-                            <label class="text-xs font-semibold text-slate-600">交通方式
-                                <input name="transit" maxlength="40" value="步行／自行安排" class="mt-1 w-full min-w-0 rounded-lg border border-slate-300 px-3 py-2 text-base text-slate-800">
-                            </label>
-                            <label class="text-xs font-semibold text-slate-600">最低預算（日圓）
-                                <input name="min" type="number" min="0" max="1000000" step="1" value="0" inputmode="numeric" class="mt-1 w-full min-w-0 rounded-lg border border-slate-300 px-3 py-2 text-base text-slate-800">
-                            </label>
-                            <label class="text-xs font-semibold text-slate-600">最高預算（日圓）
-                                <input name="max" type="number" min="0" max="1000000" step="1" value="0" inputmode="numeric" class="mt-1 w-full min-w-0 rounded-lg border border-slate-300 px-3 py-2 text-base text-slate-800">
-                            </label>
-                            <label class="col-span-2 text-xs font-semibold text-slate-600">備註
-                                <textarea name="note" maxlength="280" rows="2" class="mt-1 w-full min-w-0 resize-y rounded-lg border border-slate-300 px-3 py-2 text-base text-slate-800" placeholder="營業時間、預約資訊或提醒（選填）"></textarea>
-                            </label>
-                        </div>
-                        <button type="submit" class="inline-flex min-h-11 items-center gap-2 rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800"><i class="fa-solid fa-plus"></i>加入今日行程</button>
-                    </form>
-                </details>`;
-            container.querySelector('form').addEventListener('submit', event => {
-                event.preventDefault();
-                const form = event.currentTarget;
-                const values = new FormData(form);
-                const min = Number(values.get('min')) || 0;
-                const max = Number(values.get('max')) || 0;
-                const title = String(values.get('title')).trim();
-                const location = String(values.get('location')).trim();
-                if (!title || !location) {
-                    window.alert('請輸入景點名稱與地圖搜尋地點。');
-                    return;
-                }
-                if (max < min) {
-                    form.elements.max.setCustomValidity('最高預算不可低於最低預算');
-                    form.elements.max.reportValidity();
-                    form.elements.max.addEventListener('input', () => form.elements.max.setCustomValidity(''), { once: true });
-                    return;
-                }
-                const stop = {
-                    id: `custom-${dayKey}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-                    custom: true,
-                    time: String(values.get('time')).trim() || '彈性安排',
-                    title,
-                    transit: String(values.get('transit')).trim() || '自行安排',
-                    note: String(values.get('note')).trim() || '自訂景點',
-                    location,
-                    price: { min, max, note: '自訂預算估算' }
-                };
-                localStorage.setItem(`trip-custom-stops-${dayKey}`, JSON.stringify(customStops(dayKey).concat(stop)));
-                initApp();
-            });
+        if (avatar.position.y < -5.3) {
+          avatar.position.x = stageX[checkpointIndex];
+          avatar.position.y = stageTop[checkpointIndex];
+          verticalSpeed = 0;
+          onGround = true;
+          currentPlatform = checkpointIndex;
+          updateInteractionPrompt();
         }
+        avatar.rotation.y = facing < 0 ? Math.PI : 0;
+        legs.forEach((leg, index) => {
+          leg.rotation.z = moveDirection && onGround ? Math.sin(elapsedTotal * 12 + index * Math.PI) * .28 : 0;
+        });
 
-        function renderDaySummary(dayKey) {
-            const items = selectedDayItems(dayKey);
-            const min = items.reduce((sum, item) => sum + item.price.min, 0);
-            const max = items.reduce((sum, item) => sum + item.price.max, 0);
-            document.getElementById(`summary-${dayKey}`).innerHTML = `
-                <div><span class="block text-[11px] font-semibold uppercase tracking-wide text-slate-500">本日安排</span><span class="text-sm font-bold text-slate-800">${items.length} 個體驗 · 每人預算</span></div>
-                <div class="text-right"><span class="block text-xl font-bold text-blue-800">${formatPrice({ min, max })}</span><span class="text-[11px] text-slate-500">日圓估算 · 住宿與機票另計</span></div>`;
-        }
-
-        function renderTripBudget() {
-            const totals = Object.keys(itineraryData).reduce((sum, dayKey) => {
-                const items = selectedDayItems(dayKey);
-                sum.min += items.reduce((daySum, item) => daySum + item.price.min, 0);
-                sum.max += items.reduce((daySum, item) => daySum + item.price.max, 0);
-                return sum;
-            }, { min: 0, max: 0 });
-            document.getElementById('trip-budget').innerHTML = `<i class="fa-solid fa-wallet"></i> 五日行程預算 ${formatPrice(totals)}／人 <span class="font-normal text-amber-100/80">· 不含機票及住宿</span>`;
-        }
-
-        // Render Timelines
-        function renderDayTimeline(dayKey, containerId) {
-            const container = document.getElementById(containerId);
-            const items = selectedDayItems(dayKey);
-            
-            container.innerHTML = items.map(item => {
-                const isChecked = localStorage.getItem(item.id) === 'true';
-                const isOptional = dayOptions[dayKey].some(option => option.id === item.id);
-                const isCustom = item.custom === true;
-                const stopIndex = items.findIndex(stop => stop.id === item.id);
-                const nextStop = stopIndex >= 0
-                    ? items.slice(stopIndex + 1).find(stop => stop.location !== item.location)
-                    : null;
-                const mapsUrl = nextStop
-                    ? googleDirectionsUrl(item.location, nextStop.location)
-                    : googlePlaceUrl(item.location);
-                const mapLabel = nextStop ? '前往下一站' : '查看地點';
-                const mapDescription = nextStop
-                    ? `Google 地圖大眾運輸路線：${item.location} 至 ${nextStop.location}`
-                    : `在 Google 地圖查看 ${item.location}`;
-
-                return `
-                    <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200/80 transition hover:shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-3 ${isOptional || isCustom ? 'optional-card' : ''}">
-                        <div class="flex min-w-0 items-start gap-3 w-full md:w-auto">
-                            <input type="checkbox" id="${escapeHtml(item.id)}" onchange="toggleCheck('${escapeHtml(item.id)}')" ${isChecked ? 'checked' : ''} class="mt-1 w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 shrink-0 cursor-pointer">
-                            <div class="min-w-0 ${isChecked ? 'line-through text-slate-400' : ''}">
-                                <div class="flex flex-wrap items-center gap-2">
-                                    <span class="text-xs font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">${escapeHtml(item.time)}</span>
-                                    <span class="text-xs text-indigo-600 font-medium"><i class="fa-solid fa-van-shuttle mr-1"></i>${escapeHtml(item.transit)}</span>
-                                </div>
-                                <h3 class="break-words font-bold text-slate-900 text-base mt-1">${escapeHtml(item.title)}</h3>
-                                <p class="break-words text-xs text-slate-600 mt-1 leading-relaxed">${escapeHtml(item.note)}</p>
-                                <p class="text-[11px] text-slate-500 mt-2">${escapeHtml(item.price.note)}</p>
-                            </div>
-                        </div>
-                        <div class="flex flex-wrap items-center justify-end gap-2 self-stretch md:self-center shrink-0">
-                            <span class="price-badge"><i class="fa-solid fa-yen-sign"></i>${formatPrice(item.price)}</span>
-                            <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(mapDescription)}" title="${escapeHtml(mapDescription)} · 開啟後會將地點傳送給 Google 地圖" class="text-xs bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 px-3 py-1.5 rounded-lg border border-slate-200 transition flex items-center gap-1 font-medium">
-                                <i class="fa-solid ${nextStop ? 'fa-route' : 'fa-location-dot'} text-red-500"></i> ${mapLabel}
-                            </a>
-                            ${isOptional ? `<button onclick="toggleOption('${dayKey}', '${item.id}')" class="min-h-11 px-2 py-1.5 text-xs text-rose-600 hover:text-rose-800" aria-label="從${dayNames[dayKey]}移除此選項">移除</button>` : ''}
-                            ${isCustom ? `<button onclick="removeCustomStop('${dayKey}', '${escapeHtml(item.id)}')" class="min-h-11 px-2 py-1.5 text-xs text-rose-600 hover:text-rose-800" aria-label="從${dayNames[dayKey]}移除此自訂景點">移除</button>` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderOptions(dayKey) {
-            const selected = new Set(addedOptions(dayKey));
-            document.getElementById(`options-${dayKey}`).innerHTML = dayOptions[dayKey].map(option => `
-                <article class="rounded-xl border border-indigo-100 bg-indigo-50/70 p-4">
-                    <div class="flex items-start justify-between gap-3">
-                        <div><span class="text-[10px] font-bold uppercase tracking-wide text-indigo-600">可選體驗</span><h3 class="mt-1 text-sm font-bold text-slate-900">${option.title}</h3></div>
-                        <span class="price-badge">${formatPrice(option.price)}</span>
-                    </div>
-                    <p class="mt-2 text-xs leading-relaxed text-slate-600">${option.note}</p>
-                    <p class="mt-2 text-[11px] text-slate-500">${option.time} · ${option.price.note}</p>
-                    <button onclick="toggleOption('${dayKey}', '${option.id}')" class="mt-3 rounded-lg ${selected.has(option.id) ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-indigo-700 hover:bg-indigo-800'} px-3 py-1.5 text-xs font-semibold text-white transition">
-                        ${selected.has(option.id) ? '✓ 已加入 · 點此移除' : '+ 加入今日行程'}
-                    </button>
-                </article>`).join('');
-        }
-
-        function toggleOptions(dayKey) {
-            document.getElementById(`options-${dayKey}`).classList.toggle('hidden');
-        }
-
-        function toggleOption(dayKey, optionId) {
-            const selected = new Set(addedOptions(dayKey));
-            if (selected.has(optionId)) selected.delete(optionId);
-            else selected.add(optionId);
-            localStorage.setItem(`trip-options-${dayKey}`, [...selected].join(','));
-            initApp();
-        }
-
-        function removeCustomStop(dayKey, stopId) {
-            const stops = customStops(dayKey).filter(stop => stop.id !== stopId);
-            localStorage.setItem(`trip-custom-stops-${dayKey}`, JSON.stringify(stops));
-            localStorage.removeItem(stopId);
-            initApp();
-        }
-
-        // Tab Switching Function logic
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(tabId).classList.remove('hidden');
-
-            document.querySelectorAll('.nav-tab').forEach(btn => {
-                btn.classList.remove('bg-amber-400', 'text-slate-900', 'font-bold', 'shadow');
-                btn.classList.add('bg-white/10', 'text-white');
-            });
-
-            const activeBtn = document.getElementById('btn-' + tabId);
-            if (activeBtn) {
-                activeBtn.classList.remove('bg-white/10', 'text-white');
-                activeBtn.classList.add('bg-amber-400', 'text-slate-900', 'font-bold', 'shadow');
-            }
-            if (tabId.startsWith('tab-day')) window.setRouteDay?.(Number(tabId.slice(-1)) - 1);
-        }
-
-        // Local Storage Checkbox state logic
-        function toggleCheck(id) {
-            const checkbox = document.getElementById(id);
-            localStorage.setItem(id, checkbox.checked);
-            initApp();
-        }
-
-        function resetProgress() {
-            if (confirm('確定要重置所有行程打卡狀態嗎？')) {
-                Object.keys(itineraryData).forEach(key => {
-                    itineraryData[key].forEach(item => {
-                        localStorage.removeItem(item.id);
-                    });
-                    dayOptions[key].forEach(item => localStorage.removeItem(item.id));
-                    customStops(key).forEach(item => localStorage.removeItem(item.id));
-                    localStorage.removeItem(`trip-options-${key}`);
-                });
-                initApp();
-            }
-        }
-
-        // Initialize App Function
-        function initApp() {
-            Object.keys(itineraryData).forEach((dayKey, index) => {
-                renderCustomStopForm(dayKey);
-                renderDayTimeline(dayKey, `timeline-day${index + 1}`);
-                renderDaySummary(dayKey);
-                renderOptions(dayKey);
-            });
-            renderDayRouteLinks();
-            renderTripBudget();
-            window.refreshMap?.();
-        }
-
-        window.onload = initApp;
-    </script>
-    <script type="module">
-        import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js';
-
-        const canvas = document.getElementById('route-canvas');
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-        camera.position.set(0, 0, 12);
-
-        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
-        renderer.setClearColor(0x000000, 0);
-        const mapRoot = new THREE.Group();
-        scene.add(mapRoot);
-        const stage = new THREE.Mesh(
-            new THREE.PlaneGeometry(10, 4.4),
-            new THREE.MeshBasicMaterial({ color: 0x10243a, transparent: true, opacity: 0.55 })
-        );
-        stage.position.z = -0.5;
-        mapRoot.add(stage);
-
-        const dayColors = [0xffc878, 0x65d6d1, 0xb7a4ff, 0x8de0a2, 0xff9e9e];
-        const raycaster = new THREE.Raycaster();
-        const pointerNdc = new THREE.Vector2();
-        const markerEntries = [];
-        const markerLabels = [];
-        const routeObjects = [];
-        let activeDay = 0;
-        let selectedMapStop = null;
-        function stopsForDay(dayIndex) {
-            const dayKey = `day${dayIndex + 1}`;
-            return selectedDayItems(dayKey);
-        }
-
-        function legacyMapRenderDay(dayIndex, preserveSelection = false) {
-            activeDay = Math.max(0, Math.min(4, dayIndex));
-            routeObjects.splice(0).forEach(object => {
-                mapRoot.remove(object);
-                object.geometry?.dispose();
-                if (Array.isArray(object.material)) object.material.forEach(material => material.dispose());
-                else object.material?.dispose();
-            });
-            markerEntries.splice(0).forEach(entry => {
-                mapRoot.remove(entry.marker);
-                mapRoot.remove(entry.halo);
-                entry.marker.geometry.dispose();
-                entry.marker.material.dispose();
-                entry.halo.geometry.dispose();
-                entry.halo.material.dispose();
-            });
-            markerLabels.splice(0).forEach(label => {
-                mapRoot.remove(label);
-                label.material.map.dispose();
-                label.material.dispose();
-            });
-
-            const stops = stopsForDay(activeDay);
-            const points = stops.map(stop => toMapPoint(stop.location));
-            const routePoints = points.filter((point, index) =>
-                index === 0 || point.distanceTo(points[index - 1]) > 0.015
-            ).map(point => point.clone().setZ(0.04));
-            if (routePoints.length > 1) {
-                const routeCurve = new THREE.CatmullRomCurve3(routePoints);
-                const routeLine = new THREE.Mesh(
-                    new THREE.TubeGeometry(routeCurve, Math.max(32, routePoints.length * 16), 0.026, 8, false),
-                    new THREE.MeshBasicMaterial({ color: dayColors[activeDay], transparent: true, opacity: 1 })
-                );
-                mapRoot.add(routeLine);
-                routeObjects.push(routeLine);
-            }
-
-            const uniqueStops = [];
-            const seenCoordinates = new Set();
-            points.forEach((point, index) => {
-                const key = `${point.x.toFixed(2)},${point.y.toFixed(2)}`;
-                if (seenCoordinates.has(key)) return;
-                seenCoordinates.add(key);
-                uniqueStops.push({ stop: stops[index], index, point });
-            });
-
-            document.getElementById('map-stop-list').innerHTML = stops.map((stop, index) => `
-                <button type="button" data-map-stop-index="${index}" onclick="selectMapStop(${index})"
-                    class="rounded-full border border-white/25 bg-slate-900/60 px-2.5 py-1 text-[10px] text-white hover:bg-white/20"
-                    aria-label="選擇地圖景點：${escapeHtml(stop.title)}，${escapeHtml(stop.time)}" aria-pressed="false">${escapeHtml(stop.title)}</button>`).join('');
-
-            uniqueStops.forEach(({ stop, index, point }) => {
-                const marker = new THREE.Mesh(
-                    new THREE.SphereGeometry(0.072, 24, 20),
-                    new THREE.MeshBasicMaterial({ color: dayColors[activeDay] })
-                );
-                marker.position.copy(point).setZ(0.15);
-                marker.userData = { stop, index, stops };
-                const halo = new THREE.Mesh(
-                    new THREE.TorusGeometry(0.115, 0.012, 6, 32),
-                    new THREE.MeshBasicMaterial({ color: dayColors[activeDay], transparent: true, opacity: 0.8 })
-                );
-                halo.position.copy(marker.position);
-                mapRoot.add(marker, halo);
-                markerEntries.push({ marker, halo, stop, index });
-
-                const badgeCanvas = document.createElement('canvas');
-                badgeCanvas.width = 128;
-                badgeCanvas.height = 128;
-                const context = badgeCanvas.getContext('2d');
-                context.beginPath();
-                context.arc(64, 64, 57, 0, Math.PI * 2);
-                context.fillStyle = '#fff';
-                context.fill();
-                context.lineWidth = 8;
-                context.strokeStyle = `#${dayColors[activeDay].toString(16).padStart(6, '0')}`;
-                context.stroke();
-                context.fillStyle = '#10243a';
-                context.font = 'bold 58px sans-serif';
-                context.textAlign = 'center';
-                context.textBaseline = 'middle';
-                context.fillText(String(index + 1), 64, 66);
-                const label = new THREE.Sprite(new THREE.SpriteMaterial({
-                    map: new THREE.CanvasTexture(badgeCanvas),
-                    transparent: true,
-                    depthTest: false
-                }));
-                const badgeOffsets = [
-                    [0.17, 0.17], [0.17, -0.17], [-0.17, 0.17], [-0.17, -0.17],
-                    [0.24, 0], [-0.24, 0], [0, 0.24]
-                ];
-                const [offsetX, offsetY] = badgeOffsets[index % badgeOffsets.length];
-                label.position.copy(marker.position).add(new THREE.Vector3(offsetX, offsetY, 0.08));
-                label.scale.set(0.19, 0.19, 1);
-                label.renderOrder = 5;
-                mapRoot.add(label);
-                markerLabels.push(label);
-            });
-
-            mapRoot.position.set(0, 0, 0);
-            camera.position.set(0, 0, 12);
-            const minX = Math.min(...points.map(point => point.x));
-            const maxX = Math.max(...points.map(point => point.x));
-            const minY = Math.min(...points.map(point => point.y));
-            const maxY = Math.max(...points.map(point => point.y));
-            const centerX = (minX + maxX) / 2;
-            const centerY = (minY + maxY) / 2;
-            mapRoot.position.set(-centerX, -centerY, 0);
-            const halfHeight = Math.max((maxY - minY) / 2 + 0.65, 0.9);
-            const halfWidth = Math.max((maxX - minX) / 2 + 0.65, 0.9);
-            const verticalDistance = halfHeight / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-            const horizontalDistance = halfWidth / (Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect);
-            camera.position.z = THREE.MathUtils.clamp(Math.max(verticalDistance, horizontalDistance) * 1.15, 3.5, 16);
-            camera.updateProjectionMatrix();
-
-            document.querySelectorAll('[data-map-day]').forEach(button => {
-                const active = Number(button.dataset.mapDay) === activeDay;
-                button.setAttribute('aria-pressed', String(active));
-                button.classList.toggle('bg-amber-300', active);
-                button.classList.toggle('text-slate-900', active);
-                button.classList.toggle('font-bold', active);
-                button.classList.toggle('bg-slate-900/60', !active);
-                button.classList.toggle('text-white', !active);
-            });
-
-            const previousSelection = preserveSelection ? selectedMapStop?.stop.id : null;
-            const selectedIndex = previousSelection
-                ? stops.findIndex(stop => stop.id === previousSelection)
-                : -1;
-            const stopIndex = selectedIndex >= 0 ? selectedIndex : 0;
-            const selected = stops[stopIndex];
-            if (selected) showSelectedStop(selected, stopIndex, stops);
-            renderer.render(scene, camera);
-        }
-
-        const stationPoints = [];
-        const legOverrides = {
-            "d2-2": { label: '步行／路線巴士', icon: 'fa-bus' },
-            "d2-3": { label: '熱海高速船', icon: 'fa-ferry' },
-            "d5-2": { label: '酒店接駁／計程車／巴士', icon: 'fa-bus' }
-        };
-        const rideEstimates = {
-            "d1-2": 90, "d1-3": 20, "d1-4": 25, "d1-5": 20, "d1-6": 25,
-            "d2-2": 15, "d2-3": 30, "d2-4": 30, "d2-5": 60, "d2-6": 20, "d2-7": 50,
-            "d3-2": 90, "d3-3": 35, "d3-4": 20, "d3-5": 60, "d3-6": 65,
-            "d4-1": 15, "d4-2": 20, "d4-3": 20, "d4-4": 30, "d4-5": 35, "d4-6": 30, "d4-7": 100,
-            "d5-2": 20, "d5-3": 45, "d5-4": 90, "d5-5": 60
-        };
-        function transportFor(stop) {
-            if (legOverrides[stop.id]) return legOverrides[stop.id];
-            const transit = stop.transit || '';
-            const hasRail = /JR|伊豆急行|新幹線|電車|列車/i.test(transit);
-            const hasBus = /巴士|公車|公交|bus|接駁/i.test(transit);
-            const hasWalk = /步行|徒步|walk/i.test(transit);
-            const hasBoat = /渡輪|船|ferry/i.test(transit);
-            if (hasRail && hasBus) return { label: 'JR／巴士轉乘', icon: 'fa-train-subway' };
-            if (/京急線/.test(transit)) return { label: '京急線／JR 列車轉乘', icon: 'fa-train-subway' };
-            if (/東海道新幹線|新幹線/.test(transit)) return { label: 'JR 新幹線／特急', icon: 'fa-train-subway' };
-            if (hasRail && /伊豆急行/.test(transit)) return { label: 'JR／伊豆急行線', icon: 'fa-train-subway' };
-            if (hasRail) return { label: 'JR 列車', icon: 'fa-train-subway' };
-            if (hasBus && hasWalk) return { label: '巴士＋步行', icon: 'fa-bus' };
-            if (hasBus) return { label: '路線巴士', icon: 'fa-bus' };
-            if (hasBoat) return { label: '渡輪／船', icon: 'fa-ferry' };
-            if (hasWalk) return { label: '步行', icon: 'fa-person-walking' };
-            return { label: transit || '依行程安排', icon: 'fa-route' };
-        }
-
-        function estimatedMinutes(stop, mode) {
-            if (rideEstimates[stop.id]) return rideEstimates[stop.id];
-            if (mode.label.includes('JR')) return 45;
-            if (mode.label.includes('巴士')) return 25;
-            if (mode.label.includes('渡輪')) return 30;
-            if (mode.label.includes('步行')) return 15;
-            return 20;
-        }
-
-        function disposeObject(object) {
-            object.traverse(child => {
-                child.geometry?.dispose();
-                if (Array.isArray(child.material)) child.material.forEach(material => material.dispose());
-                else child.material?.dispose();
-                if (child.material?.map) child.material.map.dispose();
-            });
-        }
-
-        function showSelectedStop(stop, index, stops) {
-            selectedMapStop = { stop, index, stops, day: activeDay };
-            const nextIndex = stops.findIndex((item, itemIndex) =>
-                itemIndex > index && item.location !== stop.location
-            );
-            const nextStop = nextIndex >= 0 ? stops[nextIndex] : null;
-            const detail = document.getElementById('map-stop-detail');
-            if (nextStop) {
-                const mode = transportFor(nextStop);
-                const minutes = estimatedMinutes(nextStop, mode);
-                detail.innerHTML = `<span class="block">${dayNames[`day${activeDay + 1}`]} · ${escapeHtml(stop.time)} · ${formatPrice(stop.price)}</span>
-                    <span class="mt-1 block font-semibold text-white"><i class="fa-solid ${mode.icon} mr-1 text-cyan-200"></i>${escapeHtml(mode.label)} → ${escapeHtml(nextStop.title)}</span>
-                    <span class="mt-1 block text-amber-200">預估剩餘車程：約 ${minutes} 分鐘（非即時概算）</span>`;
+        enemies.forEach((enemy, index) => {
+          enemy.mesh.position.x = enemy.origin + Math.sin(elapsedTotal * 1.5 + index) * .65;
+          if (Math.abs(avatar.position.x - enemy.mesh.position.x) < .57 && Math.abs(avatar.position.y - stageTop[enemy.platform]) < .62) {
+            if (verticalSpeed < 0 && avatar.position.y > stageTop[enemy.platform] + .2) {
+              verticalSpeed = jumpSpeed * .75;
+              onGround = false;
+              enemy.mesh.position.x = enemy.origin + 1.8;
             } else {
-                detail.innerHTML = `<span class="block">${dayNames[`day${activeDay + 1}`]} · ${escapeHtml(stop.time)} · ${formatPrice(stop.price)}</span>
-                    <span class="mt-1 block font-semibold text-white">今日最後一站 · 行程已抵達</span>`;
+              avatar.position.x = stageX[checkpointIndex];
+              avatar.position.y = stageTop[checkpointIndex];
+              verticalSpeed = 0;
+              onGround = true;
+              currentPlatform = checkpointIndex;
+              updateInteractionPrompt();
             }
-            document.getElementById('map-stop-title').textContent = stop.title;
-
-            const directions = document.getElementById('map-directions-link');
-            directions.href = nextStop
-                ? googleDirectionsUrl(stop.location, nextStop.location)
-                : googlePlaceUrl(stop.location);
-            directions.setAttribute('aria-label', nextStop
-                ? `在 Google 地圖查看從${stop.title}前往${nextStop.title}的路線`
-                : `在 Google 地圖查看${stop.title}`);
-            directions.title = '開啟 Google 地圖會將所選地點與路線傳送給 Google';
-            directions.innerHTML = `<i class="fa-solid fa-route"></i> ${nextStop ? 'Google 地圖前往下一站' : 'Google 地圖查看地點'}`;
-
-            markerEntries.forEach(entry => {
-                const isSelected = entry.index === index;
-                const isNext = entry.index === nextIndex;
-                entry.marker.scale.setScalar(isSelected || isNext ? 1.45 : 1);
-                entry.marker.material.color.set(isSelected ? 0xffffff : isNext ? 0xffd166 : dayColors[activeDay]);
-                entry.halo.material.opacity = isNext ? 1 : 0.65;
-            });
-            document.querySelectorAll('[data-map-stop-index]').forEach(button => {
-                const active = Number(button.dataset.mapStopIndex) === index;
-                button.setAttribute('aria-pressed', String(active));
-                button.classList.toggle('bg-white', active);
-                button.classList.toggle('text-slate-900', active);
-                button.classList.toggle('bg-slate-900/60', !active);
-                button.classList.toggle('text-white', !active);
-            });
-            renderer.render(scene, camera);
-        }
-
-        function renderRailDay(dayIndex, preserveSelection = false) {
-            activeDay = Math.max(0, Math.min(4, dayIndex));
-            routeObjects.splice(0).forEach(object => {
-                mapRoot.remove(object);
-                disposeObject(object);
-            });
-            markerEntries.splice(0).forEach(entry => {
-                mapRoot.remove(entry.marker, entry.halo);
-                disposeObject(entry.marker);
-                disposeObject(entry.halo);
-            });
-            markerLabels.splice(0).forEach(label => {
-                mapRoot.remove(label);
-                disposeObject(label);
-            });
-            stationPoints.length = 0;
-
-            const stops = stopsForDay(activeDay);
-            const seenLocations = new Map();
-            stops.forEach(stop => {
-                if (!seenLocations.has(stop.location)) seenLocations.set(stop.location, seenLocations.size);
-            });
-            const uniqueStops = [...seenLocations.entries()];
-            const count = uniqueStops.length;
-            uniqueStops.forEach(([, stationIndex], index) => {
-                const x = count === 1 ? 0 : -4.15 + index * (8.3 / (count - 1));
-                const y = Math.sin(index * 1.35) * 0.42 + (index % 2 ? -0.08 : 0.08);
-                stationPoints[stationIndex] = new THREE.Vector3(x, y, 0.08);
-            });
-
-            for (let index = 0; index < stationPoints.length - 1; index++) {
-                const start = stationPoints[index];
-                const end = stationPoints[index + 1];
-                const control = new THREE.Vector3((start.x + end.x) / 2, (start.y + end.y) / 2 + (index % 2 ? -0.25 : 0.25), 0.08);
-                const curve = new THREE.QuadraticBezierCurve3(start, control, end);
-                const railMaterial = new THREE.MeshBasicMaterial({ color: dayColors[activeDay], transparent: true, opacity: 0.82 });
-                const rail = new THREE.Mesh(new THREE.TubeGeometry(curve, 36, 0.025, 8, false), railMaterial);
-                mapRoot.add(rail);
-                routeObjects.push(rail);
-                for (let tieIndex = 1; tieIndex < 12; tieIndex++) {
-                    const point = curve.getPoint(tieIndex / 12);
-                    const tangent = curve.getTangent(tieIndex / 12);
-                    const tie = new THREE.Mesh(
-                        new THREE.BoxGeometry(0.075, 0.19, 0.035),
-                        new THREE.MeshBasicMaterial({ color: 0xa8b5bd })
-                    );
-                    tie.position.copy(point).setZ(0.045);
-                    tie.rotation.z = Math.atan2(tangent.y, tangent.x) + Math.PI / 2;
-                    mapRoot.add(tie);
-                    routeObjects.push(tie);
-                }
-            }
-
-            document.getElementById('map-stop-list').innerHTML = stops.map((stop, index) => `
-                <button type="button" data-map-stop-index="${index}" onclick="selectMapStop(${index})"
-                    class="rounded-full border border-white/25 bg-slate-900/60 px-2.5 py-1 text-[10px] text-white hover:bg-white/20"
-                    aria-label="選擇旅程站點：${escapeHtml(stop.title)}，${escapeHtml(stop.time)}" aria-pressed="false">${escapeHtml(stop.title)}</button>`).join('');
-
-            uniqueStops.forEach(([location, stationIndex]) => {
-                const point = stationPoints[stationIndex];
-                const stopIndex = stops.findIndex(stop => stop.location === location);
-                const stop = stops[stopIndex];
-                const marker = new THREE.Mesh(
-                    new THREE.SphereGeometry(0.085, 20, 16),
-                    new THREE.MeshBasicMaterial({ color: dayColors[activeDay] })
-                );
-                marker.position.copy(point).setZ(0.16);
-                marker.userData = { stop, index: stopIndex, stops };
-                const halo = new THREE.Mesh(
-                    new THREE.TorusGeometry(0.14, 0.012, 6, 28),
-                    new THREE.MeshBasicMaterial({ color: dayColors[activeDay], transparent: true, opacity: 0.7 })
-                );
-                halo.position.copy(marker.position);
-                mapRoot.add(marker, halo);
-                markerEntries.push({ marker, halo, stop, index: stopIndex });
-
-                const labelCanvas = document.createElement('canvas');
-                labelCanvas.width = 512;
-                labelCanvas.height = 96;
-                const context = labelCanvas.getContext('2d');
-                context.fillStyle = 'rgba(5, 18, 32, 0.9)';
-                context.beginPath();
-                context.roundRect(4, 4, 504, 88, 18);
-                context.fill();
-                context.fillStyle = '#ffffff';
-                context.font = 'bold 30px sans-serif';
-                context.textAlign = 'center';
-                context.textBaseline = 'middle';
-                const labelText = location.length > 22 ? `${location.slice(0, 21)}…` : location;
-                context.fillText(`${stopIndex + 1}. ${labelText}`, 256, 48);
-                const label = new THREE.Sprite(new THREE.SpriteMaterial({
-                    map: new THREE.CanvasTexture(labelCanvas),
-                    transparent: true,
-                    depthTest: false
-                }));
-                label.position.copy(point).add(new THREE.Vector3(0, stationIndex % 2 ? -0.52 : 0.52, 0.2));
-                label.scale.set(1.35, 0.26, 1);
-                label.renderOrder = 5;
-                mapRoot.add(label);
-                markerLabels.push(label);
-            });
-
-            mapRoot.position.set(0, 0, 0);
-            mapRoot.rotation.set(0, 0, 0);
-            camera.position.set(0, 0, Math.max(
-                4.2,
-                4.75 / (Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * Math.max(camera.aspect, 0.5))
-            ));
-            camera.updateProjectionMatrix();
-
-            document.querySelectorAll('[data-map-day]').forEach(button => {
-                const active = Number(button.dataset.mapDay) === activeDay;
-                button.setAttribute('aria-pressed', String(active));
-                button.classList.toggle('bg-amber-300', active);
-                button.classList.toggle('text-slate-900', active);
-                button.classList.toggle('font-bold', active);
-                button.classList.toggle('bg-slate-900/60', !active);
-                button.classList.toggle('text-white', !active);
-            });
-
-            const previousSelection = preserveSelection ? selectedMapStop?.stop.id : null;
-            const selectedIndex = previousSelection ? stops.findIndex(stop => stop.id === previousSelection) : -1;
-            showSelectedStop(stops[selectedIndex >= 0 ? selectedIndex : 0], selectedIndex >= 0 ? selectedIndex : 0, stops);
-            renderer.render(scene, camera);
-        }
-
-        window.selectMapDay = dayIndex => renderRailDay(dayIndex);
-        window.setRouteDay = dayIndex => renderRailDay(dayIndex, true);
-        window.refreshMap = () => renderRailDay(activeDay, true);
-        window.selectMapStop = index => {
-            const stops = stopsForDay(activeDay);
-            if (Number.isInteger(index) && index >= 0 && index < stops.length) {
-                showSelectedStop(stops[index], index, stops);
-            }
-        };
-        window.openSelectedMapStop = () => {
-            if (!selectedMapStop) return;
-            switchTab(`tab-day${selectedMapStop.day + 1}`);
-            requestAnimationFrame(() => {
-                const card = document.getElementById(selectedMapStop.stop.id);
-                card?.closest('.optional-card, .bg-white')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            });
-        };
-
-        canvas.addEventListener('pointerdown', event => {
-            const bounds = canvas.getBoundingClientRect();
-            pointerNdc.x = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
-            pointerNdc.y = -((event.clientY - bounds.top) / bounds.height) * 2 + 1;
-            raycaster.setFromCamera(pointerNdc, camera);
-            const hit = raycaster.intersectObjects(markerEntries.map(entry => entry.marker))[0];
-            if (hit) window.selectMapStop(hit.object.userData.index);
+          }
         });
-        canvas.addEventListener('pointermove', event => {
-            const bounds = canvas.getBoundingClientRect();
-            pointerNdc.x = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
-            pointerNdc.y = -((event.clientY - bounds.top) / bounds.height) * 2 + 1;
-            raycaster.setFromCamera(pointerNdc, camera);
-            const hovered = raycaster.intersectObjects(markerEntries.map(entry => entry.marker))[0];
-            canvas.style.cursor = hovered ? 'pointer' : 'default';
+        collectibles.forEach((item) => {
+          if (item.collected) return;
+          item.mesh.rotation.y += delta * 2;
+          item.mesh.position.y = item.baseY + Math.sin(elapsedTotal * 3 + item.mesh.userData.placeIndex) * .12;
+          const dx = avatar.position.x - item.mesh.position.x;
+          const dy = avatar.position.y + .9 - item.mesh.position.y;
+          if (Math.hypot(dx, dy) < .78) {
+            item.collected = true;
+            item.mesh.visible = false;
+            shellCount += 1;
+            updateHud();
+          }
         });
+        markerMeshes.forEach((marker, index) => {
+          const selected = index === checkpointIndex;
+          const hot = index === hovered || index === activeIndex;
+          const scale = selected || hot ? 1.2 : 1;
+          marker.scale.lerp(new THREE.Vector3(scale, scale, scale), .14);
+        });
+        cloudGroups.forEach((cloud, index) => {
+          cloud.position.x = index * 15 - 10 + Math.sin(elapsedTotal * .12 + index) * .35;
+        });
+        const cameraX = avatar.position.x + 1.6;
+        const cameraY = Math.max(.9, Math.min(2.4, avatar.position.y + 1.2));
+        camera.position.x += (cameraX - camera.position.x) * .08;
+        camera.position.y += (cameraY - camera.position.y) * .06;
+        camera.lookAt(camera.position.x, camera.position.y, 0);
+        renderer.render(scene, camera);
+      };
+      animate();
+    } catch (error) {
+      document.querySelector("#scene-error").hidden = false;
+      console.error("Three.js scene could not be initialized:", error);
+    }
+  </script>
+  <script>
+    (() => {
+      const dayPanels = {
+        night: document.querySelector("#day-night"),
+        day: document.querySelector("#day-day")
+      };
+      const tabs = {
+        night: document.querySelector("#tab-night"),
+        day: document.querySelector("#tab-day")
+      };
+      const progressTrack = document.querySelector(".progress-track");
+      const progressBar = document.querySelector(".progress-bar");
+      const progressLabel = document.querySelector("#progress-label");
+      const progressCount = document.querySelector("#progress-count");
+      const storageKey = "okinawa-itinerary-completed-v1";
+      let completed = {};
+      let selectedDay = "night";
+      let timerInterval = null;
+      let pausedAt = null;
 
-        function resizeMap() {
-            const bounds = canvas.getBoundingClientRect();
-            if (!bounds.width || !bounds.height) return;
-            renderer.setSize(bounds.width, bounds.height, false);
-            camera.aspect = bounds.width / bounds.height;
-            camera.updateProjectionMatrix();
-            renderRailDay(activeDay, true);
+      try {
+        completed = JSON.parse(localStorage.getItem(storageKey) || "{}");
+      } catch {
+        completed = {};
+      }
+
+      document.querySelectorAll('input[type="checkbox"][data-id]').forEach((input) => {
+        input.checked = Boolean(completed[input.dataset.id]);
+        input.addEventListener("change", () => {
+          completed[input.dataset.id] = input.checked;
+          try {
+            localStorage.setItem(storageKey, JSON.stringify(completed));
+          } catch {
+            document.querySelector("#clock-status").textContent = "浏览器未允许保存进度；本次页面内仍可勾选。";
+          }
+          updateProgress();
+          updateCurrentItem();
+        });
+      });
+
+      function updateProgress() {
+        const panel = dayPanels[selectedDay];
+        const checks = [...panel.querySelectorAll('input[type="checkbox"]')];
+        const done = checks.filter((check) => check.checked).length;
+        const percent = checks.length ? Math.round((done / checks.length) * 100) : 0;
+        progressLabel.textContent = selectedDay === "night" ? "第一晚完成进度" : "第二天完成进度";
+        progressCount.textContent = `${done} / ${checks.length}`;
+        progressBar.style.width = `${percent}%`;
+        progressTrack.setAttribute("aria-valuenow", String(percent));
+        panel.querySelectorAll(".timeline-row").forEach((row) => {
+          const check = row.querySelector('input[type="checkbox"]');
+          row.classList.toggle("is-done", Boolean(check && check.checked));
+        });
+      }
+
+      function selectDay(day) {
+        selectedDay = day;
+        Object.keys(dayPanels).forEach((key) => {
+          const active = key === day;
+          dayPanels[key].hidden = !active;
+          tabs[key].setAttribute("aria-selected", String(active));
+          tabs[key].tabIndex = active ? 0 : -1;
+        });
+        updateProgress();
+        updateCurrentItem();
+      }
+      tabs.night.addEventListener("click", () => selectDay("night"));
+      tabs.day.addEventListener("click", () => selectDay("day"));
+      [tabs.night, tabs.day].forEach((tab, index) => {
+        tab.addEventListener("keydown", (event) => {
+          if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+            event.preventDefault();
+            const next = index === 0 ? "day" : "night";
+            selectDay(next);
+            tabs[next].focus();
+          }
+        });
+      });
+
+      function getRows() {
+        return [...document.querySelectorAll(".timeline-row")].map((row) => ({
+          row,
+          start: new Date(row.dataset.start).getTime(),
+          end: new Date(row.dataset.end).getTime()
+        }));
+      }
+
+      function updateCurrentItem() {
+        const now = Date.now();
+        let current = null;
+        getRows().forEach(({ row, start, end }) => {
+          const visible = !row.closest(".timeline").hidden;
+          const active = visible && now >= start && now < end;
+          row.classList.toggle("is-current", active);
+          if (active) current = { row, end };
+        });
+        return current;
+      }
+
+      function renderTimer() {
+        const now = pausedAt ?? Date.now();
+        const status = document.querySelector("#clock-status");
+        const time = document.querySelector("#clock-time");
+        const day = document.querySelector("#clock-day");
+        const rows = getRows();
+        const next = rows.find(({ end }) => end > now);
+        const current = rows.find(({ start, end }) => now >= start && now < end);
+        if (!next) {
+          day.textContent = "行程状态";
+          time.textContent = "--:--:--";
+          status.textContent = now < rows[0].start ? "行程尚未开始" : "本次行程已结束";
+          return;
         }
+        const dateString = new Date(next.start).toLocaleDateString("zh-CN", { month: "long", day: "numeric", timeZone: "Asia/Tokyo" });
+        const selectedDate = new Date(next.start).getDate() === 13 ? "第一晚" : "第二天";
+        day.textContent = `${selectedDate} · ${dateString}`;
+        const target = current ? current.end : next.start;
+        let seconds = Math.max(0, Math.floor((target - now) / 1000));
+        if (pausedAt !== null) {
+          time.textContent = "已暂停";
+          status.textContent = current ? `当前：${current.row.querySelector(".item-title").textContent}` : `待开始：${next.row.querySelector(".item-title").textContent}`;
+          return;
+        }
+        const hours = String(Math.floor(seconds / 3600)).padStart(2, "0");
+        const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+        const remainder = String(seconds % 60).padStart(2, "0");
+        time.textContent = `${hours}:${minutes}:${remainder}`;
+        status.textContent = current ? `距离本项结束 · ${current.row.querySelector(".item-title").textContent}` : `距离下一项开始 · ${next.row.querySelector(".item-title").textContent}`;
+      }
 
-        const resizeObserver = new ResizeObserver(resizeMap);
-        resizeObserver.observe(canvas);
-        window.addEventListener('resize', resizeMap);
-        renderRailDay(0);
-        resizeMap();
-    </script>
+      document.querySelector("#timer-toggle").addEventListener("click", (event) => {
+        if (timerInterval) {
+          pausedAt = Date.now();
+          clearInterval(timerInterval);
+          timerInterval = null;
+          event.currentTarget.textContent = "继续计时";
+        } else {
+          pausedAt = null;
+          renderTimer();
+          timerInterval = window.setInterval(() => {
+            renderTimer();
+            updateCurrentItem();
+          }, 1000);
+          event.currentTarget.textContent = "暂停";
+        }
+      });
+      document.querySelector("#timer-reset").addEventListener("click", () => {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = null;
+        pausedAt = null;
+        document.querySelector("#timer-toggle").textContent = "开始计时";
+        renderTimer();
+        updateCurrentItem();
+      });
+
+      document.querySelectorAll(".mobile-bar a").forEach((link) => {
+        link.addEventListener("click", () => {
+          if (link.getAttribute("href") === "#itinerary") {
+            selectDay(new Date().getDate() === 14 ? "day" : "night");
+          }
+        });
+      });
+
+      updateProgress();
+      renderTimer();
+      updateCurrentItem();
+      window.setInterval(() => {
+        if (!timerInterval) {
+          renderTimer();
+          updateCurrentItem();
+        }
+      }, 15000);
+    })();
+  </script>
 </body>
 </html>
