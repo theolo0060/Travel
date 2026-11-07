@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#eaf6f5">
-  <meta name="description" content="冲绳那霸两日互动行程：时间轴、路线、预算和出行提醒。">
-  <title>冲绳那霸 · 两日行程</title>
+  <meta name="description" content="冲绳那霸三日自驾互动行程：时间轴、租车与还车、路线、预算和出行提醒。">
+  <title>冲绳那霸 · 三日自驾行程</title>
   <style>
     :root {
       color-scheme: light;
@@ -70,7 +70,15 @@
     .day-switch { display: flex; background: #dceceb; border-radius: 12px; padding: 4px; gap: 3px; }
     .day-tab { border: 0; background: transparent; padding: 9px 13px; border-radius: 9px; color: var(--muted); cursor: pointer; font-size: 11px; font-weight: 720; }
     .day-tab[aria-selected="true"] { color: var(--ink); background: white; box-shadow: 0 2px 6px rgb(0 0 0 / 7%); }
-    .day-progress { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; margin: 0 0 13px; }
+    .route-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0 0 19px; }
+    .route-option { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; width: 100%; padding: 15px; border: 1px solid var(--line); border-radius: 15px; background: var(--card); color: var(--ink); text-align: left; cursor: pointer; box-shadow: none; transition: border-color .2s, box-shadow .2s, transform .2s; }
+    .route-option:hover { transform: translateY(-2px); border-color: #83c4c3; }
+    .route-option[aria-pressed="true"] { border-color: var(--green); box-shadow: 0 0 0 3px #d8f0ee; }
+    .route-option-title { font-size: 12px; font-weight: 760; }
+    .route-option-intro { color: var(--muted); font-size: 10px; line-height: 1.65; }
+    .route-option-meta { color: #16727b; font-size: 9px; font-weight: 720; }
+    .route-selection-summary { margin: -5px 0 17px; padding: 10px 12px; border-radius: 11px; background: #e5f4f3; color: #41666b; font-size: 10px; line-height: 1.65; }
+    .day-progress { display: flex; justify-content: space-between; gap: 12px; margin: 0 0 8px; color: var(--muted); font-size: 10px; font-weight: 700; }
     .progress-track { height: 6px; background: #dcebea; overflow: hidden; border-radius: 20px; margin-bottom: 21px; }
     .progress-bar { height: 100%; width: 0; background: var(--green); border-radius: inherit; transition: width .25s ease; }
     .timeline { position: relative; }
@@ -137,10 +145,34 @@
     .scene-interact { position: absolute; bottom: 76px; left: 50%; transform: translateX(-50%); border: 2px solid #123f55; border-radius: 4px; padding: 8px 12px; background: #e6f8f6; color: #123f55; font-size: 10px; font-weight: 800; box-shadow: 3px 3px 0 rgb(18 63 85 / 24%); cursor: pointer; touch-action: manipulation; }
     .scene-interact:disabled { opacity: .7; cursor: not-allowed; }
     .scene-interact:not(:disabled) { background: #9de0d8; }
-    .scene-controls { position: absolute; bottom: 13px; left: 50%; transform: translateX(-50%); display: flex; gap: 7px; padding: 6px; background: #d7f0ed; border: 3px solid #123f55; border-radius: 5px; box-shadow: 4px 4px 0 rgb(18 63 85 / 28%); }
-    .scene-controls button { border: 2px solid #123f55; border-radius: 4px; padding: 9px 13px; background: #a9dfd9; color: #123f55; font-size: 11px; font-weight: 800; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+    .scene-controls { position: absolute; bottom: 13px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; padding: 6px; background: #d7f0ed; border: 3px solid #123f55; border-radius: 5px; box-shadow: 4px 4px 0 rgb(18 63 85 / 28%); }
+    .scene-controls button { border: 2px solid #123f55; border-radius: 4px; padding: 9px 10px; min-width: 46px; background: #a9dfd9; color: #123f55; font-size: 11px; font-weight: 800; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
     .scene-controls button:hover, .scene-controls button:active { background: #5fc2bd; transform: translateY(2px); }
     .scene-error { position: absolute; inset: auto 14px 60px; padding: 10px 12px; background: rgb(255 255 255 / 90%); border-radius: 11px; font-size: 10px; color: #6b796f; }
+    .battle-overlay { position: absolute; z-index: 3; inset: 0; display: grid; place-items: center; padding: 14px; background: rgb(11 49 67 / 76%); }
+    .battle-window { width: min(100%, 560px); max-height: 100%; overflow-y: auto; border: 4px solid #123f55; border-radius: 10px; padding: 13px; background: #e6f7f3; color: #123b4a; box-shadow: 0 7px 0 rgb(9 50 68 / 45%); }
+    .battle-top { min-height: 122px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 13px; border: 3px solid #276778; border-radius: 9px 22px 9px 22px; background: linear-gradient(145deg,#f9fffa,#c7e9df); }
+    .battle-foe { min-width: 0; flex: 1; }
+    .battle-name { font-size: 13px; font-weight: 850; }
+    .battle-level { color: #52777c; font-size: 10px; margin-left: 5px; }
+    .battle-hp-row { display: flex; align-items: center; gap: 7px; margin-top: 9px; font: 800 9px ui-monospace,monospace; }
+    .battle-hp-track { height: 8px; flex: 1; border: 1px solid #246274; border-radius: 9px; padding: 1px; background: #f7fff7; overflow: hidden; }
+    .battle-hp-fill { height: 100%; width: 100%; border-radius: inherit; background: #54b894; transition: width .25s; }
+    .battle-monster { display: grid; place-items: center; width: 88px; height: 88px; flex: 0 0 auto; border: 3px solid #287186; border-radius: 50%; background: #98d7ce; box-shadow: inset 0 -7px rgb(22 90 107 / 12%); font-size: 49px; image-rendering: pixelated; animation: monster-bob 1s steps(2,end) infinite; }
+    @keyframes monster-bob { 50% { transform: translateY(-4px); } }
+    .battle-party { display: flex; align-items: center; gap: 9px; width: min(82%,390px); margin: 10px 0 10px auto; padding: 9px 12px; border: 3px solid #276778; border-radius: 20px 8px 20px 8px; background: #f8fffb; }
+    .battle-player-icon { font-size: 32px; }
+    .battle-player-data { flex: 1; }
+    .battle-message { min-height: 49px; padding: 9px 11px; border: 3px solid #123f55; border-radius: 7px; background: #fbffff; font-size: 11px; font-weight: 700; line-height: 1.65; }
+    .battle-menu { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; margin-top: 8px; }
+    .battle-menu button,.battle-continue { min-height: 40px; border: 2px solid #276778; border-radius: 6px; background: #f6fffb; color: #123b4a; font-size: 10px; font-weight: 800; cursor: pointer; touch-action: manipulation; }
+    .battle-menu button:hover,.battle-continue:hover { background: #a9dfd9; }
+    .battle-victory { padding: 6px 2px 2px; }
+    .battle-victory h3 { margin: 4px 0; font-size: 17px; }
+    .battle-victory p { margin: 8px 0; font-size: 11px; line-height: 1.7; }
+    .battle-victory .battle-why { padding: 9px; border-radius: 7px; background: #d7f0ed; color: #315d69; }
+    .battle-victory .map-link { margin: 5px 0 10px; }
+    .battle-continue { width: 100%; background: #9de0d8; }
     .spot-card { position: relative; padding: 22px; border: 1px solid #cfe5e4; border-radius: 20px; background: #fbffff; display: flex; flex-direction: column; min-height: 360px; }
     .spot-card.spot-pop { animation: spot-pop .32s cubic-bezier(.2,.8,.2,1); }
     @keyframes spot-pop { 0% { opacity: .55; transform: translateY(9px) scale(.985); } 75% { transform: translateY(-2px) scale(1.005); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
@@ -168,6 +200,7 @@
       .stats { grid-template-columns: repeat(2, 1fr); }
       .lower-grid { grid-template-columns: 1fr; }
       .reminders { grid-template-columns: repeat(2, 1fr); }
+      .route-options { grid-template-columns: 1fr; }
     }
     @media (max-width: 560px) {
       .shell { padding: 18px 15px 95px; }
@@ -201,7 +234,19 @@
       .scene-hud { top: 48px; left: 9px; right: auto; font-size: 9px; }
       .scene-interact { bottom: 72px; min-height: 40px; font-size: 11px; }
       .scene-controls { bottom: 9px; gap: 6px; padding: 5px; }
-      .scene-controls button { padding: 12px 10px; min-width: 68px; min-height: 48px; font-size: 12px; }
+      .scene-controls button { padding: 10px 8px; min-width: 44px; min-height: 46px; font-size: 12px; }
+      .battle-overlay { padding: 7px; }
+      .battle-overlay { padding: 4px; }
+      .battle-window { padding: 6px; border-width: 3px; }
+      .battle-top { min-height: 66px; padding: 5px 8px; }
+      .battle-name { font-size: 11px; }
+      .battle-hp-row { margin-top: 5px; }
+      .battle-monster { width: 54px; height: 54px; font-size: 31px; }
+      .battle-party { min-height: 45px; margin-top: 5px; margin-bottom: 5px; padding: 5px 8px; }
+      .battle-player-icon { font-size: 24px; }
+      .battle-message { min-height: 35px; padding: 5px 7px; font-size: 9px; }
+      .battle-menu { gap: 4px; margin-top: 5px; }
+      .battle-menu button,.battle-continue { min-height: 35px; font-size: 9px; }
       .spot-card { padding: 17px; }
       .spot-summary { font-size: 11px; }
       .mobile-bar { display: grid; grid-template-columns: repeat(3, 1fr); position: fixed; z-index: 5; bottom: 0; left: 0; right: 0; padding: 9px 10px max(9px, env(safe-area-inset-bottom)); background: rgb(255 255 255 / 94%); border-top: 1px solid var(--line); backdrop-filter: blur(12px); }
@@ -217,7 +262,7 @@
       .hero-main, .clock-card, .panel, .stat-card, .timeline-card, .reminder { box-shadow: none; break-inside: avoid; }
       .timeline-card { border-color: #ddd; }
       .game-panel, .game-panel * { display: none !important; }
-      .timeline-row[hidden] { display: grid !important; }
+      .timeline-row[hidden] { display: none !important; }
       a { text-decoration: none; }
     }
   </style>
@@ -237,13 +282,13 @@
 
     <section class="hero" aria-labelledby="page-title">
       <div class="hero-main">
-        <div class="eyebrow">Naha · Okinawa · 2 days</div>
+        <div class="eyebrow">Naha · Okinawa · 3 days</div>
         <h1 id="page-title">海风、市场与<br>一段慢旅行。</h1>
-        <p>从那霸机场开始，沿着海鲜早市、波上宫与 Outlet，逐站走进冲绳。路线与营业信息请出发前再次确认。</p>
+        <p>第一晚轻松入住；第二天早上取车，串联海鲜市场、波上宫、壶屋陶器街城市漫步、指定鞋店、Golf5、Outlet 与濑长岛海景；第三天早上还车后搭机返程。</p>
         <div class="hero-meta">
-          <span class="pill">📅 11月13日—14日，2026</span>
+          <span class="pill">📅 11月13日—15日，2026（暂按原页面日期）</span>
           <span class="pill">👥 2位旅人</span>
-          <span class="pill">🚆 公共交通</span>
+          <span class="pill">🚗 第二天取车 · 第三天还车</span>
           <span class="pill">🏨 Loisir Hotel Naha</span>
         </div>
       </div>
@@ -263,31 +308,70 @@
 
     <div class="notice" role="note">
       <span aria-hidden="true">ⓘ</span>
-      <span><strong>出行信息说明：</strong>路线、距离、车程与公交换乘均为规划估算，无法实时核验；不是实时班次或路况。鞋品牌/型号、营业时间、库存、市场摊位及预算上限仍待确认。请在出发当天检查 Google Maps 和店家公告。</span>
+      <span><strong>出行信息说明：</strong>日期按原页面的 2026年11月13–14日顺延为三天，第三天暂定11月15日；航班为11:55。路线、距离、车程、停车和营业时间无法实时核验。为避免落地后赶租车柜台，第一晚不取车；第二天早上在预约租车公司的那霸机场指定门店取车，第三天在同一门店还车。租车公司、实际门店、接驳点、营业时间、鞋品牌/型号与库存仍待确认。请按预订确认单修正时间。</span>
     </div>
 
     <section class="stats" aria-label="行程概览">
-      <article class="stat-card"><div class="stat-title">行程跨度</div><div class="stat-value">1晚 · 2天</div><div class="stat-foot">周五抵达 / 周六游玩</div></article>
-      <article class="stat-card"><div class="stat-title">交通方式</div><div class="stat-value">公共交通为主</div><div class="stat-foot">视班次与天气搭配出租车</div></article>
-      <article class="stat-card"><div class="stat-title">基础预算 · 两人</div><div class="stat-value">约 ¥19,000–38,000</div><div class="stat-foot">估算，不含鞋与购物</div></article>
-      <article class="stat-card"><div class="stat-title">待确认</div><div class="stat-value">鞋品牌 / 预算</div><div class="stat-foot">On 昂跑 ≠ Onitsuka Tiger</div></article>
+      <article class="stat-card"><div class="stat-title">行程跨度</div><div class="stat-value">2晚 · 3天</div><div class="stat-foot">第1天19:00抵达 / 第3天11:55返程</div></article>
+      <article class="stat-card"><div class="stat-title">交通方式</div><div class="stat-value">第二天自驾</div><div class="stat-foot">第1天与酒吧行程不驾车</div></article>
+      <article class="stat-card"><div class="stat-title">基础预算 · 两人</div><div class="stat-value">约 ¥36,000–69,000</div><div class="stat-foot">粗估，不含住宿、鞋与购物</div></article>
+      <article class="stat-card"><div class="stat-title">待确认</div><div class="stat-value">租车门店 / 鞋品牌</div><div class="stat-foot">预订机场店；On ≠ Onitsuka Tiger</div></article>
     </section>
 
     <section class="game-panel" aria-labelledby="game-title">
       <div class="game-heading">
-        <div><h2 id="game-title">冲绳冒险岛 · 横版闯关</h2><p>左右移动、跳过海湾、收集贝壳；到达每站后按 E 或点互动按钮，解锁该地点介绍。</p></div>
-        <span class="game-badge">THREE.JS · RETRO SIDE-SCROLLER</span>
+        <div><h2 id="game-title">冲绳冒险岛 · 海灵对决</h2><p>探索像素海岛、挑战原创海灵；战斗胜利后立即解锁该地点的旅行介绍。</p></div>
+        <span class="game-badge">THREE.JS · PIXEL ISLAND RPG</span>
       </div>
       <div class="game-layout">
         <div class="scene-wrap">
-          <canvas id="okinawa-scene" tabindex="0" role="application" aria-label="冲绳横版平台跳跃游戏，方向键移动，空格跳跃"></canvas>
-          <div class="scene-hint"><strong>触屏按住左右键移动</strong> · 点“跳跃”起跳；到站后互动看介绍</div>
-          <div class="scene-hud" id="scene-hud" aria-live="polite">贝壳 00 / 10 · 检查点 01 / 10</div>
-          <button class="scene-interact" id="scene-interact" type="button" aria-label="到达地点后互动查看介绍" disabled>到达平台后互动查看介绍 · E</button>
+          <canvas id="okinawa-scene" tabindex="0" role="application" aria-label="冲绳像素岛屿探索游戏，方向键移动，E键互动"></canvas>
+          <div class="scene-hint"><strong>方向键探索</strong> · 走近地点后按屏幕 A / 键盘 E 开战</div>
+          <div class="scene-hud" id="scene-hud" aria-live="polite">海灵胜场 00 / 12 · 地点 01 / 12</div>
+          <button class="scene-interact" id="scene-interact" type="button" aria-label="走到地点旁挑战海灵" disabled>走近地点后挑战海灵 · 屏幕 A / 键盘 E</button>
           <div class="scene-controls">
-            <button type="button" id="scene-prev" aria-label="按住向左移动">◀ 左移</button>
-            <button type="button" id="scene-jump" aria-label="跳跃">▲ 跳跃</button>
-            <button type="button" id="scene-next" aria-label="按住向右移动">右移 ▶</button>
+            <button type="button" id="scene-prev" aria-label="按住向左移动">◀</button>
+            <button type="button" id="scene-up" aria-label="按住向上移动">▲</button>
+            <button type="button" id="scene-jump" aria-label="互动">A</button>
+            <button type="button" id="scene-down" aria-label="按住向下移动">▼</button>
+            <button type="button" id="scene-next" aria-label="按住向右移动">▶</button>
+          </div>
+          <div class="battle-overlay" id="battle-overlay" role="dialog" aria-modal="true" aria-labelledby="battle-heading" hidden>
+            <section class="battle-window">
+              <div class="battle-combat" id="battle-combat">
+                <h3 id="battle-heading" class="spot-kicker">野外遭遇</h3>
+                <div class="battle-top">
+                  <div class="battle-foe">
+                    <span class="battle-name" id="battle-name">海灵</span><span class="battle-level">野生</span>
+                    <div class="battle-hp-row"><span>HP</span><div class="battle-hp-track"><div class="battle-hp-fill" id="enemy-hp-fill"></div></div><span id="enemy-hp-text">12/12</span></div>
+                  </div>
+                  <div class="battle-monster" id="battle-monster" aria-hidden="true">🪸</div>
+                </div>
+                <div class="battle-party">
+                  <span class="battle-player-icon" aria-hidden="true">🧭</span>
+                  <div class="battle-player-data">
+                    <div class="battle-name">旅行者 <span class="battle-level">Lv. 08</span></div>
+                    <div class="battle-hp-row"><span>HP</span><div class="battle-hp-track"><div class="battle-hp-fill" id="player-hp-fill"></div></div><span id="player-hp-text">20/20</span></div>
+                  </div>
+                </div>
+                <div class="battle-message" id="battle-message" aria-live="polite">野生海灵出现了！选择行动。</div>
+                <div class="battle-menu">
+                  <button type="button" id="battle-attack">🌊 海潮冲击</button>
+                  <button type="button" id="battle-guard">🫧 潮汐护盾</button>
+                  <button type="button" id="battle-item">🥥 岛屿补给</button>
+                  <button type="button" id="battle-run">↩ 暂时离开</button>
+                </div>
+              </div>
+              <div class="battle-victory" id="battle-victory" hidden>
+                <div class="spot-kicker">战斗胜利 · 行程已解锁</div>
+                <h3 id="victory-title"></h3>
+                <p id="victory-summary"></p>
+                <p class="battle-why" id="victory-why"></p>
+                <p id="victory-status"></p>
+                <a class="map-link" id="victory-map" target="_blank" rel="noopener noreferrer" href="#">↗ 在 Google Maps 查看地点</a>
+                <button class="battle-continue" id="battle-continue" type="button">继续探索</button>
+              </div>
+            </section>
           </div>
           <div class="scene-error" id="scene-error" hidden>3D 场景暂不可用；地点介绍和下方行程仍可正常使用。</div>
         </div>
@@ -295,24 +379,61 @@
           <div class="spot-kicker" id="spot-kicker">互动导览 · 旅程地点</div>
           <h3 id="spot-title">准备出发</h3>
           <div class="spot-jp" id="spot-subtitle">抵达地点后即可解锁介绍</div>
-          <p class="spot-summary" id="spot-summary">先操控旅人走上机场平台。到站后，按键盘 E 或点击游戏画面中的“互动”按钮，即可查看那一站的介绍、路线意义和出发前提醒。继续前进并在每个地点平台落地，逐站解锁导览。</p>
-          <div class="spot-why"><strong>怎么玩</strong><span id="spot-why">按住左右键移动，点“跳跃”跨过海湾；必须落在地点平台上，互动按钮才会启用。</span></div>
-          <div class="spot-status" id="spot-status">电脑：方向键 / 空格 / E　·　iPhone：按住方向按钮并点触屏按钮</div>
+          <p class="spot-summary" id="spot-summary">踏上像素冲绳小岛，沿海岸探索每个行程地点。走近地点附近的原创海灵，按 A / E 进入回合制战斗；使用海潮攻击、护盾或补给击败对手。KO 对手后会立刻解锁该站的介绍、路线意义与出发前提醒。</p>
+          <div class="spot-why"><strong>冒险指南</strong><span id="spot-why">用方向键或 WASD 探索，走近地点后按屏幕 A / 键盘 E 开战。战斗中选择海潮冲击、潮汐护盾或岛屿补给；KO 海灵后自动显示地点介绍。</span></div>
+          <div class="spot-status" id="spot-status">方向键 / WASD 移动 · E 互动　·　iPhone：屏幕方向键 + A</div>
           <a class="map-link" id="spot-map" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Naha+Airport" hidden>↗ 在 Google Maps 查看地点</a>
         </aside>
       </div>
-      <p class="game-caption">原创冲绳主题横版跳跃玩法，不含任天堂角色或游戏素材。iPhone 可用触控操作；请在 Safari 打开可访问的网页链接并保持联网以加载 Three.js，电脑上的 file:// 地址不会自动同步到手机。地点介绍是旅行规划摘要，不代表实时营业或交通核实。</p>
+      <p class="game-caption">原创像素海岛回合制 RPG 与原创海灵，不使用任何现有游戏角色、名称或专属素材。iPhone 可用屏幕方向键和战斗按钮；Safari 需联网加载 Three.js。</p>
     </section>
 
     <section id="itinerary" aria-labelledby="itinerary-title">
       <div class="section-heading">
-        <div><h2 id="itinerary-title">行程时间轴</h2><p>逐段安排，预留门到门与候车缓冲</p></div>
+        <div><h2 id="itinerary-title">行程时间轴</h2><p>逐段安排，预留门到门、取还车与驾驶缓冲</p></div>
         <div class="day-switch" role="tablist" aria-label="选择行程日期">
-          <button class="day-tab" role="tab" id="tab-night" aria-selected="true" aria-controls="day-night">第一晚 · 11.13</button>
+          <button class="day-tab" role="tab" id="tab-night" aria-selected="true" aria-controls="day-night">第一天 · 11.13</button>
           <button class="day-tab" role="tab" id="tab-day" aria-selected="false" aria-controls="day-day">第二天 · 11.14</button>
+          <button class="day-tab" role="tab" id="tab-day3" aria-selected="false" aria-controls="day-day3">第三天 · 11.15</button>
         </div>
       </div>
-      <div class="day-progress"><span id="progress-label">第一晚完成进度</span><span id="progress-count">0 / 5</span></div>
+      <div class="route-options" id="night-route-options" aria-label="选择第一晚方案" hidden>
+        <button class="route-option" type="button" data-night-plan="planA" aria-pressed="true">
+          <span class="route-option-title">方案 A · 牛肉餐厅优先</span>
+          <span class="route-option-intro">机场 → Steak House 88 → 酒店入住 → 酒店附近酒吧 → 回房。符合当前首选；国际航班取行李后直接打车，不租车。</span>
+          <span class="route-option-meta">需先确认最后点单、行李寄存及酒吧营业时间</span>
+        </button>
+        <button class="route-option" type="button" data-night-plan="planB" aria-pressed="false">
+          <span class="route-option-title">方案 B · 先酒店寄存行李</span>
+          <span class="route-option-intro">机场 → 酒店办理入住/寄存 → 打车去 Steak House 88 → 回酒店区域酒吧 → 回房。行李更轻松，但到店更晚。</span>
+          <span class="route-option-meta">适合不想带行李用餐；晚餐时间风险较高</span>
+        </button>
+        <button class="route-option" type="button" data-night-plan="planC" aria-pressed="false">
+          <span class="route-option-title">方案 C · 航班延误备选</span>
+          <span class="route-option-intro">机场 → 酒店 → 仅前往已电话确认仍接单的附近牛肉店；若 Steak House 88 已停止接单，地图查找并先电话确认附近替代店。取消酒吧，回酒店休息。</span>
+          <span class="route-option-meta">不跨区追赶；替代店与营业状态须当晚确认</span>
+        </button>
+      </div>
+      <div class="route-selection-summary" id="night-route-summary" aria-live="polite" hidden></div>
+      <div class="route-options" id="route-options" aria-label="选择第二天自驾路线" hidden>
+        <button class="route-option" type="button" data-route="route1" aria-pressed="true">
+          <span class="route-option-title">路线 1 · 市区文化＋南部海景</span>
+          <span class="route-option-intro">泊いゆまち → 波上宫 → 壶屋やちむん通（壶屋陶器街）→ 指定鞋店 → Golf5 → ASHIBINAA → 晚餐 → 濑长岛 → 酒吧。神社海景之后接一段老街漫步与陶艺店探访。</span>
+          <span class="route-option-meta">约 35 分钟街区步行 + 30 分钟海景 · 默认推荐</span>
+        </button>
+        <button class="route-option" type="button" data-route="route2" aria-pressed="false">
+          <span class="route-option-title">路线 2 · 少一站文化景点，多留机动</span>
+          <span class="route-option-intro">跳过壶屋陶器街，波上宫后直接前往鞋店；保留 Golf5、Outlet、晚餐与濑长岛。省下城市步行与逛店时间，留给试鞋、购物及交通缓冲。</span>
+          <span class="route-option-meta">保留南部海景 · 购物与交通更从容</span>
+        </button>
+        <button class="route-option" type="button" data-route="route3" aria-pressed="false">
+          <span class="route-option-title">路线 3 · 壶屋老街＋轻松收尾</span>
+          <span class="route-option-intro">保留波上宫与壶屋陶器街，完成鞋店、Golf5、Outlet 和晚餐后直接回酒店；不绕去濑长岛，留出休息时间，再步行去酒吧。</span>
+          <span class="route-option-meta">老街与陶艺探访 · 少一次夜间驾车</span>
+        </button>
+      </div>
+      <div class="route-selection-summary" id="route-selection-summary" aria-live="polite" hidden></div>
+      <div class="day-progress"><span id="progress-label">第一天完成进度</span><span id="progress-count">0 / 5</span></div>
       <div class="progress-track" role="progressbar" aria-label="当日行程完成比例" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-bar"></div></div>
 
       <div class="timeline" id="day-night" role="tabpanel" aria-labelledby="tab-night">
@@ -321,91 +442,177 @@
           <div class="timeline-card">
             <div class="card-top"><div><div class="item-title">抵达冲绳 · 那霸机场</div><div class="item-place">下机、入境（如适用）、取行李</div></div><div class="item-icon">✈️</div></div>
             <div class="item-details"><span class="detail-chip">⏱ 预留 90 分钟</span><span class="detail-chip">🧳 国际航班需更多缓冲</span></div>
-            <div class="item-note">航班、入境或行李延误时，不要按落地时刻直接赶餐厅；先联系酒店及餐厅确认可否延后。</div>
-            <div class="item-footer"><span></span><label class="check-label"><input type="checkbox" data-id="n1"><span>标记完成</span></label></div>
+            <div class="item-note">航班、入境或行李延误时先联系餐厅确认最后点单；若预计赶不上，改为出发前核实过、可接待晚到和行李的附近牛肉店，并优先取消酒吧，不跨区追赶。</div>
+            <div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Naha+Airport">↗ 那霸机场地图</a><label class="check-label"><input type="checkbox" data-id="n1"><span>标记完成</span></label></div>
           </div>
         </article>
-        <article class="timeline-row" data-start="2026-11-13T20:30:00+09:00" data-end="2026-11-13T21:15:00+09:00">
+        <article class="timeline-row" data-night-plan="planA" data-start="2026-11-13T20:30:00+09:00" data-end="2026-11-13T21:00:00+09:00">
           <div class="time-label">20:30</div><span class="dot"></span>
           <div class="timeline-card">
-            <div class="card-top"><div><div class="item-title">前往酒店 · 办理入住 / 寄存行李</div><div class="item-place">Loisir Hotel Naha · 那霸市西3-2-1</div><div class="item-address">Nishi, Naha, Okinawa 900-0036</div></div><div class="item-icon">🏨</div></div>
-            <div class="item-details"><span class="detail-chip">🚆 单轨 + 步行</span><span class="detail-chip">📍 约 4–5 km</span><span class="detail-chip">⏱ 门到门约 35–50 分钟</span></div>
-            <div class="item-note">估算路线：机场站至旭桥站后步行约1公里；行李多、延误或错过班次时可改乘出租车，约15–25分钟估算。</div>
-            <div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Naha+Airport&amp;destination=Loisir+Hotel+Naha&amp;travelmode=transit">↗ Google Maps 路线</a><label class="check-label"><input type="checkbox" data-id="n2"><span>标记完成</span></label></div>
+            <div class="card-top"><div><div class="item-title">机场直接前往牛肉餐厅</div><div class="item-place">那霸机场 → Steak House 88 国際通り西口店 · 那霸市松尾1-4-3 永昇商事ビル2F</div></div><div class="item-icon">🚕</div></div>
+            <div class="item-details"><span class="detail-chip">🚕 出租车估算15–25分钟</span><span class="detail-chip">📍 约5–7 km估算</span><span class="detail-chip">⏱ 预留30分钟含等车/行李</span></div>
+            <div class="item-note">餐厅优先方案：仅在出发前确认餐厅接受晚到、最后点单时间足够且可否携带行李后采用。路线、车程及营业状态未实时核验。</div>
+            <div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Naha+Airport&amp;destination=Steak+House+88+Kokusai-dori+Nishiguchi%2C+Naha&amp;travelmode=driving">↗ 机场 → 牛肉餐厅（出租车）</a><label class="check-label"><input type="checkbox" data-id="n2"><span>标记完成</span></label></div>
           </div>
         </article>
-        <article class="timeline-row" data-start="2026-11-13T21:15:00+09:00" data-end="2026-11-13T22:20:00+09:00">
-          <div class="time-label">21:15</div><span class="dot"></span>
+        <article class="timeline-row" data-night-plan="planA" data-start="2026-11-13T21:00:00+09:00" data-end="2026-11-13T21:50:00+09:00">
+          <div class="time-label">21:00</div><span class="dot"></span>
           <div class="timeline-card">
             <div class="card-top"><div><div class="item-title">牛肉晚餐 · Steak House 88 国際通り西口店</div><div class="item-place">冲绳牛排老字号分店 · 那霸市松尾1-4-3 永昇商事ビル2F</div><div class="item-address">Matsuo, Naha, Okinawa 900-0014</div></div><div class="item-icon">🥩</div></div>
-            <div class="item-details"><span class="detail-chip">🚕 建议出租车约10–15分钟</span><span class="detail-chip">📍 约2.5–3 km</span><span class="detail-chip">🍽 预留排队与用餐</span></div>
-            <div class="item-note">搜索到的店铺信息显示约11:00–23:00、最后点单约22:00；请出发当天向门店确认。建议从酒店直接打车前往，避免公交候车耽误最后点单；这是估算，并非实时营业核验。</div>
-            <div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Loisir+Hotel+Naha&amp;destination=Steak+House+88+Kokusai-dori+Nishiguchi%2C+Naha&amp;travelmode=driving">↗ 出租车路线</a><label class="check-label"><input type="checkbox" data-id="n3"><span>标记完成</span></label></div>
+            <div class="item-details"><span class="detail-chip">🍽 预留约50分钟用餐</span><span class="detail-chip">⏱ 排队时间另计</span><span class="detail-chip">📞 最后点单时间须确认</span></div>
+            <div class="item-note">国际航班入境可能使抵店时间明显后移。若估计会晚于餐厅最后点单，先电话确认；无法接待时使用当天确认营业且可带行李的附近牛肉餐厅，避免跨区奔波。</div>
+            <div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Steak+House+88+Kokusai-dori+Nishiguchi%2C+Naha">↗ 餐厅地图</a><label class="check-label"><input type="checkbox" data-id="n3"><span>标记完成</span></label></div>
           </div>
         </article>
-        <article class="timeline-row" data-start="2026-11-13T22:20:00+09:00" data-end="2026-11-13T23:20:00+09:00">
+        <article class="timeline-row" data-night-plan="planA" data-start="2026-11-13T21:50:00+09:00" data-end="2026-11-13T22:20:00+09:00">
+          <div class="time-label">21:50</div><span class="dot"></span>
+          <div class="timeline-card">
+            <div class="card-top"><div><div class="item-title">前往酒店 · 办理入住 / 寄存行李</div><div class="item-place">Steak House 88 → Loisir Hotel Naha · 那霸市西3-2-1</div><div class="item-address">Nishi, Naha, Okinawa 900-0036</div></div><div class="item-icon">🏨</div></div>
+            <div class="item-details"><span class="detail-chip">🚕 出租车约10–20分钟估算</span><span class="detail-chip">📍 约2.5–3 km估算</span><span class="detail-chip">⏱ 预留30分钟办入住</span></div>
+            <div class="item-note">第一晚不取车；行李寄存/入住服务及晚到办理方式需提前告知酒店。第二天早上再取租车。</div>
+            <div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Steak+House+88+Kokusai-dori+Nishiguchi%2C+Naha&amp;destination=Loisir+Hotel+Naha&amp;travelmode=driving">↗ 牛肉餐厅 → 酒店（出租车）</a><label class="check-label"><input type="checkbox" data-id="n4"><span>标记完成</span></label></div>
+          </div>
+        </article>
+        <article class="timeline-row" data-night-plan="planA" data-start="2026-11-13T22:20:00+09:00" data-end="2026-11-13T23:10:00+09:00">
           <div class="time-label">22:20</div><span class="dot"></span>
           <div class="timeline-card">
-            <div class="card-top"><div><div class="item-title">一杯小酌 · Bar “Planete”</div><div class="item-place">Loisir Spa Tower Naha · 酒店区域，具体入口问前台</div><div class="item-address">Nishi 3-2-1, Naha, Okinawa 900-0036</div></div><div class="item-icon">🍸</div></div>
-            <div class="item-details"><span class="detail-chip">🚶 步行约 3–8 分钟</span><span class="detail-chip">⏱ 预留 1 小时</span></div>
-            <div class="item-note">当前营业状态与时间待确认；若未营业，改去酒店附近当天确认营业的酒吧，不跨区奔波。</div>
-            <div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Steak+House+88+Kokusai-dori+Nishiguchi%2C+Naha&amp;destination=Bar+Planete%2C+Loisir+Spa+Tower+Naha&amp;travelmode=transit">↗ 餐厅 → 酒吧</a><label class="check-label"><input type="checkbox" data-id="n4"><span>标记完成</span></label></div>
+            <div class="card-top"><div><div class="item-title">一杯小酌 · Bar “Planete”</div><div class="item-place">Loisir Spa Tower Naha · 酒店区域，具体入口与是否对外营业请问前台</div><div class="item-address">Nishi 3-2-1, Naha, Okinawa 900-0036</div></div><div class="item-icon">🍸</div></div>
+            <div class="item-details"><span class="detail-chip">🚶 酒店区域步行约5–10分钟估算</span><span class="detail-chip">⏱ 预留50分钟</span><span class="detail-chip">🕙 营业时间待核实</span></div>
+            <div class="item-note">餐厅后先办理入住再去酒吧；当晚不驾驶。若酒吧未营业或到店过晚，取消酒吧直接回房，不跨区寻找。</div>
+            <div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Loisir+Hotel+Naha&amp;destination=Bar+Planete%2C+Loisir+Spa+Tower+Naha&amp;travelmode=walking">↗ 酒店 → 酒吧（步行）</a><label class="check-label"><input type="checkbox" data-id="n5"><span>标记完成</span></label></div>
           </div>
         </article>
-        <article class="timeline-row" data-start="2026-11-13T23:20:00+09:00" data-end="2026-11-13T23:30:00+09:00">
-          <div class="time-label">23:20</div><span class="dot"></span>
+        <article class="timeline-row" data-night-plan="planA" data-start="2026-11-13T23:10:00+09:00" data-end="2026-11-13T23:20:00+09:00">
+          <div class="time-label">23:10</div><span class="dot"></span>
           <div class="timeline-card">
             <div class="card-top"><div><div class="item-title">回房休息</div><div class="item-place">Loisir Hotel Naha · 酒店内步行 / 电梯约3–5分钟</div></div><div class="item-icon">🌙</div></div>
-            <div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Bar+Planete%2C+Loisir+Spa+Tower+Naha&amp;destination=Loisir+Hotel+Naha&amp;travelmode=walking">↗ 酒吧 → 住宿</a><label class="check-label"><input type="checkbox" data-id="n5"><span>标记完成</span></label></div>
+            <div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Bar+Planete%2C+Loisir+Spa+Tower+Naha&amp;destination=Loisir+Hotel+Naha&amp;travelmode=walking">↗ 酒吧 → 住宿</a><label class="check-label"><input type="checkbox" data-id="n6"><span>标记完成</span></label></div>
           </div>
+        </article>
+        <article class="timeline-row" data-night-plan="planB" data-start="2026-11-13T20:30:00+09:00" data-end="2026-11-13T21:00:00+09:00" hidden>
+          <div class="time-label">20:30</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">机场前往酒店 · 先寄存行李</div><div class="item-place">那霸机场 → Loisir Hotel Naha · 那霸市西3-2-1</div></div><div class="item-icon">🚕</div></div><div class="item-details"><span class="detail-chip">约4–5 km估算</span><span class="detail-chip">出租车约10–20分钟，另留等车缓冲</span></div><div class="item-note">行李寄存及晚到入住需提前联系酒店确认；该方案会压缩用餐时间。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Naha+Airport&amp;destination=Loisir+Hotel+Naha&amp;travelmode=driving">↗ 机场 → 酒店（出租车）</a><label class="check-label"><input type="checkbox" data-id="n7"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-night-plan="planB" data-start="2026-11-13T21:00:00+09:00" data-end="2026-11-13T21:20:00+09:00" hidden>
+          <div class="time-label">21:00</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">酒店办理入住 / 寄存行李</div><div class="item-place">Loisir Hotel Naha · 那霸市西3-2-1</div></div><div class="item-icon">🏨</div></div><div class="item-note">酒店地址地图；确认晚到入住安排后再选此方案。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Loisir+Hotel+Naha">↗ 酒店地图</a><label class="check-label"><input type="checkbox" data-id="n8"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-night-plan="planB" data-start="2026-11-13T21:20:00+09:00" data-end="2026-11-13T21:40:00+09:00" hidden>
+          <div class="time-label">21:20</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">酒店打车前往牛肉餐厅</div><div class="item-place">Loisir Hotel Naha → Steak House 88 国際通り西口店</div></div><div class="item-icon">🚕</div></div><div class="item-details"><span class="detail-chip">约2.5–3 km估算</span><span class="detail-chip">出租车约10–20分钟估算</span></div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Loisir+Hotel+Naha&amp;destination=Steak+House+88+Kokusai-dori+Nishiguchi%2C+Naha&amp;travelmode=driving">↗ 酒店 → 牛肉餐厅（出租车）</a><label class="check-label"><input type="checkbox" data-id="n9"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-night-plan="planB" data-start="2026-11-13T21:40:00+09:00" data-end="2026-11-13T22:30:00+09:00" hidden>
+          <div class="time-label">21:40</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">牛肉晚餐 · Steak House 88 国際通り西口店</div><div class="item-place">那霸市松尾1-4-3 永昇商事ビル2F</div></div><div class="item-icon">🥩</div></div><div class="item-details"><span class="detail-chip">预留约50分钟用餐</span><span class="detail-chip">最后点单时间必须先确认</span></div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Steak+House+88+Kokusai-dori+Nishiguchi%2C+Naha">↗ 牛肉餐厅地图</a><label class="check-label"><input type="checkbox" data-id="n10"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-night-plan="planB" data-start="2026-11-13T22:30:00+09:00" data-end="2026-11-13T22:50:00+09:00" hidden>
+          <div class="time-label">22:30</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">牛肉餐厅返回酒店区域</div><div class="item-place">Steak House 88 → Loisir Hotel Naha</div></div><div class="item-icon">🚕</div></div><div class="item-details"><span class="detail-chip">出租车约10–20分钟估算</span><span class="detail-chip">约2.5–3 km估算</span></div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Steak+House+88+Kokusai-dori+Nishiguchi%2C+Naha&amp;destination=Loisir+Hotel+Naha&amp;travelmode=driving">↗ 牛肉餐厅 → 酒店区域（出租车）</a><label class="check-label"><input type="checkbox" data-id="n11"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-night-plan="planB" data-start="2026-11-13T22:50:00+09:00" data-end="2026-11-13T23:10:00+09:00" hidden>
+          <div class="time-label">22:50</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">酒店区域酒吧 · Bar “Planete”</div><div class="item-place">Loisir Spa Tower Naha · 入口与对外营业情况待确认</div></div><div class="item-icon">🍸</div></div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Loisir+Hotel+Naha&amp;destination=Bar+Planete%2C+Loisir+Spa+Tower+Naha&amp;travelmode=walking">↗ 酒店 → 酒吧（步行）</a><label class="check-label"><input type="checkbox" data-id="n12"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-night-plan="planB" data-start="2026-11-13T23:10:00+09:00" data-end="2026-11-13T23:20:00+09:00" hidden>
+          <div class="time-label">23:10</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">步行回房休息</div><div class="item-place">Bar “Planete” → Loisir Hotel Naha</div></div><div class="item-icon">🌙</div></div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Bar+Planete%2C+Loisir+Spa+Tower+Naha&amp;destination=Loisir+Hotel+Naha&amp;travelmode=walking">↗ 酒吧 → 住宿</a><label class="check-label"><input type="checkbox" data-id="n13"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-night-plan="planC" data-start="2026-11-13T20:30:00+09:00" data-end="2026-11-13T21:00:00+09:00" hidden>
+          <div class="time-label">20:30</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">机场前往酒店 · 延误时先安顿</div><div class="item-place">那霸机场 → Loisir Hotel Naha</div></div><div class="item-icon">🚕</div></div><div class="item-note">按实际落地和通关时间调整；若预估超过此时间，先致电酒店确认晚到入住。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Naha+Airport&amp;destination=Loisir+Hotel+Naha&amp;travelmode=driving">↗ 机场 → 酒店（出租车）</a><label class="check-label"><input type="checkbox" data-id="n14"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-night-plan="planC" data-start="2026-11-13T21:00:00+09:00" data-end="2026-11-13T21:20:00+09:00" hidden>
+          <div class="time-label">21:00</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">酒店办理入住、放下行李</div><div class="item-place">Loisir Hotel Naha · 那霸市西3-2-1</div></div><div class="item-icon">🏨</div></div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Loisir+Hotel+Naha">↗ 酒店地图</a><label class="check-label"><input type="checkbox" data-id="n15"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-night-plan="planC" data-start="2026-11-13T21:20:00+09:00" data-end="2026-11-13T21:40:00+09:00" hidden>
+          <div class="time-label">21:20</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">查找并打车去已确认营业的牛肉店</div><div class="item-place">酒店周边 → 当晚电话确认接单的牛肉餐厅</div></div><div class="item-icon">🚕</div></div><div class="item-note">此处不预设另一家店名：在 Google Maps 搜索“牛排/ステーキ 那覇”，电话确认最后点单、行李与座位后再出发；若无店可接待，直接回酒店休息。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=steak+restaurant+near+Loisir+Hotel+Naha">↗ 搜索酒店附近牛肉店</a><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Loisir+Hotel+Naha&amp;destination=steak+restaurant+near+Loisir+Hotel+Naha&amp;travelmode=driving">↗ 酒店 → 搜索结果（出租车）</a><label class="check-label"><input type="checkbox" data-id="n16"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-night-plan="planC" data-start="2026-11-13T21:40:00+09:00" data-end="2026-11-13T22:20:00+09:00" hidden>
+          <div class="time-label">21:40</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">附近牛肉晚餐 · 仅去已电话确认店铺</div><div class="item-place">实际选择的那霸市内牛肉餐厅 · 地址以当晚确认结果为准</div></div><div class="item-icon">🥩</div></div><div class="item-note">搜索链接只用于找店，不代表实时营业或已确认接待；如果餐厅拒绝晚到或不可携带行李，不再奔波，改为酒店附近可用餐食并结束行程。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=steak+restaurant+Naha+Okinawa">↗ 搜索那霸牛肉餐厅</a><label class="check-label"><input type="checkbox" data-id="n17"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-night-plan="planC" data-start="2026-11-13T22:20:00+09:00" data-end="2026-11-13T22:40:00+09:00" hidden>
+          <div class="time-label">22:20</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">返回酒店 · 延误方案不安排酒吧</div><div class="item-place">当晚牛肉餐厅 → Loisir Hotel Naha</div></div><div class="item-icon">🚕</div></div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=steak+restaurant+Naha+Okinawa&amp;destination=Loisir+Hotel+Naha&amp;travelmode=driving">↗ 餐厅 → 酒店（出发前改为已确认店名）</a><label class="check-label"><input type="checkbox" data-id="n18"><span>标记完成</span></label></div></div>
         </article>
       </div>
 
       <div class="timeline" id="day-day" role="tabpanel" aria-labelledby="tab-day" hidden>
-        <article class="timeline-row" data-start="2026-11-14T08:00:00+09:00" data-end="2026-11-14T09:00:00+09:00">
-          <div class="time-label">08:00</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">起床、整理 · 退房或寄存行李</div><div class="item-place">Loisir Hotel Naha</div></div><div class="item-icon">🧳</div></div><div class="item-note">先确认酒店寄存服务及退房安排。</div><div class="item-footer"><span></span><label class="check-label"><input type="checkbox" data-id="d1"><span>标记完成</span></label></div></div>
+        <article class="timeline-row" data-start="2026-11-14T06:45:00+09:00" data-end="2026-11-14T07:15:00+09:00">
+          <div class="time-label">06:45</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">起床、整理 · 保留房间与行李</div><div class="item-place">Loisir Hotel Naha · 第二晚仍住此处</div></div><div class="item-icon">🧳</div></div><div class="item-note">不退房，带好驾照、护照、租车预订凭证；确认酒店停车场可过夜停车及收费。早餐简单解决，避免影响取车预约。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Loisir+Hotel+Naha">↗ 酒店地图</a><label class="check-label"><input type="checkbox" data-id="d1"><span>标记完成</span></label></div></div>
         </article>
-        <article class="timeline-row" data-start="2026-11-14T09:00:00+09:00" data-end="2026-11-14T09:40:00+09:00">
-          <div class="time-label">09:00</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">前往泊いゆまち海鲜市场</div><div class="item-place">Tomari Iyumachi · 那霸市港町1-1-18</div></div><div class="item-icon">🚌</div></div><div class="item-details"><span class="detail-chip">📍 约 2–3 km</span><span class="detail-chip">🚶 步行约30–40分钟</span><span class="detail-chip">🚕 出租车约10–15分钟</span></div><div class="item-note">估算时间；公交站点/班次未核验。下雨或行李较多时可考虑出租车。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Loisir+Hotel+Naha&amp;destination=Tomari+Iyumachi%2C+Naha&amp;travelmode=transit">↗ Google Maps 路线</a><label class="check-label"><input type="checkbox" data-id="d2"><span>标记完成</span></label></div></div>
+        <article class="timeline-row" data-start="2026-11-14T07:15:00+09:00" data-end="2026-11-14T08:00:00+09:00">
+          <div class="time-label">07:15</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">酒店前往那霸机场租车接驳点</div><div class="item-place">Loisir Hotel Naha → 那霸机场租车公司指定集合点</div></div><div class="item-icon">🚕</div></div><div class="item-details"><span class="detail-chip">🚕 出租车约10–20分钟</span><span class="detail-chip">📍 约4–5 km估算</span><span class="detail-chip">⏱ 预留45分钟含候车</span></div><div class="item-note">租车公司尚未指定：预订时选“那霸机场店”，确认集合点究竟在机场航站楼、接驳乘车区还是店铺柜台，并核实是否需要预约接驳。Google Maps 目的地按订单门店替换。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Loisir+Hotel+Naha&amp;destination=Naha+Airport+Rental+Car+Pickup&amp;travelmode=driving">↗ 酒店 → 机场租车接驳点</a><label class="check-label"><input type="checkbox" data-id="d16"><span>标记完成</span></label></div></div>
         </article>
-        <article class="timeline-row" data-start="2026-11-14T09:40:00+09:00" data-end="2026-11-14T10:40:00+09:00">
-          <div class="time-label">09:40</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">海鲜早餐 / 早午餐 · 泊いゆまち</div><div class="item-place">市场内摊位 · 那霸市港町</div></div><div class="item-icon">🐟</div></div><div class="item-details"><span class="detail-chip">🍽 预留排队时间</span><span class="detail-chip">⏱ 约 1 小时</span></div><div class="item-note">市场营业时间与各摊位周六开摊时间不同，出发前确认目标摊位。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Tomari+Iyumachi+Market+Naha">↗ 市场地图</a><label class="check-label"><input type="checkbox" data-id="d3"><span>标记完成</span></label></div></div>
+        <article class="timeline-row" data-start="2026-11-14T08:00:00+09:00" data-end="2026-11-14T08:45:00+09:00">
+          <div class="time-label">08:00</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">取车 · 那霸机场预约租车门店</div><div class="item-place">机场租车接驳点 → 预订确认单上的那霸机场店；第三天同店还车</div></div><div class="item-icon">🚗</div></div><div class="item-details"><span class="detail-chip">🕗 预约取车08:00（待门店营业时间确认）</span><span class="detail-chip">⏱ 预留45分钟办手续/接驳</span><span class="detail-chip">🪪 驾照、护照及所需日文翻译件</span></div><div class="item-note">确认保险、ETC、儿童座椅（如需）、油种、还车油量政策、门店营业时间及过路费支付方式。勿把“机场租车”搜索结果当作已确认门店。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Naha+Airport+Rental+Car+Office">↗ 搜索机场租车门店</a><label class="check-label"><input type="checkbox" data-id="d17"><span>标记完成</span></label></div></div>
         </article>
-        <article class="timeline-row" data-start="2026-11-14T10:40:00+09:00" data-end="2026-11-14T11:30:00+09:00">
-          <div class="time-label">10:40</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">前往波上宫</div><div class="item-place">Naminoue Shrine（波上宫）· 那霸市若狭1-25-11</div><div class="item-address">Wakasa, Naha, Okinawa 900-0031</div></div><div class="item-icon">⛩️</div></div><div class="item-details"><span class="detail-chip">📍 约 2–3 km（估算）</span><span class="detail-chip">🚶 步行或公交 / 出租车</span><span class="detail-chip">⏱ 约 15–35 分钟估算</span></div><div class="item-note">市场与神社相距不远；公交班次未实时核验，可按当天地图选择步行、公交或短程出租车。路线另留候车/步行缓冲。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Tomari+Iyumachi%2C+Naha&amp;destination=Naminoue+Shrine%2C+Naha&amp;travelmode=transit">↗ Google Maps 路线</a><label class="check-label"><input type="checkbox" data-id="d4"><span>标记完成</span></label></div></div>
+        <article class="timeline-row" data-start="2026-11-14T08:45:00+09:00" data-end="2026-11-14T09:10:00+09:00">
+          <div class="time-label">08:45</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">取车后开往泊いゆまち海鲜市场</div><div class="item-place">那霸机场租车门店 → Tomari Iyumachi · 那霸市港町1-1-18</div></div><div class="item-icon">🚗</div></div><div class="item-details"><span class="detail-chip">🚗 约5–6 km</span><span class="detail-chip">⏱ 约15–25分钟估算</span><span class="detail-chip">🅿️ 市场停车位/收费待确认</span></div><div class="item-note">办手续完成时间若晚于08:45，早餐改为市场可买到的简餐，不压缩后续参拜与购物顺序。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Naha+Airport+Rental+Car+Office&amp;destination=Tomari+Iyumachi%2C+Naha&amp;travelmode=driving">↗ Google Maps 自驾路线</a><label class="check-label"><input type="checkbox" data-id="d2"><span>标记完成</span></label></div></div>
         </article>
-        <article class="timeline-row" data-start="2026-11-14T11:30:00+09:00" data-end="2026-11-14T13:00:00+09:00">
-          <div class="time-label">11:30</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">参拜与海边散步 · 波上宫</div><div class="item-place">波上宫（Naminoue Shrine）· 那霸市若狭1-25-11</div></div><div class="item-icon">⛩️</div></div><div class="item-details"><span class="detail-chip">⏱ 停留约 1小时30分</span><span class="detail-chip">🎟 神社境内参拜；授与品自选</span></div><div class="item-note">神社境内开放时间、祭事安排及海边通道情况请出发前核对；尊重参拜礼仪，不进入限制区域。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Naminoue+Shrine%2C+Naha">↗ 波上宫地图</a><label class="check-label"><input type="checkbox" data-id="d5"><span>标记完成</span></label></div></div>
+        <article class="timeline-row" data-start="2026-11-14T09:10:00+09:00" data-end="2026-11-14T10:00:00+09:00">
+          <div class="time-label">09:10</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">海鲜早餐 / 早午餐 · 泊いゆまち</div><div class="item-place">泊いゆまち · 那霸市港町1-1-18</div></div><div class="item-icon">🐟</div></div><div class="item-details"><span class="detail-chip">🍽 预留排队时间</span><span class="detail-chip">⏱ 约50分钟</span><span class="detail-chip">🅿️ 摊位与停车需核实</span></div><div class="item-note">市场营业时间与各摊位周六开摊时间不同，出发前确认目标摊位及可堂食情况。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Tomari+Iyumachi+Market+Naha">↗ 市场地图</a><label class="check-label"><input type="checkbox" data-id="d3"><span>标记完成</span></label></div></div>
         </article>
-        <article class="timeline-row" data-start="2026-11-14T13:00:00+09:00" data-end="2026-11-14T13:45:00+09:00">
-          <div class="time-label">13:00</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">前往鞋店 · 先确认品牌与门店</div><div class="item-place">On 昂跑候选：Sports Depo 天久店 · 那霸市天久1-2-1</div></div><div class="item-icon">👟</div></div><div class="item-details"><span class="detail-chip">📍 约 5–7 km（估算）</span><span class="detail-chip">🚌 公交 / 出租车接驳</span><span class="detail-chip">⏱ 估算 30–50 分钟</span></div><div class="item-note">门店是否经营 On、指定款和尺码库存均未确认。若你选的是 Onitsuka Tiger（鬼塚虎），不能把这家店当作目标门店。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Naminoue+Shrine%2C+Naha&amp;destination=Sports+Depo+Ameku%2C+Naha&amp;travelmode=transit">↗ 候选路线</a><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Onitsuka+Tiger+store+Naha+Okinawa">↗ 搜索鬼塚虎门店</a><label class="check-label"><input type="checkbox" data-id="d6"><span>标记完成</span></label></div></div>
+        <article class="timeline-row" data-start="2026-11-14T10:00:00+09:00" data-end="2026-11-14T10:20:00+09:00">
+          <div class="time-label">10:00</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">开车前往波上宫</div><div class="item-place">泊いゆまち → Naminoue Shrine · 那霸市若狭1-25-11</div><div class="item-address">Wakasa, Naha, Okinawa 900-0031</div></div><div class="item-icon">🚗</div></div><div class="item-details"><span class="detail-chip">📍 约2–3 km估算</span><span class="detail-chip">🚗 约10–20分钟</span><span class="detail-chip">🅿️ 神社周边停车/收费待核实</span></div><div class="item-note">短途驾驶仍预留找停车位与步行缓冲；不得把车停在神社限制或居民区域。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Tomari+Iyumachi%2C+Naha&amp;destination=Naminoue+Shrine%2C+Naha&amp;travelmode=driving">↗ Google Maps 自驾路线</a><label class="check-label"><input type="checkbox" data-id="d4"><span>标记完成</span></label></div></div>
         </article>
-        <article class="timeline-row" data-start="2026-11-14T13:45:00+09:00" data-end="2026-11-14T14:30:00+09:00">
-          <div class="time-label">13:45</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">试穿与购鞋 · 品牌待确认</div><div class="item-place">门店未最终确认；以用户指定品牌、店址和库存为准</div></div><div class="item-icon">🛍️</div></div><div class="item-details"><span class="detail-chip">⏱ 预留 45 分钟</span><span class="detail-chip">📞 先电话确认尺码</span></div><div class="item-note">为高尔夫用品店预留时段，购鞋时间小幅压缩；项目顺序仍是景点→买鞋→高尔夫用品店→Outlet。如无库存，先确认同品牌可行门店。</div><div class="item-footer"><label class="check-label"><input type="checkbox" data-id="d7"><span>标记完成</span></label></div></div>
+        <article class="timeline-row" data-start="2026-11-14T10:20:00+09:00" data-end="2026-11-14T10:55:00+09:00">
+          <div class="time-label">10:20</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">参拜与海边散步 · 波上宫</div><div class="item-place">波上宫（Naminoue Shrine）· 那霸市若狭1-25-11</div></div><div class="item-icon">⛩️</div></div><div class="item-details"><span class="detail-chip">⏱ 停留约35分钟</span><span class="detail-chip">🎟 参拜与授与品自选</span></div><div class="item-note">神社境内开放时间、祭事安排及海边通道情况请出发前核对；尊重参拜礼仪，不进入限制区域。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Naminoue+Shrine%2C+Naha">↗ 波上宫地图</a><label class="check-label"><input type="checkbox" data-id="d5"><span>标记完成</span></label></div></div>
         </article>
-        <article class="timeline-row" data-start="2026-11-14T14:30:00+09:00" data-end="2026-11-14T15:45:00+09:00">
-          <div class="time-label">14:30</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">前往 Golf5 丰崎店</div><div class="item-place">丰崎 Lifestyle Center TOMITON · 丰见城市丰崎1-411</div></div><div class="item-icon">🚌</div></div><div class="item-details"><span class="detail-chip">🚌 公共交通换乘待核</span><span class="detail-chip">⏱ 估算 60–80 分钟</span></div><div class="item-note">路线未实时核验；请在 Google Maps 以当天时间确认交通方式、候车和换乘缓冲。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Sports+Depo+Ameku%2C+Naha&amp;destination=Golf5+Toyosaki%2C+Tomigusuku&amp;travelmode=transit">↗ Google Maps 路线</a><label class="check-label"><input type="checkbox" data-id="d8"><span>标记完成</span></label></div></div>
+        <article class="timeline-row route-citywalk" data-start="2026-11-14T10:55:00+09:00" data-end="2026-11-14T11:15:00+09:00">
+          <div class="time-label">10:55</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">开车前往壶屋陶器街 · 壶屋やちむん通</div><div class="item-place">波上宫 → 壶屋やちむん通 · 那霸市壶屋1丁目一带</div></div><div class="item-icon">🚗</div></div><div class="item-details"><span class="detail-chip">📍 约3–4 km估算</span><span class="detail-chip">🚗 约15–25分钟估算</span><span class="detail-chip">🅿️ 建议停入附近正规停车场</span></div><div class="item-note">市区自驾时间含找车位缓冲；陶器街巷道适合步行，不建议把车驶入狭窄街巷。具体停车点按当日导航确认。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Naminoue+Shrine%2C+Naha&amp;destination=Tsuboya+Yachimun+Street%2C+Naha&amp;travelmode=driving">↗ 波上宫 → 壶屋陶器街自驾</a><label class="check-label"><input type="checkbox" data-id="d23"><span>标记完成</span></label></div></div>
         </article>
-        <article class="timeline-row" data-start="2026-11-14T15:45:00+09:00" data-end="2026-11-14T16:30:00+09:00">
-          <div class="time-label">15:45</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">高尔夫用品采购 · Golf5 丰崎店</div><div class="item-place">Golf5 Toyosaki · TOMITON内 · 丰见城市丰崎1-411</div></div><div class="item-icon">⛳</div></div><div class="item-details"><span class="detail-chip">🕙 店铺资料列示约10:00–21:00</span><span class="detail-chip">⏱ 预留 45 分钟</span></div><div class="item-note">位于 Outlet Mall ASHIBINAA 斜对面；店铺地址和营业时间请查看官方门店页并在出发当天再次确认。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Golf5+Toyosaki+Store+Tomigusuku">↗ Golf5 地图</a><label class="check-label"><input type="checkbox" data-id="d14"><span>标记完成</span></label></div></div>
+        <article class="timeline-row route-citywalk" data-start="2026-11-14T11:15:00+09:00" data-end="2026-11-14T11:50:00+09:00">
+          <div class="time-label">11:15</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">壶屋陶器街城市漫步 · 老街与陶艺店</div><div class="item-place">壶屋やちむん通（Tsuboya Yachimun Street）· 那霸市壶屋1丁目</div></div><div class="item-icon">🏺</div></div><div class="item-details"><span class="detail-chip">🚶 预留约35分钟步行</span><span class="detail-chip">🏺 老窑、陶艺店与石板街巷</span><span class="detail-chip">🕰️ 各店营业时间不同</span></div><div class="item-note">壶屋是那霸陶艺文化街区，适合沿街慢走、看传统窑址与当代陶器店；若想深入了解，可视营业情况顺访壶屋烧物博物馆（壶屋1-9-32），入馆时间与票价出发前核实。逛店不必强制购物，注意居民巷道礼仪。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Tsuboya+Yachimun+Street+Naha">↗ 壶屋陶器街地图</a><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Tsuboya+Yachimun+Street%2C+Naha&amp;destination=Tsuboya+Pottery+Museum%2C+Naha&amp;travelmode=walking">↗ 陶器街 → 博物馆步行</a><label class="check-label"><input type="checkbox" data-id="d24"><span>标记完成</span></label></div></div>
         </article>
-        <article class="timeline-row" data-start="2026-11-14T16:30:00+09:00" data-end="2026-11-14T16:45:00+09:00">
-          <div class="time-label">16:30</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">步行前往 Outlet Mall ASHIBINAA</div><div class="item-place">Golf5 丰崎店（TOMITON）→ ASHIBINAA · 丰见城市丰崎</div></div><div class="item-icon">🚶</div></div><div class="item-details"><span class="detail-chip">📍 斜对面，约0.3–0.6 km估算</span><span class="detail-chip">⏱ 步行约5–10分钟，含过街缓冲预留15分钟</span></div><div class="item-note">实际出口、步行入口及安全过街路线请用地图现场确认。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Golf5+Toyosaki%2C+Tomigusuku&amp;destination=Okinawa+Outlet+Mall+Ashibinaa&amp;travelmode=walking">↗ Golf5 → Outlet</a><label class="check-label"><input type="checkbox" data-id="d15"><span>标记完成</span></label></div></div>
+        <article class="timeline-row" data-route-shoe-drive data-start="2026-11-14T11:50:00+09:00" data-end="2026-11-14T12:15:00+09:00">
+          <div class="time-label">11:50</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">自驾前往鞋店 · 先确认品牌与门店</div><div class="item-place" data-route-shoe-origin>壶屋陶器街 → On 昂跑候选：Sports Depo 天久店 · 那霸市天久1-2-1</div></div><div class="item-icon">🚗</div></div><div class="item-details"><span class="detail-chip">📍 约3–5 km估算</span><span class="detail-chip">🚗 约10–20分钟估算</span><span class="detail-chip">🅿️ 停车条件待核实</span></div><div class="item-note">此店仅为 On 昂跑候选，品牌、指定款、尺码库存与营业时间均未确认；若选 Onitsuka Tiger（鬼塚虎），需另找该品牌门店，不能混作同一品牌。</div><div class="item-footer"><a class="map-link" data-route-shoe-link target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Tsuboya+Yachimun+Street%2C+Naha&amp;destination=Sports+Depo+Ameku%2C+Naha&amp;travelmode=driving">↗ 壶屋陶器街 → 候选鞋店自驾</a><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Onitsuka+Tiger+store+Naha+Okinawa">↗ 搜索鬼塚虎门店</a><label class="check-label"><input type="checkbox" data-id="d6"><span>标记完成</span></label></div></div>
         </article>
-        <article class="timeline-row" data-start="2026-11-14T16:45:00+09:00" data-end="2026-11-14T18:15:00+09:00">
-          <div class="time-label">16:45</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">Outlet 购物 · ASHIBINAA</div><div class="item-place">Okinawa Outlet Mall ASHIBINAA · 丰见城市丰崎1-188</div></div><div class="item-icon">🛒</div></div><div class="item-details"><span class="detail-chip">⏱ 预留 1小时30分</span><span class="detail-chip">🕙 店铺营业时间需确认</span></div><div class="item-note">为新增高尔夫用品店，Outlet停留从2小时调整为1小时30分。预算未设上限；当天确认商场和目标店铺营业时间。若购物优先级高，可减少Golf5停留而非挤压晚餐及返程。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Okinawa+Outlet+Mall+Ashibinaa">↗ 商场地图</a><label class="check-label"><input type="checkbox" data-id="d9"><span>标记完成</span></label></div></div>
+        <article class="timeline-row" data-route-shoe-visit data-start="2026-11-14T12:15:00+09:00" data-end="2026-11-14T13:00:00+09:00">
+          <div class="time-label" data-route-shoe-visit-time>12:15</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">试穿与购鞋 · 品牌待确认</div><div class="item-place">预约确认后的指定品牌门店；Sports Depo 天久店仅是 On 候选</div></div><div class="item-icon">🛍️</div></div><div class="item-details"><span class="detail-chip">⏱ 预留45分钟</span><span class="detail-chip">📞 出发前确认尺码/营业时间</span></div><div class="item-note">若候选店不售指定品牌或缺货，不在此处改买其他品牌；先确认同品牌可行门店，按所选路线依序前往鞋店、Golf5 与 Outlet。可在店旁简餐补充午餐。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Sports+Depo+Ameku+Naha">↗ 候选鞋店地图（品牌待确认）</a><label class="check-label"><input type="checkbox" data-id="d7"><span>标记完成</span></label></div></div>
         </article>
-        <article class="timeline-row" data-start="2026-11-14T18:15:00+09:00" data-end="2026-11-14T19:15:00+09:00">
-          <div class="time-label">18:15</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">晚餐 · やっぱりステーキ 5th Ashibina</div><div class="item-place">ASHIBINAA 2楼 · 丰见城市丰崎</div></div><div class="item-icon">🍽️</div></div><div class="item-details"><span class="detail-chip">🚶 商场内约3–8分钟</span><span class="detail-chip">⏱ 预留排队及用餐</span></div><div class="item-note">分店营业时间与最后点单时间需确认；建议不晚于18:30入店。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Okinawa+Outlet+Mall+Ashibinaa&amp;destination=Yappari+Steak+5th+Ashibina&amp;travelmode=walking">↗ Outlet 内步行</a><label class="check-label"><input type="checkbox" data-id="d10"><span>标记完成</span></label></div></div>
+        <article class="timeline-row route2-buffer" data-start="2026-11-14T12:05:00+09:00" data-end="2026-11-14T12:50:00+09:00" hidden>
+          <div class="time-label">12:05</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">机动缓冲 · 试穿延时 / 咖啡休息</div><div class="item-place">鞋店周边 · 路线2跳过壶屋陶器街后留出的45分钟</div></div><div class="item-icon">☕</div></div><div class="item-note">不额外增加必须到访的景点；用于鞋店排队、停车、补水或坐下休息，后续顺序不变。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=cafe+near+Sports+Depo+Ameku+Naha">↗ 搜索鞋店附近咖啡店</a><label class="check-label"><input type="checkbox" data-id="d28"><span>标记完成</span></label></div></div>
         </article>
-        <article class="timeline-row" data-start="2026-11-14T19:15:00+09:00" data-end="2026-11-14T20:45:00+09:00">
-          <div class="time-label">19:15</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">公共交通返回那霸酒店区域</div><div class="item-place">ASHIBINAA → Loisir Hotel Naha</div></div><div class="item-icon">🚍</div></div><div class="item-details"><span class="detail-chip">📍 约 14–16 km</span><span class="detail-chip">⏱ 估算 55–80 分钟</span><span class="detail-chip">🕒 预留候车/换乘缓冲</span></div><div class="item-note">确认返回方向末班与班次；若延误，按需乘出租车。酒后不得驾驶。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Yappari+Steak+5th+Ashibina&amp;destination=Loisir+Hotel+Naha&amp;travelmode=transit">↗ Google Maps 路线</a><label class="check-label"><input type="checkbox" data-id="d11"><span>标记完成</span></label></div></div>
+        <article class="timeline-row" data-route-row="lunch" data-start="2026-11-14T12:50:00+09:00" data-end="2026-11-14T13:15:00+09:00">
+          <div class="time-label">12:50</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">简餐与补水 · 天久一带</div><div class="item-place">鞋店附近；以当日营业店铺为准</div></div><div class="item-icon">🍱</div></div><div class="item-details"><span class="detail-chip">⏱ 预留25分钟</span><span class="detail-chip">🥤 自驾途中补水</span></div><div class="item-note">为避免午餐占用 Outlet 时段，安排快速简餐；具体餐厅需按鞋店最终位置现场选择。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=restaurants+near+Ameku+Naha">↗ 搜索天久简餐</a><label class="check-label"><input type="checkbox" data-id="d18"><span>标记完成</span></label></div></div>
         </article>
-        <article class="timeline-row" data-start="2026-11-14T20:45:00+09:00" data-end="2026-11-14T21:45:00+09:00">
-          <div class="time-label">20:45</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">酒吧 · Bar “Planete”</div><div class="item-place">Loisir Spa Tower Naha · 酒店区域</div></div><div class="item-icon">🍹</div></div><div class="item-details"><span class="detail-chip">🚶 步行约3–8分钟</span><span class="detail-chip">营业状态待确认</span></div><div class="item-note">若不营业，选择酒店附近已确认营业的酒吧；不跨区追店。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Loisir+Hotel+Naha&amp;destination=Bar+Planete%2C+Loisir+Spa+Tower+Naha&amp;travelmode=walking">↗ 酒店 → 酒吧</a><label class="check-label"><input type="checkbox" data-id="d12"><span>标记完成</span></label></div></div>
+        <article class="timeline-row" data-route-row="golf-drive" data-start="2026-11-14T13:15:00+09:00" data-end="2026-11-14T13:55:00+09:00">
+          <div class="time-label">13:15</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">自驾前往 Golf5 丰崎店</div><div class="item-place">Sports Depo 天久候选店 → Golf5 Toyosaki · 丰崎 Lifestyle Center TOMITON · 丰见城市丰崎1-411</div></div><div class="item-icon">🚗</div></div><div class="item-details"><span class="detail-chip">📍 约13–16 km估算</span><span class="detail-chip">🚗 约30–40分钟估算</span><span class="detail-chip">🅿️ TOMITON停车待核实</span></div><div class="item-note">如果鞋店最终门店不同，重新计算驾驶时间；为市区及丰崎方向交通预留至少10–15分钟机动。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Sports+Depo+Ameku%2C+Naha&amp;destination=Golf5+Toyosaki%2C+Tomigusuku&amp;travelmode=driving">↗ 鞋店 → Golf5 自驾</a><label class="check-label"><input type="checkbox" data-id="d8"><span>标记完成</span></label></div></div>
         </article>
-        <article class="timeline-row" data-start="2026-11-14T21:45:00+09:00" data-end="2026-11-14T22:00:00+09:00">
-          <div class="time-label">21:45</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">返回住宿 · 行程结束</div><div class="item-place">Loisir Hotel Naha · 酒店内步行约3–5分钟</div></div><div class="item-icon">🌙</div></div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Bar+Planete%2C+Loisir+Spa+Tower+Naha&amp;destination=Loisir+Hotel+Naha&amp;travelmode=walking">↗ 酒吧 → 住宿</a><label class="check-label"><input type="checkbox" data-id="d13"><span>标记完成</span></label></div></div>
+        <article class="timeline-row" data-route-row="golf-visit" data-start="2026-11-14T13:55:00+09:00" data-end="2026-11-14T14:40:00+09:00">
+          <div class="time-label">13:55</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">高尔夫用品采购 · Golf5 丰崎店</div><div class="item-place">Golf5 Toyosaki · TOMITON内 · 丰见城市丰崎1-411</div></div><div class="item-icon">⛳</div></div><div class="item-details"><span class="detail-chip">⏱ 预留45分钟</span><span class="detail-chip">🕙 营业时间须出发前核实</span></div><div class="item-note">地址与当日营业状态需查看官方门店信息；结账后步行前往对面的 Outlet，不需要挪车。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Golf5+Toyosaki+Store+Tomigusuku">↗ Golf5 地图</a><label class="check-label"><input type="checkbox" data-id="d14"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-route-row="outlet-walk" data-start="2026-11-14T14:40:00+09:00" data-end="2026-11-14T14:55:00+09:00">
+          <div class="time-label">14:40</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">步行前往 Outlet Mall ASHIBINAA</div><div class="item-place">Golf5 丰崎店（TOMITON）→ ASHIBINAA · 丰见城市丰崎</div></div><div class="item-icon">🚶</div></div><div class="item-details"><span class="detail-chip">📍 约0.3–0.6 km估算</span><span class="detail-chip">⏱ 步行约5–10分钟，预留15分钟过街</span></div><div class="item-note">车留在TOMITON停车场，实际步行入口及安全过街路线请现场确认。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Golf5+Toyosaki%2C+Tomigusuku&amp;destination=Okinawa+Outlet+Mall+Ashibinaa&amp;travelmode=walking">↗ Golf5 → Outlet</a><label class="check-label"><input type="checkbox" data-id="d15"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-route-row="outlet-visit" data-start="2026-11-14T14:55:00+09:00" data-end="2026-11-14T16:45:00+09:00">
+          <div class="time-label">14:55</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">Outlet 购物 · ASHIBINAA</div><div class="item-place">Okinawa Outlet Mall ASHIBINAA · 丰见城市丰崎1-188</div></div><div class="item-icon">🛒</div></div><div class="item-details"><span class="detail-chip">⏱ 路线2约1小时50分钟；路线1约1小时40分钟</span><span class="detail-chip">🕙 店铺营业时间需确认</span><span class="detail-chip">🅿️ 停车收费/折抵待核实</span></div><div class="item-note">路线1因增加壶屋街区步行，Outlet时间略短；路线2会更早到达。先确认商场及目标店铺营业时间，若时间不足优先保留鞋店与晚餐。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Okinawa+Outlet+Mall+Ashibinaa">↗ 商场地图</a><label class="check-label"><input type="checkbox" data-id="d9"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-14T16:45:00+09:00" data-end="2026-11-14T17:45:00+09:00">
+          <div class="time-label">16:45</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">晚餐 · やっぱりステーキ 5th Ashibina</div><div class="item-place">ASHIBINAA 2楼 · 丰见城市丰崎</div></div><div class="item-icon">🍽️</div></div><div class="item-details"><span class="detail-chip">🚶 商场内步行约3–8分钟</span><span class="detail-chip">⏱ 预留排队及用餐</span></div><div class="item-note">分店营业时间与最后点单时间需确认；若该店关门，选Outlet内仍营业的晚餐店，保留“Outlet购物→晚餐”顺序。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Okinawa+Outlet+Mall+Ashibinaa&amp;destination=Yappari+Steak+5th+Ashibina&amp;travelmode=walking">↗ Outlet 内步行</a><label class="check-label"><input type="checkbox" data-id="d10"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row route-umikaji" data-start="2026-11-14T17:45:00+09:00" data-end="2026-11-14T18:05:00+09:00">
+          <div class="time-label">17:45</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">自驾前往濑长岛 Umikaji Terrace</div><div class="item-place">ASHIBINAA → Senagajima Umikaji Terrace · 丰见城市濑长174-6</div></div><div class="item-icon">🚗</div></div><div class="item-details"><span class="detail-chip">📍 约5–7 km估算</span><span class="detail-chip">🚗 约15–25分钟估算</span><span class="detail-chip">🅿️ 岛上停车情况待核实</span></div><div class="item-note">同属机场南侧区域，作为返那霸路上的短停，不额外跑北部；留意岛上道路、停车场入口及晚间营业公告。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Okinawa+Outlet+Mall+Ashibinaa&amp;destination=Umikaji+Terrace+Senagajima&amp;travelmode=driving">↗ Outlet → 濑长岛自驾</a><label class="check-label"><input type="checkbox" data-id="d25"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row route-umikaji" data-start="2026-11-14T18:05:00+09:00" data-end="2026-11-14T18:35:00+09:00">
+          <div class="time-label">18:05</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">濑长岛海景短停 · Umikaji Terrace</div><div class="item-place">Umikaji Terrace · 丰见城市濑长174-6 · 机场南侧海岛</div></div><div class="item-icon">🌊</div></div><div class="item-details"><span class="detail-chip">⏱ 预留30分钟</span><span class="detail-chip">✈️ 海景/飞机观景点</span><span class="detail-chip">🕕 单店营业时间各异，须确认</span></div><div class="item-note">11月日落较早，此时段按傍晚海景与机场夜景安排，不承诺日落景观；只作观景短停，不依赖餐饮店营业，停车与开放状态出发前核实。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Umikaji+Terrace+Senagajima+174-6">↗ 濑长岛地图</a><label class="check-label"><input type="checkbox" data-id="d26"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-route-hotel-return data-start="2026-11-14T18:35:00+09:00" data-end="2026-11-14T19:10:00+09:00">
+          <div class="time-label">18:35</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title" data-route-return-title>濑长岛自驾返回酒店并停车</div><div class="item-place" data-route-return-place>Umikaji Terrace → Loisir Hotel Naha · 那霸市西3-2-1</div></div><div class="item-icon">🚗</div></div><div class="item-details"><span class="detail-chip" data-route-return-distance>📍 约8–10 km估算</span><span class="detail-chip" data-route-return-time>🚗 约20–30分钟估算</span><span class="detail-chip">🅿️ 酒店停车位/费用需预订确认</span></div><div class="item-note">回酒店停好车后步行去酒吧；之后不再驾驶。</div><div class="item-footer"><a class="map-link" data-route-return-link target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Umikaji+Terrace+Senagajima&amp;destination=Loisir+Hotel+Naha&amp;travelmode=driving">↗ 濑长岛 → 酒店自驾</a><label class="check-label"><input type="checkbox" data-id="d11"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row route3-rest" data-start="2026-11-14T18:30:00+09:00" data-end="2026-11-14T19:10:00+09:00" hidden>
+          <div class="time-label">18:30</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">酒店休息、整理购物袋</div><div class="item-place">Loisir Hotel Naha · 酒吧前缓冲</div></div><div class="item-icon">🛋️</div></div><div class="item-note">轻松路线省下濑长岛往返时间，可先回房休息；车辆停妥后再步行去酒吧。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Loisir+Hotel+Naha">↗ 酒店地图</a><label class="check-label"><input type="checkbox" data-id="d27"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-14T19:10:00+09:00" data-end="2026-11-14T20:30:00+09:00">
+          <div class="time-label">19:10</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">酒吧 · Bar “Planete”</div><div class="item-place">Loisir Spa Tower Naha · 酒店区域</div></div><div class="item-icon">🍹</div></div><div class="item-details"><span class="detail-chip">🚶 酒店内步行约3–8分钟</span><span class="detail-chip">营业状态/预约待确认</span></div><div class="item-note">车辆已停妥，酒后不再驾驶。若酒吧未营业，选择酒店内或步行可达且确认营业的场所，不开车跨区。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Loisir+Hotel+Naha&amp;destination=Bar+Planete%2C+Loisir+Spa+Tower+Naha&amp;travelmode=walking">↗ 酒店 → 酒吧</a><label class="check-label"><input type="checkbox" data-id="d12"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-14T20:30:00+09:00" data-end="2026-11-14T20:40:00+09:00">
+          <div class="time-label">20:30</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">步行返回住宿 · 行程结束</div><div class="item-place">Bar “Planete” → Loisir Hotel Naha · 酒店内步行约3–5分钟</div></div><div class="item-icon">🌙</div></div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Bar+Planete%2C+Loisir+Spa+Tower+Naha&amp;destination=Loisir+Hotel+Naha&amp;travelmode=walking">↗ 酒吧 → 住宿</a><label class="check-label"><input type="checkbox" data-id="d13"><span>标记完成</span></label></div></div>
+        </article>
+      </div>
+      <div class="timeline" id="day-day3" role="tabpanel" aria-labelledby="tab-day3" hidden>
+        <article class="timeline-row" data-start="2026-11-15T08:15:00+09:00" data-end="2026-11-15T08:45:00+09:00">
+          <div class="time-label">08:15</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">起床、退房与行李清点</div><div class="item-place">Loisir Hotel Naha · 退房前核对账单及遗留物</div></div><div class="item-icon">🧳</div></div><div class="item-note">航班11:55起飞，按你指定的提前1.5小时到机场，目标10:25抵达。先确认航空公司值机截止和航站楼；租车门店与接驳点须支持这个时间安排。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Loisir+Hotel+Naha">↗ 酒店地图</a><label class="check-label"><input type="checkbox" data-id="d19"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-15T08:45:00+09:00" data-end="2026-11-15T09:35:00+09:00">
+          <div class="time-label">08:45</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">开车前往机场方向加油并到还车门店</div><div class="item-place">Loisir Hotel Naha → 租车公司指定加油站 → 那霸机场同一租车门店</div></div><div class="item-icon">⛽</div></div><div class="item-details"><span class="detail-chip">📍 酒店至机场区域约4–5 km估算</span><span class="detail-chip">🚗 行车约10–20分钟，另留加油/堵车缓冲</span><span class="detail-chip">🕤 目标09:35前抵达门店</span></div><div class="item-note">按合同加满指定油种并留存小票；此时段含加油与道路缓冲。提前确认门店可在09:35前接收还车。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&amp;origin=Loisir+Hotel+Naha&amp;destination=Naha+Airport+Rental+Car+Office&amp;travelmode=driving">↗ 酒店 → 机场租车还车点</a><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Gas+station+near+Naha+Airport+Okinawa">↗ 搜索机场附近加油站</a><label class="check-label"><input type="checkbox" data-id="d20"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-15T09:35:00+09:00" data-end="2026-11-15T10:25:00+09:00">
+          <div class="time-label">09:35</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">还车验车并搭接驳前往航站楼</div><div class="item-place">那霸机场预约租车门店 → 那霸机场航站楼</div></div><div class="item-icon">🔑</div></div><div class="item-details"><span class="detail-chip">⏱ 预留约50分钟办还车/等接驳/乘车</span><span class="detail-chip">🎯 10:25前抵达机场</span><span class="detail-chip">🚌 接驳时间与班次须按租车公司确认</span></div><div class="item-note">目标10:25抵达航站楼，即起飞前1.5小时。若接驳无法保证此到达时间，预订前确认门店或选择直接在机场可还车的方案；按航司值机截止时间适度提前。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Naha+Airport+Rental+Car+Return">↗ 搜索租车还车/接驳</a><label class="check-label"><input type="checkbox" data-id="d21"><span>标记完成</span></label></div></div>
+        </article>
+        <article class="timeline-row" data-start="2026-11-15T10:25:00+09:00" data-end="2026-11-15T11:55:00+09:00">
+          <div class="time-label">10:25</div><span class="dot"></span><div class="timeline-card"><div class="card-top"><div><div class="item-title">抵达那霸机场 · 值机、托运与安检</div><div class="item-place">那霸机场 · 航班起飞时间11:55</div></div><div class="item-icon">✈️</div></div><div class="item-details"><span class="detail-chip">⏱ 提前1小时30分钟抵达</span><span class="detail-chip">🎫 航司柜台/航站楼待航班确认</span></div><div class="item-note">按你提供的时间预留1.5小时；仍请确认航司值机/行李托运截止、航站楼及登机口要求。如果航司要求更早到达，把还车和接驳一起前移。</div><div class="item-footer"><a class="map-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&amp;query=Naha+Airport">↗ 那霸机场地图</a><label class="check-label"><input type="checkbox" data-id="d22"><span>标记完成</span></label></div></div>
         </article>
       </div>
     </section>
@@ -413,30 +620,35 @@
     <div class="lower-grid">
       <section class="panel" id="route" aria-labelledby="route-title">
         <h3 id="route-title">一路向南 · 路线示意</h3>
-        <p class="panel-sub">按行程顺序连接 · 公交路段请点时间轴逐段核对</p>
-        <div class="route-flow" aria-label="第一晚路线示意">
-          <span class="route-node">✈ 那霸机场</span><span class="route-arrow">→</span><span class="route-node">🏨 Loisir</span><span class="route-arrow">→</span><span class="route-node">🥩 Steak House 88</span><span class="route-arrow">→</span><span class="route-node">🍸 Planete</span>
+        <p class="panel-sub">按行程顺序连接 · 驾车时间、停车及接驳需出发前核实</p>
+        <div class="route-flow" aria-label="第一天路线示意">
+          <span class="route-node">✈ 那霸机场</span><span class="route-arrow">→</span><span class="route-node">🚕 Loisir（不取车）</span><span class="route-arrow">→</span><span class="route-node">🥩 Steak House 88</span><span class="route-arrow">→</span><span class="route-node">🍸 Planete</span><span class="route-arrow">→</span><span class="route-node">🏨 住宿</span>
         </div>
         <div class="route-flow" aria-label="第二天路线示意">
-          <span class="route-node">🐟 泊いゆまち</span><span class="route-arrow">→</span><span class="route-node">⛩ 波上宫</span><span class="route-arrow">→</span><span class="route-node">👟 鞋店待确认</span><span class="route-arrow">→</span><span class="route-node">⛳ Golf5 丰崎</span><span class="route-arrow">→</span><span class="route-node">🛍 ASHIBINAA</span>
+          <span class="route-node">🚗 机场取车</span><span class="route-arrow">→</span><span class="route-node">🐟 泊いゆまち</span><span class="route-arrow">→</span><span class="route-node">⛩ 波上宫</span><span class="route-arrow">→</span><span class="route-node">🏺 壶屋陶器街</span><span class="route-arrow">→</span><span class="route-node">👟 鞋店待确认</span><span class="route-arrow">→</span><span class="route-node">⛳ Golf5 丰崎</span><span class="route-arrow">→</span><span class="route-node">🛍 ASHIBINAA</span>
         </div>
         <div class="route-flow" aria-label="第二天晚间路线示意">
-          <span class="route-node">🛍 Outlet</span><span class="route-arrow">→</span><span class="route-node">🍽 晚餐</span><span class="route-arrow">→</span><span class="route-node">🍹 酒吧</span><span class="route-arrow">→</span><span class="route-node">🏨 住宿</span>
+          <span class="route-node">🛍 Outlet</span><span class="route-arrow">→</span><span class="route-node">🍽 晚餐</span><span class="route-arrow">→</span><span class="route-node">🌊 濑长岛 Umikaji</span><span class="route-arrow">→</span><span class="route-node">🚗 酒店停车</span><span class="route-arrow">→</span><span class="route-node">🍹 酒吧</span><span class="route-arrow">→</span><span class="route-node">🏨 住宿</span>
         </div>
-        <div class="legend">示意图，非比例地图。所有线路、距离、公交班次与时间均待出发前核验。</div>
+        <div class="route-flow" aria-label="第三天路线示意">
+          <span class="route-node">🏨 退房</span><span class="route-arrow">→</span><span class="route-node">⛽ 加油</span><span class="route-arrow">→</span><span class="route-node">🔑 机场店还车</span><span class="route-arrow">→</span><span class="route-node">🚌 接驳航站楼</span><span class="route-arrow">→</span><span class="route-node">✈ 11:55返程</span>
+        </div>
+        <div class="legend">示意图，非比例地图。驾车距离/时间、停车及租车接驳均为待核实估算；预订时确认同一家机场分店可08:00取车、次日按时还车。路线1保留约35分钟壶屋街区步行，购物时段相应压缩；若需机动，路线2可跳过街区漫步，不删指定购物与用餐项目。</div>
       </section>
 
       <section class="panel" id="budget" aria-labelledby="budget-title">
         <h3 id="budget-title">预算速览 <span style="font-weight:500;color:#78999e">/ JPY</span></h3>
-        <p class="panel-sub">两人估算 · 非实时价格 · 购物弹性自定</p>
+        <p class="panel-sub">两人估算 · 非实时价格 · 不含住宿 · 购物弹性自定</p>
         <div class="budget-row"><span class="budget-name">牛肉晚餐</span><div class="budget-line"><span style="width:28%"></span></div><span class="budget-amount">¥5k–9k</span></div>
         <div class="budget-row"><span class="budget-name">海鲜早餐</span><div class="budget-line"><span style="width:18%"></span></div><span class="budget-amount">¥2k–4k</span></div>
         <div class="budget-row"><span class="budget-name">波上宫</span><div class="budget-line"><span style="width:4%"></span></div><span class="budget-amount">参拜免费*</span></div>
-        <div class="budget-row"><span class="budget-name">公共交通</span><div class="budget-line"><span style="width:23%"></span></div><span class="budget-amount">¥3k–7k</span></div>
+        <div class="budget-row"><span class="budget-name">租车（约24小时）</span><div class="budget-line"><span style="width:34%"></span></div><span class="budget-amount">¥10k–20k估算</span></div>
+        <div class="budget-row"><span class="budget-name">油费 / 停车 / 接驳</span><div class="budget-line"><span style="width:20%"></span></div><span class="budget-amount">¥6k–10k估算</span></div>
+        <div class="budget-row"><span class="budget-name">简餐 + 机场出租车</span><div class="budget-line"><span style="width:12%"></span></div><span class="budget-amount">¥4k–8k估算</span></div>
         <div class="budget-row"><span class="budget-name">Outlet 晚餐</span><div class="budget-line"><span style="width:18%"></span></div><span class="budget-amount">¥3k–6k</span></div>
         <div class="budget-row"><span class="budget-name">两晚酒吧</span><div class="budget-line"><span style="width:29%"></span></div><span class="budget-amount">¥6k–12k</span></div>
-        <div class="budget-total"><span>基础开支参考</span><span>约 ¥19,000–38,000</span></div>
-        <p class="budget-foot">不含鞋、Outlet购物与出租车额外费用。*神社境内参拜通常不收门票；御守、御朱印等授与品另计。鞋约¥12,000–25,000/双（估算）；两人各买一双另加约¥24,000–50,000。Outlet购物上限待你设定。</p>
+        <div class="budget-total"><span>基础开支参考（不含住宿）</span><span>约 ¥36,000–69,000</span></div>
+        <p class="budget-foot">租车、油费和停车受车型、保险、日期及门店条件影响，以上仅为宽幅估算。简餐/午餐与机场出租车合计粗估¥4,000–8,000；未包含鞋约¥12,000–25,000/双估算、Outlet购物、住宿与个人消费。神社参拜通常免费，授与品另计。</p>
       </section>
     </div>
 
@@ -444,25 +656,27 @@
       <div class="section-heading"><div><h2 id="reminder-title">出发前确认清单</h2><p>这几项会直接影响当天路线是否衔接</p></div></div>
       <div class="reminders">
         <article class="reminder"><div class="reminder-icon">👟</div><h4>确认鞋品牌与尺码</h4><p>请在 On 昂跑、Onitsuka Tiger 或其他品牌中明确选择，并电话查指定款和库存。</p></article>
-        <article class="reminder"><div class="reminder-icon">🕘</div><h4>核对营业时间</h4><p>市场摊位、牛排店、鞋店、Golf5、Outlet、晚餐店和酒吧均需核对当日营业状态。</p></article>
-        <article class="reminder"><div class="reminder-icon">🚌</div><h4>查看公交换乘</h4><p>重点核对市场→波上宫、波上宫→鞋店、鞋店→丰崎 Golf5、Outlet→那霸的周六班次。</p></article>
-        <article class="reminder"><div class="reminder-icon">💴</div><h4>设置预算上限</h4><p>现有总额不包括鞋、购物或可能产生的出租车费；按个人预算预留弹性。</p></article>
+        <article class="reminder"><div class="reminder-icon">🕘</div><h4>核对营业时间</h4><p>市场摊位、壶屋陶器街商店与博物馆、鞋店、Golf5、Outlet、晚餐店、濑长岛店铺和酒吧均需核对当日开放状态。</p></article>
+        <article class="reminder"><div class="reminder-icon">🚗</div><h4>锁定租车门店与取还时间</h4><p>预订那霸机场同一家门店：11月14日08:00取车、11月15日08:00前后还车；确认接驳点、营业时间、保险、油料政策与酒店停车。</p></article>
+        <article class="reminder"><div class="reminder-icon">💴</div><h4>设置预算上限</h4><p>现有总额不包括住宿、鞋、Outlet购物及额外出租车费；按个人预算预留弹性。</p></article>
       </div>
       <details class="emergency">
         <summary>打开应急方案 · 延误 / 下雨 / 缺货</summary>
         <div class="emergency-body">
           <ul>
-            <li><strong>航班延误：</strong>先入住或寄存行李，优先保留就近牛肉餐；缩短酒吧时间，不跨区赶店。临近最后入店时间，先致电餐厅。</li>
-            <li><strong>下雨：</strong>酒店到市场可改乘出租车；波上宫境内与海边散步视雨势缩短。路线顺序不变。</li>
+            <li><strong>航班延误：</strong>第一晚不取车，直接出租车到酒店；优先保留牛肉餐，缩短酒吧时间。若晚餐已过最后点单，改酒店附近简餐，第二天仍按预订时段取车。</li>
+            <li><strong>下雨：</strong>第二天使用租车往返市场与波上宫，现场确认停车位；海边散步视雨势缩短。路线顺序不变。</li>
             <li><strong>鞋店关门/缺货：</strong>先确认同品牌可买的门店或库存；保持“景点→买鞋→Outlet”的先后，不擅自替换品牌。</li>
-            <li><strong>交通延误：</strong>波上宫与 Outlet 已分别预留约90分钟；优先缩短 Golf5 停留，不要压缩晚餐或错过返程班次。需要时打车回那霸并预留费用。</li>
-            <li><strong>酒后不要驾驶。</strong>选择公共交通、步行或出租车。</li>
+            <li><strong>交通延误：</strong>优先缩短壶屋陶器街或濑长岛停留，再酌情缩短 Golf5/Outlet；不跳过指定买鞋、Outlet与晚餐。预留加油、还车验车及租车接驳时间。</li>
+            <li><strong>景点关闭/下雨：</strong>壶屋陶器街个别店铺或博物馆关闭时，可沿公共街巷短走后继续前往鞋店；濑长岛天气不佳则缩短停留。按Google Maps导航并确认停车，不在雨中盲目等候。</li>
+            <li><strong>酒后不要驾驶：</strong>第二天先开回酒店停车，再步行去酒吧；酒吧后直接步行回房。切勿饮酒后挪车。</li>
+            <li><strong>第三天门店不开/接驳延误：</strong>预订前确认机场店最早营业时间和首班接驳。若无法在08:15前完成还车，改订更早营业的机场店，或与租车公司确认可行的机场还车方案。</li>
           </ul>
         </div>
       </details>
     </section>
 
-    <footer class="footer">冲绳那霸两日行程 · 行程信息为规划估算；路线链接打开 Google Maps 后请重新核对日期、交通方式与实时班次。<br>营业时间、票价、库存、预算和个人偏好仍需出发前确认。</footer>
+    <footer class="footer">冲绳那霸三日自驾行程 · 日期暂按2026年11月13–15日，路线和车程均为待核实估算。<br>租车公司/分店、取还时间、停车、营业时间、航班航站楼与鞋款库存均须以预订及官方信息为准。</footer>
   </main>
   <nav class="mobile-bar" aria-label="快捷导航">
     <a href="#itinerary">◷ 行程</a><a href="#route">⌖ 路线</a><a href="#reminders">✓ 提醒</a>
@@ -479,7 +693,7 @@
       {
         id: "hotel", name: "Loisir Hotel Naha", subtitle: "ロワジールホテル那覇 · 那霸市西3-2-1",
         map: "https://www.google.com/maps/search/?api=1&query=Loisir+Hotel+Naha",
-        summary: "Loisir Hotel Naha 位于那霸市西侧，是这两晚行程的固定据点。先办理入住或寄存行李，再前往周边用餐，可避免带着行李赶路。它也让夜间的酒吧安排有一个明确返程终点。机场至酒店的公共交通与步行接驳需要按行李量、抵达时段和当天班次选择；若航班延误或行李较多，出租车是更直接但费用较高的替代方式。",
+        summary: "Loisir Hotel Naha 位于那霸市西侧，是两晚行程的固定据点。抵达当晚直接从机场搭出租车入住，避免落地后赶租车柜台；第二天早上从酒店乘出租车到预订的那霸机场租车门店取车，夜间回酒店停车后再去酒吧。第三天清晨退房，自驾加油并在同一机场门店还车，再搭门店接驳前往航站楼。",
         why: "第一晚和第二晚都回同一住宿，减少搬运行李；夜间活动后无需再跨区返回。",
         status: "酒店入住、寄存和夜间设施请以预订与酒店确认信息为准。"
       },
@@ -487,7 +701,7 @@
         id: "beef", name: "Steak House 88 国際通り西口店", subtitle: "那霸市松尾1-4-3 · 永昇商事ビル2F",
         map: "https://www.google.com/maps/search/?api=1&query=Steak+House+88+Kokusai-dori+Nishiguchi+Naha",
         summary: "Steak House 88 是冲绳具有代表性的牛排店品牌，国際通り西口店位于那霸市松尾，店内提供牛排等肉类料理。与酒店不是同一片街区，因此抵达当晚建议先确认航班出关时间和门店最后点单，再决定是否前往。相比在落地后临时搜索远处餐馆，这家店地址明确、地图容易定位，也适合作为冲绳牛排体验的候选。店铺忙碌时仍可能排队，最好预留缓冲并确认营业安排。",
-        why: "是冲绳牛排体验的明确候选，且地址在那霸市区；从酒店搭出租车前往比晚间赶公交更稳妥。",
+        why: "是冲绳牛排体验的明确候选，且地址在那霸市区；第一晚尚未取车，从酒店搭出租车前往。",
         status: "搜索信息列示约11:00–23:00、最后点单约22:00；须当天确认。"
       },
       {
@@ -512,6 +726,13 @@
         status: "境内活动、祭事及海边通道情况请出发前核对。"
       },
       {
+        id: "tsuboya", name: "壶屋陶器街", subtitle: "壶屋やちむん通 · 那霸市壶屋1丁目",
+        map: "https://www.google.com/maps/search/?api=1&query=Tsuboya+Yachimun+Street+Naha",
+        summary: "壶屋やちむん通是那霸老城区的陶艺街区，沿途可看到石板路、红瓦与陶器店，适合体验真实街区漫步。安排在波上宫之后，先自驾到附近正规停车场，再步行约35分钟看街巷与窑场、逛几家陶艺店；壶屋烧物博物馆（壶屋1-9-32）可作为时间允许时的加选点，需确认当日营业、入馆时间与票价。随后继续去鞋店，保留既定购物顺序。",
+        why: "同时满足城市散步与文化探访，在那霸市区就能体验当地陶艺街景，不必增加远距离自驾或固定门票景点。",
+        status: "陶艺店营业时间各异；博物馆开放时间、休馆日、票价及周边停车需出发前核实。"
+      },
+      {
         id: "shoes", name: "指定品牌鞋店 · 待确认", subtitle: "On 昂跑 / Onitsuka Tiger / 其他品牌",
         map: "https://www.google.com/maps/search/?api=1&query=shoe+store+Naha+Okinawa",
         summary: "购鞋站目前仍是待确认项目：On 昂跑与 Onitsuka Tiger（鬼塚虎）是不同品牌，不能用一家店或一个搜索结果代替另一个。Sports Depo 天久店只是 On 昂跑方向的候选经销商，品牌、指定型号、尺码与现货均未确认；若目标是鬼塚虎，需要先找到对应门店并致电核库存。把这站放在波上宫之后、Golf5 与 Outlet 之前，既保留用户要求的顺序，也能先处理特定款缺货的风险。",
@@ -523,21 +744,28 @@
         map: "https://www.google.com/maps/search/?api=1&query=Golf5+Toyosaki+Store+Tomigusuku",
         summary: "Golf5 丰崎店位于丰崎 Lifestyle Center TOMITON 内，是采购高尔夫球杆、球、服饰与配件的专业体育用品店候选。它与 ASHIBINAA Outlet Mall 在丰崎同一购物区域，地址资料显示相距不远，因此把高尔夫采购插在购鞋之后、Outlet 之前，可以减少重复往返。是否有特定品牌、型号或球杆服务仍需向门店确认。前往时留意商场入口、过街路线和携带大件商品的便利性，步行距离为估算。",
         why: "与 Outlet 相邻，顺路完成高尔夫购物；不用为了买装备专门安排一次跨城往返。",
-        status: "店铺资料列示约10:00–21:00；营业时间与库存仍需当天确认。"
+        status: "营业时间、库存、停车及营业日均需出发前核实。"
       },
       {
         id: "outlet", name: "Outlet Mall ASHIBINAA", subtitle: "Okinawa Outlet Mall · 丰见城市丰崎1-188",
         map: "https://www.google.com/maps/search/?api=1&query=Okinawa+Outlet+Mall+Ashibinaa",
-        summary: "ASHIBINAA 是丰见城市丰崎的大型奥特莱斯购物中心，安排在鞋店和 Golf5 之后，可以集中处理服饰、运动用品与伴手礼购物。行程目前给它约90分钟，属于紧凑但仍可执行的逛店时长；若想慢慢购物，应优先延长这里并缩短 Golf5 停留，而不是压缩晚餐或回程交通缓冲。商场和各店营业时间可能不同，且回那霸依赖公交接驳，购物结束前要先确认返程班次与候车位置。",
-        why: "与 Golf5 位于同一丰崎购物片区，连续安排可减少折返；保留晚餐和返那霸时间更稳妥。",
+        summary: "ASHIBINAA 是丰见城市丰崎的大型奥特莱斯购物中心，安排在鞋店和 Golf5 之后，可以集中处理服饰、运动用品与伴手礼购物。路线1加入壶屋陶器街漫步后，Outlet时段约1小时40分钟；若想多逛，可选择跳过陶器街的路线2，而非压缩晚餐、酒店停车和酒吧时间。商场营业时间、停车及收费政策都要出发前核实。",
+        why: "Outlet 安排在鞋店与 Golf5 之后，按指定顺序完成采购；晚餐后短停濑长岛，再回酒店停车并步行去酒吧。",
         status: "商场营业时间、目标店铺和返那霸交通请当天核实。"
       },
       {
         id: "dinner", name: "やっぱりステーキ 5th Ashibina", subtitle: "ASHIBINAA 2F · 丰见城市丰崎",
         map: "https://www.google.com/maps/search/?api=1&query=Yappari+Steak+5th+Ashibina",
-        summary: "やっぱりステーキ 5th Ashibina 是位于 ASHIBINAA 商场内的牛排晚餐候选，购物后无需再到其他区域找餐厅，可直接在同一商场用餐。这个安排对依赖公共交通的一天尤其有帮助：先在 Outlet 购物，再就近吃饭，避免为了晚餐额外转车。具体分店营业时间、最后点单、当天排队和餐点供应仍需确认；建议不要把购物拖到关门前才开始用餐，给晚饭和返程都留出足够余量。",
-        why: "晚餐与购物地点相邻，减少晚上额外移动；之后再按确认好的公交班次返回那霸。",
+        summary: "やっぱりステーキ 5th Ashibina 是位于 ASHIBINAA 商场内的牛排晚餐候选，购物后无需再到其他区域找餐厅，可直接在同一商场用餐。晚餐后自驾回Loisir Hotel Naha并把车停好，之后只步行前往酒店区域的酒吧，饮酒后不再驾驶。分店营业时间、最后点单和停车安排仍须确认。",
+        why: "晚餐与Outlet相邻；饭后把车开回酒店停妥，再去酒吧并步行回住宿，避免酒后驾驶。",
         status: "分店最后点单与周六营业状态须出发前确认。"
+      },
+      {
+        id: "umikaji", name: "濑长岛 Umikaji Terrace", subtitle: "Senagajima · 丰见城市濑长174-6",
+        map: "https://www.google.com/maps/search/?api=1&query=Umikaji+Terrace+Senagajima+174-6",
+        summary: "濑长岛 Umikaji Terrace 位于冲绳本岛南部机场附近的海岛坡地，以临海露台、餐饮店和观赏飞机起降的视野闻名。它放在Outlet晚餐之后、返回酒店之前，只作约30分钟傍晚海景短停，不额外安排购物或依赖任何一家餐厅营业。11月此时可能已过日落，因此定位为暮色/夜景；请确认当日道路、停车场开放和商户时间。",
+        why: "位于丰崎购物区回那霸的南侧路线附近，是新增海景点而不改变晚餐、酒吧和住宿的先后。",
+        status: "停车可用性、道路状况及各商户营业时间须当天确认。"
       }
     ];
 
@@ -550,8 +778,6 @@
     const spotMap = document.querySelector("#spot-map");
     const spotCard = document.querySelector("#spot-card");
     let activeIndex = 0;
-    let jumpAction = () => {};
-
     function showPlace(index) {
       activeIndex = (index + places.length) % places.length;
       const place = places[activeIndex];
@@ -566,7 +792,6 @@
       spotMap.href = place.map;
       spotMap.hidden = false;
       spotMap.setAttribute("aria-label", `在 Google Maps 查看${place.name}`);
-      jumpAction(activeIndex);
     }
 
     const placeByKeyword = [
@@ -605,255 +830,441 @@
       const canvas = document.querySelector("#okinawa-scene");
       const host = canvas.parentElement;
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color("#73cfe0");
-      const camera = new THREE.OrthographicCamera(-8, 8, 4.5, -4.5, 0.1, 100);
-      camera.position.set(0, 1.1, 24);
-      camera.lookAt(0, 1.1, 0);
+      scene.background = new THREE.Color("#67c3d6");
+      const camera = new THREE.OrthographicCamera(-9, 9, 7, -7, .1, 100);
+      camera.position.set(0, 25, 10);
+      camera.lookAt(0, 0, 0);
       const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false });
       renderer.setPixelRatio(1);
-      renderer.shadowMap.enabled = false;
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.toneMapping = THREE.NoToneMapping;
-      scene.add(new THREE.AmbientLight("#ffffff", 2.2));
-      const sun = new THREE.DirectionalLight("#fff1c8", 1.5);
-      sun.position.set(-5, 10, 8);
+      scene.add(new THREE.AmbientLight("#ffffff", 2.3));
+      const sun = new THREE.DirectionalLight("#fff7dc", 1.1);
+      sun.position.set(-7, 16, -5);
       scene.add(sun);
 
-      const cloudGroups = [];
-      for (let i = 0; i < 8; i++) {
-        const x = i * 15 - 10;
-        const cloud = new THREE.Group();
-        [[0,0,0],[.7,.2,0],[1.3,0,0],[-.65,.05,0]].forEach(([dx,dy,dz]) => {
-          const puff = new THREE.Mesh(new THREE.BoxGeometry(1.05, .55, .4), new THREE.MeshLambertMaterial({ color: "#fffaf0" }));
-          puff.position.set(dx,dy,dz);
-          cloud.add(puff);
-        });
-        cloud.position.set(x, 3.9 + (i % 3) * .45, -2);
-        scene.add(cloud);
-        cloudGroups.push(cloud);
-      }
-      for (let i = 0; i < 12; i++) {
-        const hill = new THREE.Mesh(new THREE.SphereGeometry(2.4 + (i % 3) * .45, 8, 6), new THREE.MeshLambertMaterial({ color: i % 2 ? "#2e9c91" : "#56b9a8", flatShading: true }));
-        hill.scale.y = .38;
-        hill.position.set(i * 9 - 5, -2.3, -5);
-        scene.add(hill);
-      }
-      const sea = new THREE.Mesh(new THREE.PlaneGeometry(200, 80), new THREE.MeshLambertMaterial({ color: "#168fb0" }));
-      sea.position.set(45, -3.15, -3);
-      scene.add(sea);
+      const material = (color) => new THREE.MeshLambertMaterial({ color, flatShading: true });
+      const addBox = (parent, w, h, d, color, x, y, z) => {
+        const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material(color));
+        mesh.position.set(x, y, z);
+        parent.add(mesh);
+        return mesh;
+      };
+      const water = new THREE.Mesh(new THREE.PlaneGeometry(180, 34), material("#168fb0"));
+      water.rotation.x = -Math.PI / 2;
+      water.position.set(31, -.34, 0);
+      scene.add(water);
 
-      const stageX = places.map((_, index) => index * 8);
-      const stageTop = [-1.35, -.55, -1.05, -.3, -1.25, -.45, -1.2, -.35, -1.1, -.4];
-      const platforms = [];
-      const markerMeshes = [];
-      const collectibles = [];
-      const goldMaterial = new THREE.MeshLambertMaterial({ color: "#b7f2e7", emissive: "#155a70" });
-      const platformTopMaterial = new THREE.MeshLambertMaterial({ color: "#39aaa3" });
-      const platformSideMaterial = new THREE.MeshLambertMaterial({ color: "#266f82" });
-      const labelNames = ["机场","酒店","牛排","酒吧","海鲜市场","波上宫","鞋店","Golf5","Outlet","晚餐"];
+      const points = places.map((_, index) => new THREE.Vector3(
+        index * 7.2,
+        0,
+        Math.sin(index * Math.PI / 2) * 1.25
+      ));
+      const labels = ["机场","酒店","牛排","酒吧","海鲜市场","波上宫","壶屋陶器街","鞋店","Golf5","Outlet","晚餐","濑长岛"];
+      const stationMarkers = [];
+      const seaSpirits = [];
+      const waveTiles = [];
+      const stageColors = ["#92d8c6","#a5dfc8","#7fd0bb","#8dd8c8","#b1dfbe","#8dd5b7","#9bdac3","#86d2bd","#a8dfc7","#8ad5be","#9ed9c5","#8bd2c8"];
+      const buildingColors = ["#f1d58c","#c9e6d3","#e6a87e","#e8c481","#7bbdc2","#efd99d","#a8cbb2","#bdd59c","#e2b37f","#d98e72","#c5d8a8","#80bdc4"];
+
+      for (let i = 0; i < 45; i++) {
+        const wave = new THREE.Mesh(new THREE.BoxGeometry(.75, .035, .09), material(i % 3 ? "#53bdd0" : "#a1e4dc"));
+        wave.position.set(-12 + (i % 9) * 15, -.15, -14 + Math.floor(i / 9) * 7);
+        scene.add(wave);
+        waveTiles.push({ mesh: wave, phase: i * .8 });
+      }
+
       const makeLabel = (text) => {
         const labelCanvas = document.createElement("canvas");
-        labelCanvas.width = 256;
-        labelCanvas.height = 64;
+        labelCanvas.width = 640;
+        labelCanvas.height = 128;
         const ctx = labelCanvas.getContext("2d");
         ctx.fillStyle = "#e7f8f6";
-        ctx.fillRect(0, 0, 256, 64);
+        ctx.fillRect(0, 0, 640, 128);
         ctx.strokeStyle = "#123f55";
-        ctx.lineWidth = 6;
-        ctx.strokeRect(3, 3, 250, 58);
+        ctx.lineWidth = 10;
+        ctx.strokeRect(4, 4, 632, 120);
         ctx.fillStyle = "#123f55";
-        ctx.font = "bold 30px sans-serif";
+        ctx.font = "bold 62px sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(text, 128, 33);
+        ctx.fillText(text, 320, 65);
         const texture = new THREE.CanvasTexture(labelCanvas);
         texture.magFilter = THREE.NearestFilter;
         texture.minFilter = THREE.NearestFilter;
-        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true }));
-        sprite.scale.set(2.3, .58, 1);
+        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture }));
+        sprite.scale.set(4.1, .82, 1);
         return sprite;
       };
 
-      places.forEach((place, index) => {
-        const x = stageX[index];
-        const top = stageTop[index];
-        const platform = new THREE.Group();
-        const soil = new THREE.Mesh(new THREE.BoxGeometry(6.15, .78, 1.8), platformSideMaterial);
-        soil.position.set(x, top - .39, 0);
-        platform.add(soil);
-        const turf = new THREE.Mesh(new THREE.BoxGeometry(6.25, .22, 1.9), platformTopMaterial);
-        turf.position.set(x, top - .11, 0);
-        platform.add(turf);
-        for (let tile = 0; tile < 5; tile++) {
-          const tileMesh = new THREE.Mesh(new THREE.BoxGeometry(1.18, .16, 1.84), new THREE.MeshLambertMaterial({ color: tile % 2 ? "#5fc2bd" : "#80d7cb" }));
-          tileMesh.position.set(x - 2.48 + tile * 1.24, top - .08, 0);
-          platform.add(tileMesh);
+      const addPalm = (parent, x, z, scale = 1) => {
+        const tree = new THREE.Group();
+        tree.position.set(x, .12, z);
+        tree.scale.setScalar(scale);
+        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.11,.16,.9,5), material("#8f7250"));
+        trunk.position.y = .48;
+        tree.add(trunk);
+        const crown = new THREE.Mesh(new THREE.SphereGeometry(.48,6,5), material("#207f76"));
+        crown.scale.set(1.2,.52,1);
+        crown.position.y = 1.02;
+        tree.add(crown);
+        for (let leaf = 0; leaf < 4; leaf++) {
+          const frond = addBox(tree, .12,.08,.72, "#35a98d", 0,1.04,0);
+          frond.rotation.y = leaf * Math.PI / 2;
         }
-        scene.add(platform);
-        platforms.push({ x, top, half: 3.12 });
+        parent.add(tree);
+      };
 
-        const pole = new THREE.Mesh(new THREE.BoxGeometry(.12, 1.65, .12), new THREE.MeshLambertMaterial({ color: "#17566c" }));
-        pole.position.set(x, top + .95, -.2);
-        scene.add(pole);
-        const flag = new THREE.Mesh(new THREE.BoxGeometry(.95, .48, .1), new THREE.MeshLambertMaterial({ color: index % 2 ? "#48bdb7" : "#c2eee4" }));
-        flag.position.set(x + .47, top + 1.47, -.2);
-        scene.add(flag);
-        const label = makeLabel(labelNames[index]);
-        label.position.set(x, top + 2.05, -.3);
+      places.forEach((place, index) => {
+        const point = points[index];
+        const island = new THREE.Mesh(new THREE.CylinderGeometry(3.45,3.8,.42,12), material("#d7c58c"));
+        island.position.set(point.x,-.08,point.z);
+        scene.add(island);
+        const grass = new THREE.Mesh(new THREE.CylinderGeometry(3.22,3.45,.16,12), material(stageColors[index]));
+        grass.position.set(point.x,.18,point.z);
+        scene.add(grass);
+
+        if (index < points.length - 1) {
+          const next = points[index + 1];
+          const dx = next.x - point.x;
+          const dz = next.z - point.z;
+          const length = Math.hypot(dx,dz);
+          const path = new THREE.Mesh(new THREE.BoxGeometry(length,.06,1.05), material("#e7d8a6"));
+          path.position.set((point.x + next.x) / 2,.12,(point.z + next.z) / 2);
+          path.rotation.y = -Math.atan2(dz,dx);
+          scene.add(path);
+          for (let tile = 0; tile < 4; tile++) {
+            const foam = new THREE.Mesh(new THREE.BoxGeometry(.18,.045,1.12), material("#f4e7bd"));
+            foam.position.set(point.x + dx * (tile + 1) / 5,.16,point.z + dz * (tile + 1) / 5);
+            foam.rotation.y = -Math.atan2(dz,dx);
+            scene.add(foam);
+          }
+        }
+
+        const landmark = new THREE.Group();
+        landmark.position.set(point.x - .45,.27,point.z - .7);
+        addBox(landmark,1.75,.9,1.45,buildingColors[index],0,.55,-.4);
+        addBox(landmark,2,.22,1.7,index % 2 ? "#f2eee0" : "#b9e8e4",0,1.08,-.4);
+        addBox(landmark,.4,.52,.08,"#3d7880",0,.43,.36);
+        addBox(landmark,.34,.3,.08,"#b9e8e4",-.55,.74,.36);
+        addBox(landmark,.34,.3,.08,"#b9e8e4",.55,.74,.36);
+        if (index === 5) {
+          addBox(landmark,.18,1.25,.18,"#b15c4a",-.65,1.53,-.42);
+          addBox(landmark,.18,1.25,.18,"#b15c4a",.65,1.53,-.42);
+          addBox(landmark,1.48,.2,.18,"#b15c4a",0,2.1,-.42);
+        } else if (index === 0) {
+          addBox(landmark,1.15,.42,.18,"#e8f4ec",0,1.46,-.4);
+          addBox(landmark,.16,.34,.1,"#247a8b",0,1.46,-.28);
+        } else if (index === 2 || index === 9) {
+          const awning = addBox(landmark,2,.16,.34,"#4c9f9b",0,.95,.55);
+          awning.rotation.x = -.12;
+        }
+        scene.add(landmark);
+
+        const palmOffsets = [[-2.35,-1.7],[2.25,1.75]];
+        palmOffsets.forEach(([ox,oz], palmIndex) => {
+          if ((index + palmIndex) % 3 !== 1) addPalm(scene,point.x + ox,point.z + oz,.68 + palmIndex * .12);
+        });
+
+        const label = makeLabel(labels[index]);
+        label.position.set(point.x,1.05,point.z - 2.6);
         scene.add(label);
+        const marker = new THREE.Mesh(new THREE.TorusGeometry(.72,.075,4,12), material("#e8ffff"));
+        marker.rotation.x = Math.PI / 2;
+        marker.position.set(point.x,.32,point.z);
+        scene.add(marker);
+        stationMarkers.push(marker);
 
-        const group = new THREE.Group();
-        group.position.set(x, top, .75);
-        const marker = new THREE.Mesh(new THREE.BoxGeometry(.46, .46, .2), new THREE.MeshLambertMaterial({ color: "#22a9ad" }));
-        marker.position.y = .4;
-        marker.userData.placeIndex = index;
-        group.add(marker);
-        markerMeshes.push(marker);
-        const shell = new THREE.Mesh(new THREE.TorusGeometry(.23, .1, 4, 8), goldMaterial);
-        shell.position.set(index % 2 ? 1.55 : -1.55, top + 1.7, 0);
-        shell.userData.placeIndex = index;
-        scene.add(shell);
-        collectibles.push({ mesh: shell, collected: false, baseY: top + 1.7 });
-        scene.add(group);
+        const spirit = new THREE.Group();
+        const palette = ["#67c8c0","#84c7e4","#f1bd76","#e58e7d","#9f9bdb","#71c9a2","#dfa6ce","#e6aa73","#5bb4c2","#e58e77","#8dceaa","#68b8d5"];
+        const body = new THREE.Mesh(new THREE.SphereGeometry(.42,6,5),material(palette[index]));
+        body.scale.set(1,.72,.9);
+        body.position.y = .48;
+        spirit.add(body);
+        const fin = addBox(spirit,.2,.08,.52,index % 2 ? "#dff9e7" : "#edf8d7",-.32,.45,0);
+        fin.rotation.y = -.25;
+        const fin2 = addBox(spirit,.2,.08,.52,index % 2 ? "#dff9e7" : "#edf8d7",.32,.45,0);
+        fin2.rotation.y = .25;
+        const eyeMat = material("#153c50");
+        [-.13,.13].forEach((eyeX) => {
+          const eye = new THREE.Mesh(new THREE.SphereGeometry(.045,5,4),eyeMat);
+          eye.position.set(eyeX,.57,.36);
+          spirit.add(eye);
+        });
+        spirit.position.set(point.x + (index % 2 ? 1.65 : -1.65),.23,point.z + (index % 3 - 1) * 1.15);
+        scene.add(spirit);
+        seaSpirits.push({
+          mesh: spirit,
+          name: ["珊瑚仔","浪花团","琉璃鱼","月光螺","蓝潮灵","海葡萄精","星砂狐","港湾獭","泡泡魟","夕潮貘","石桥精","浪云鲸"][index],
+          icon: ["🪸","🌊","🐠","🐚","🪼","🍇","🦊","🦦","🐟","🦭","🏯","🐋"][index],
+          defeated:false,
+          phase:index * .7
+        });
       });
 
-      const avatar = new THREE.Group();
-      const shirt = new THREE.Mesh(new THREE.BoxGeometry(.7,.68,.55), new THREE.MeshLambertMaterial({ color: "#087e8b" }));
-      shirt.position.y = .8;
-      avatar.add(shirt);
-      const face = new THREE.Mesh(new THREE.BoxGeometry(.56,.55,.52), new THREE.MeshLambertMaterial({ color: "#f2bd88" }));
-      face.position.y = 1.42;
-      avatar.add(face);
-      const hair = new THREE.Mesh(new THREE.BoxGeometry(.66,.2,.56), new THREE.MeshLambertMaterial({ color: "#123f55" }));
-      hair.position.y = 1.79;
-      avatar.add(hair);
-      const backpack = new THREE.Mesh(new THREE.BoxGeometry(.22,.55,.48), new THREE.MeshLambertMaterial({ color: "#59c8bf" }));
-      backpack.position.set(-.42,.84,.04);
-      avatar.add(backpack);
-      const legs = [-.2,.2].map((x) => {
-        const leg = new THREE.Mesh(new THREE.BoxGeometry(.24,.38,.35), new THREE.MeshLambertMaterial({ color: "#28788a" }));
-        leg.position.set(x,.26,0);
-        avatar.add(leg);
-        return leg;
-      });
-      avatar.position.set(stageX[0], stageTop[0], .2);
+      const makeHeroTexture = (direction) => {
+        const art = document.createElement("canvas");
+        art.width = 64;
+        art.height = 64;
+        const ctx = art.getContext("2d");
+        const pixel = (x,y,w,h,color) => {
+          ctx.fillStyle = color;
+          ctx.fillRect(x,y,w,h);
+        };
+        pixel(18,34,28,21,"#a7744c");
+        pixel(14,39,9,10,"#f1c96b");
+        pixel(41,39,9,10,"#f1c96b");
+        pixel(20,30,24,18,"#168b91");
+        pixel(18,33,28,5,"#55c9b8");
+        pixel(21,14,22,17,"#f0bd91");
+        pixel(18,10,28,8,"#164f63");
+        pixel(20,7,24,7,"#42b9ae");
+        pixel(16,16,6,8,"#164f63");
+        pixel(42,16,6,8,"#164f63");
+        if (direction === "down") {
+          pixel(24,22,4,4,"#123b4a");
+          pixel(36,22,4,4,"#123b4a");
+          pixel(28,28,8,2,"#b76d62");
+        } else if (direction === "up") {
+          pixel(23,17,18,8,"#164f63");
+          pixel(20,33,24,13,"#32a995");
+        } else {
+          const eyeX = direction === "left" ? 22 : 38;
+          pixel(eyeX,22,4,4,"#123b4a");
+          pixel(direction === "left" ? 14 : 44,18,5,12,"#164f63");
+        }
+        pixel(20,49,10,7,"#164f63");
+        pixel(34,49,10,7,"#164f63");
+        const texture = new THREE.CanvasTexture(art);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.colorSpace = THREE.SRGBColorSpace;
+        return texture;
+      };
+      const heroTextures = {
+        down: makeHeroTexture("down"),
+        up: makeHeroTexture("up"),
+        left: makeHeroTexture("left"),
+        right: makeHeroTexture("right")
+      };
+      const avatar = new THREE.Sprite(new THREE.SpriteMaterial({ map:heroTextures.down, transparent:true }));
+      avatar.scale.set(1.55,1.75,1);
+      avatar.position.set(points[0].x + 1.5,.95,points[0].z + 1.55);
       scene.add(avatar);
-      const enemies = [2,5,7].map((index) => {
-        const enemy = new THREE.Group();
-        const shell = new THREE.Mesh(new THREE.BoxGeometry(.65,.46,.54), new THREE.MeshLambertMaterial({ color: "#c85f51" }));
-        shell.position.y = .25;
-        enemy.add(shell);
-        const eye = new THREE.Mesh(new THREE.BoxGeometry(.12,.12,.08), new THREE.MeshLambertMaterial({ color: "#fff9e8" }));
-        eye.position.set(.13,.35,.3);
-        enemy.add(eye);
-        enemy.position.set(stageX[index] + 1.2, stageTop[index] + .25, .35);
-        scene.add(enemy);
-        return { mesh: enemy, origin: stageX[index] + 1.2, platform: index };
-      });
+      const avatarShadow = new THREE.Mesh(new THREE.CylinderGeometry(.48,.48,.035,8),material("#2c7c82"));
+      avatarShadow.position.set(avatar.position.x,.27,avatar.position.z);
+      scene.add(avatarShadow);
 
-      const raycaster = new THREE.Raycaster();
-      const pointer = new THREE.Vector2();
       const keys = new Set();
       const hud = document.querySelector("#scene-hud");
-      let hovered = -1;
-      let verticalSpeed = 0;
-      let onGround = true;
-      let jumpQueued = false;
-      let checkpointIndex = 0;
-      let currentPlatform = 0;
-      let shellCount = 0;
-      let facing = 1;
-      let elapsedTotal = 0;
-      const gravity = 22;
-      const jumpSpeed = 9.2;
-      const walkSpeed = 7.3;
-      const setMove = (key, active) => {
-        if (active) keys.add(key);
-        else keys.delete(key);
-      };
       const interactButton = document.querySelector("#scene-interact");
-      const updateInteractionPrompt = () => {
-        const canInteract = currentPlatform >= 0 && onGround;
-        interactButton.disabled = !canInteract;
-        interactButton.textContent = canInteract ? "互动查看本站介绍 · E" : "到达地点平台后可互动";
-        interactButton.setAttribute("aria-label", canInteract
-          ? `互动查看${places[currentPlatform].name}介绍`
-          : "到达地点平台后互动查看介绍");
+      const battleOverlay = document.querySelector("#battle-overlay");
+      const battleCombat = document.querySelector("#battle-combat");
+      const battleVictory = document.querySelector("#battle-victory");
+      const battleMessage = document.querySelector("#battle-message");
+      const enemyHpFill = document.querySelector("#enemy-hp-fill");
+      const playerHpFill = document.querySelector("#player-hp-fill");
+      const defeatedPlaces = new Set();
+      const playerMaxHp = 20;
+      let playerHp = playerMaxHp;
+      let enemyHp = 12;
+      let battleIndex = -1;
+      let guarding = false;
+      let hasMedkit = true;
+      let checkpointIndex = 0;
+      let currentPlaceIndex = 0;
+      let elapsedTotal = 0;
+      let facing = "down";
+      const moveSpeed = 5.1;
+      const keyDirections = {
+        ArrowLeft: "left", a: "left", A: "left",
+        ArrowRight: "right", d: "right", D: "right",
+        ArrowUp: "up", w: "up", W: "up",
+        ArrowDown: "down", s: "down", S: "down"
       };
-      const interactAtCurrentPlatform = () => {
-        if (currentPlatform >= 0 && onGround) showPlace(currentPlatform);
+      const setMove = (direction, active) => {
+        if (active) keys.add(direction);
+        else keys.delete(direction);
       };
-      const bindHold = (element, key) => {
+      const updateHud = () => {
+        hud.textContent = `海灵胜场 ${String(defeatedPlaces.size).padStart(2,"0")} / ${String(places.length).padStart(2,"0")} · 地点 ${String(checkpointIndex + 1).padStart(2,"0")} / ${String(places.length).padStart(2,"0")}`;
+      };
+      const updateInteraction = () => {
+        const available = currentPlaceIndex >= 0;
+        interactButton.disabled = !available;
+        const defeated = available && defeatedPlaces.has(currentPlaceIndex);
+        interactButton.textContent = available
+          ? defeated ? "查看本站介绍 · 屏幕 A / 键盘 E" : "挑战本站海灵 · 屏幕 A / 键盘 E"
+          : "走近地点标记后可挑战";
+        interactButton.setAttribute("aria-label", available
+          ? defeated ? `查看${places[currentPlaceIndex].name}介绍` : `挑战${seaSpirits[currentPlaceIndex].name}`
+          : "走近地点标记后互动");
+      };
+      const updateBattleBars = () => {
+        const enemyMaxHp = 12;
+        enemyHpFill.style.width = `${Math.max(0,enemyHp / enemyMaxHp * 100)}%`;
+        playerHpFill.style.width = `${Math.max(0,playerHp / playerMaxHp * 100)}%`;
+        document.querySelector("#enemy-hp-text").textContent = `${enemyHp}/${enemyMaxHp}`;
+        document.querySelector("#player-hp-text").textContent = `${playerHp}/${playerMaxHp}`;
+      };
+      const openBattle = (index) => {
+        if (defeatedPlaces.has(index)) {
+          showPlace(index);
+          return;
+        }
+        battleIndex = index;
+        enemyHp = 12;
+        playerHp = Math.min(playerMaxHp,Math.max(14,playerHp));
+        guarding = false;
+        hasMedkit = true;
+        const spirit = seaSpirits[index];
+        document.querySelector("#battle-name").textContent = spirit.name;
+        document.querySelector("#battle-monster").textContent = spirit.icon;
+        document.querySelector("#battle-heading").textContent = `地点 ${String(index + 1).padStart(2,"0")} · 海灵对战`;
+        battleMessage.textContent = `野生的${spirit.name}出现了！选择行动。`;
+        battleCombat.hidden = false;
+        battleVictory.hidden = true;
+        battleOverlay.hidden = false;
+        updateBattleBars();
+        document.querySelector("#battle-attack").focus({preventScroll:true});
+      };
+      const interactAtCurrentPlace = () => {
+        if (currentPlaceIndex < 0) return;
+        if (defeatedPlaces.has(currentPlaceIndex)) showPlace(currentPlaceIndex);
+        else openBattle(currentPlaceIndex);
+      };
+      const closeBattle = () => {
+        battleOverlay.hidden = true;
+        battleIndex = -1;
+        canvas.focus({preventScroll:true});
+      };
+      const showVictory = () => {
+        const place = places[battleIndex];
+        const spirit = seaSpirits[battleIndex];
+        defeatedPlaces.add(battleIndex);
+        spirit.defeated = true;
+        spirit.mesh.visible = false;
+        playerHp = Math.min(playerMaxHp,playerHp + 4);
+        updateHud();
+        updateInteraction();
+        showPlace(battleIndex);
+        document.querySelector("#victory-title").textContent = place.name;
+        document.querySelector("#victory-summary").textContent = place.summary;
+        document.querySelector("#victory-why").textContent = `为什么在这站停留：${place.why}`;
+        document.querySelector("#victory-status").textContent = place.status;
+        const victoryMap = document.querySelector("#victory-map");
+        victoryMap.href = place.map;
+        victoryMap.setAttribute("aria-label", `在 Google Maps 查看${place.name}`);
+        battleCombat.hidden = true;
+        battleVictory.hidden = false;
+        document.querySelector("#battle-continue").focus({preventScroll:true});
+      };
+      const enemyTurn = () => {
+        const damage = guarding ? 1 : 2 + Math.floor(Math.random() * 3);
+        guarding = false;
+        playerHp = Math.max(0,playerHp - damage);
+        updateBattleBars();
+        if (playerHp === 0) {
+          playerHp = 10;
+          battleMessage.textContent = `受到 ${damage} 点伤害！海风带来补给，体力恢复后继续战斗。`;
+          updateBattleBars();
+          return;
+        }
+        battleMessage.textContent = `海灵反击，造成 ${damage} 点伤害。选择下一步行动。`;
+      };
+      const attack = () => {
+        if (battleIndex < 0 || battleOverlay.hidden) return;
+        enemyHp = Math.max(0,enemyHp - 4);
+        updateBattleBars();
+        if (enemyHp === 0) {
+          battleMessage.textContent = `${seaSpirits[battleIndex].name}被击败！正在解锁地点介绍…`;
+          showVictory();
+          return;
+        }
+        battleMessage.textContent = `海潮冲击命中！${seaSpirits[battleIndex].name}还剩 ${enemyHp} HP。`;
+        enemyTurn();
+      };
+      const guard = () => {
+        if (battleIndex < 0 || battleOverlay.hidden) return;
+        guarding = true;
+        battleMessage.textContent = "潮汐护盾升起，本回合反击伤害降低。";
+        enemyTurn();
+      };
+      const useMedkit = () => {
+        if (battleIndex < 0 || battleOverlay.hidden) return;
+        if (!hasMedkit) {
+          battleMessage.textContent = "岛屿补给已经用完。";
+          return;
+        }
+        hasMedkit = false;
+        const recovered = Math.min(6,playerMaxHp - playerHp);
+        playerHp += recovered;
+        updateBattleBars();
+        battleMessage.textContent = `使用岛屿补给，恢复 ${recovered} HP。`;
+        enemyTurn();
+      };
+      document.querySelector("#battle-attack").addEventListener("click",attack);
+      document.querySelector("#battle-guard").addEventListener("click",guard);
+      document.querySelector("#battle-item").addEventListener("click",useMedkit);
+      document.querySelector("#battle-run").addEventListener("click",closeBattle);
+      document.querySelector("#battle-continue").addEventListener("click",closeBattle);
+      const bindHold = (element, direction) => {
         element.addEventListener("pointerdown", (event) => {
           event.preventDefault();
           element.setPointerCapture?.(event.pointerId);
-          setMove(key, true);
+          setMove(direction,true);
         });
-        element.addEventListener("click", (event) => {
+        const release = () => setMove(direction,false);
+        element.addEventListener("pointerup",release);
+        element.addEventListener("pointercancel",release);
+        element.addEventListener("lostpointercapture",release);
+        element.addEventListener("click",(event) => {
           if (event.detail !== 0) return;
-          setMove(key, true);
-          setTimeout(() => setMove(key, false), 180);
+          setMove(direction,true);
+          setTimeout(release,180);
         });
-        const release = () => setMove(key, false);
-        element.addEventListener("pointerup", release);
-        element.addEventListener("pointercancel", release);
-        element.addEventListener("lostpointercapture", release);
       };
-      bindHold(document.querySelector("#scene-prev"), "left");
-      bindHold(document.querySelector("#scene-next"), "right");
-      document.querySelector("#scene-jump").addEventListener("pointerdown", (event) => {
+      bindHold(document.querySelector("#scene-prev"),"left");
+      bindHold(document.querySelector("#scene-up"),"up");
+      bindHold(document.querySelector("#scene-down"),"down");
+      bindHold(document.querySelector("#scene-next"),"right");
+      const actionButton = document.querySelector("#scene-jump");
+      actionButton.addEventListener("pointerdown",(event) => {
         event.preventDefault();
-        jumpQueued = true;
+        interactAtCurrentPlace();
       });
-      document.querySelector("#scene-jump").addEventListener("click", (event) => {
-        if (event.detail === 0) jumpQueued = true;
+      actionButton.addEventListener("click",(event) => {
+        if (event.detail === 0) interactAtCurrentPlace();
       });
-      interactButton.addEventListener("click", interactAtCurrentPlatform);
-      window.addEventListener("keydown", (event) => {
-        if (event.target.closest("input, textarea, select, button, a")) return;
-        if (["ArrowRight", "ArrowLeft", "Space", "ArrowUp"].includes(event.code) || ["ArrowRight", "ArrowLeft"].includes(event.key)) event.preventDefault();
-        if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") setMove("right", true);
-        if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") setMove("left", true);
-        if (event.code === "Space" || event.key === "ArrowUp" || event.key.toLowerCase() === "w") jumpQueued = true;
-        if (event.key.toLowerCase() === "e") interactAtCurrentPlatform();
-      });
-      window.addEventListener("keyup", (event) => {
-        if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") setMove("right", false);
-        if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") setMove("left", false);
-      });
-      window.addEventListener("blur", () => keys.clear());
-      jumpAction = (_index, jump = false) => {
-        if (jump) jumpQueued = true;
-      };
-      const updateHud = () => {
-        hud.textContent = `贝壳 ${String(shellCount).padStart(2, "0")} / ${String(collectibles.length).padStart(2, "0")} · 检查点 ${String(checkpointIndex + 1).padStart(2, "0")} / ${String(places.length).padStart(2, "0")}`;
-      };
-      updateHud();
-      updateInteractionPrompt();
-
-      canvas.addEventListener("pointermove", (event) => {
-        const rect = canvas.getBoundingClientRect();
-        pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-        raycaster.setFromCamera(pointer, camera);
-        const hit = raycaster.intersectObjects(markerMeshes, false)[0];
-        const nextHover = hit ? hit.object.userData.placeIndex : -1;
-        canvas.style.cursor = nextHover >= 0 ? "pointer" : "default";
-        if (nextHover >= 0 && nextHover !== hovered) {
-          hovered = nextHover;
+      interactButton.addEventListener("click",interactAtCurrentPlace);
+      window.addEventListener("keydown",(event) => {
+        if (!battleOverlay.hidden) {
+          if (event.key === "1") attack();
+          if (event.key === "2") guard();
+          if (event.key === "3") useMedkit();
+          if (event.key === "Escape") closeBattle();
+          return;
         }
+        if (event.target.closest("input,textarea,select,button,a")) return;
+        const direction = keyDirections[event.key];
+        if (direction) {
+          event.preventDefault();
+          setMove(direction,true);
+        }
+        if (event.key.toLowerCase() === "e" || event.key === " ") interactAtCurrentPlace();
       });
-      canvas.addEventListener("pointerleave", () => {
-        hovered = -1;
-        canvas.style.cursor = "default";
+      window.addEventListener("keyup",(event) => {
+        const direction = keyDirections[event.key];
+        if (direction) setMove(direction,false);
       });
-      canvas.addEventListener("pointerdown", () => canvas.focus({ preventScroll: true }));
+      window.addEventListener("blur",() => keys.clear());
+      canvas.addEventListener("pointerdown",() => canvas.focus({preventScroll:true}));
 
       const resize = () => {
-        const width = Math.max(280, host.clientWidth);
-        const height = Math.max(270, host.clientHeight);
-        renderer.setSize(width, height, false);
-        const viewHeight = 9;
+        const width = Math.max(280,host.clientWidth);
+        const height = Math.max(270,host.clientHeight);
+        renderer.setSize(width,height,false);
+        const viewHeight = 14;
         const viewWidth = viewHeight * width / height;
         camera.left = -viewWidth / 2;
         camera.right = viewWidth / 2;
@@ -863,115 +1274,71 @@
       };
       new ResizeObserver(resize).observe(host);
       resize();
+      updateHud();
+      updateInteraction();
+
       const clock = new THREE.Clock();
       const animate = () => {
         requestAnimationFrame(animate);
-        const delta = Math.min(clock.getDelta(), 0.04);
+        const delta = Math.min(clock.getDelta(),.04);
         elapsedTotal += delta;
-        const moveDirection = (keys.has("right") ? 1 : 0) - (keys.has("left") ? 1 : 0);
-        if (moveDirection) {
-          avatar.position.x += moveDirection * walkSpeed * delta;
-          facing = moveDirection;
-        }
-        if (jumpQueued && onGround) {
-          verticalSpeed = jumpSpeed;
-          onGround = false;
-          currentPlatform = -1;
-          updateInteractionPrompt();
-        }
-        jumpQueued = false;
-
-        const previousY = avatar.position.y;
-        if (!onGround) {
-          verticalSpeed -= gravity * delta;
-          avatar.position.y += verticalSpeed * delta;
-        }
-        let landedOn = -1;
-        if (verticalSpeed <= 0) {
-          platforms.forEach((platform, index) => {
-            const withinX = Math.abs(avatar.position.x - platform.x) <= platform.half - .34;
-            if (withinX && previousY >= platform.top && avatar.position.y <= platform.top) {
-              if (landedOn < 0 || platform.top > platforms[landedOn].top) landedOn = index;
-            }
-          });
-        }
-        if (landedOn >= 0) {
-          avatar.position.y = platforms[landedOn].top;
-          verticalSpeed = 0;
-          onGround = true;
-          if (currentPlatform !== landedOn) {
-            currentPlatform = landedOn;
-            updateInteractionPrompt();
-          }
-          if (landedOn > checkpointIndex) {
-            checkpointIndex = landedOn;
-            updateHud();
+        const dx = battleOverlay.hidden ? (keys.has("right") ? 1 : 0) - (keys.has("left") ? 1 : 0) : 0;
+        const dz = battleOverlay.hidden ? (keys.has("down") ? 1 : 0) - (keys.has("up") ? 1 : 0) : 0;
+        const length = Math.hypot(dx,dz) || 1;
+        if (dx || dz) {
+          avatar.position.x += dx / length * moveSpeed * delta;
+          avatar.position.z += dz / length * moveSpeed * delta;
+          facing = Math.abs(dx) > Math.abs(dz) ? (dx > 0 ? "right" : "left") : (dz > 0 ? "down" : "up");
+          avatar.rotation.y = facing === "left" ? Math.PI / 2 : facing === "right" ? -Math.PI / 2 : facing === "up" ? Math.PI : 0;
+          avatar.position.y = .95 + Math.abs(Math.sin(elapsedTotal * 12)) * .05;
+          if (avatar.material.map !== heroTextures[facing]) {
+            avatar.material.map = heroTextures[facing];
+            avatar.material.needsUpdate = true;
           }
         } else {
-          onGround = false;
-          if (currentPlatform >= 0) {
-            currentPlatform = -1;
-            updateInteractionPrompt();
-          }
+          avatar.position.y += (.95 - avatar.position.y) * .2;
         }
-        if (avatar.position.y < -5.3) {
-          avatar.position.x = stageX[checkpointIndex];
-          avatar.position.y = stageTop[checkpointIndex];
-          verticalSpeed = 0;
-          onGround = true;
-          currentPlatform = checkpointIndex;
-          updateInteractionPrompt();
-        }
-        avatar.rotation.y = facing < 0 ? Math.PI : 0;
-        legs.forEach((leg, index) => {
-          leg.rotation.z = moveDirection && onGround ? Math.sin(elapsedTotal * 12 + index * Math.PI) * .28 : 0;
-        });
+        avatar.position.x = THREE.MathUtils.clamp(avatar.position.x,-2,points[points.length - 1].x + 2);
+        avatar.position.z = THREE.MathUtils.clamp(avatar.position.z,-5.7,5.7);
+        avatarShadow.position.x = avatar.position.x;
+        avatarShadow.position.z = avatar.position.z;
 
-        enemies.forEach((enemy, index) => {
-          enemy.mesh.position.x = enemy.origin + Math.sin(elapsedTotal * 1.5 + index) * .65;
-          if (Math.abs(avatar.position.x - enemy.mesh.position.x) < .57 && Math.abs(avatar.position.y - stageTop[enemy.platform]) < .62) {
-            if (verticalSpeed < 0 && avatar.position.y > stageTop[enemy.platform] + .2) {
-              verticalSpeed = jumpSpeed * .75;
-              onGround = false;
-              enemy.mesh.position.x = enemy.origin + 1.8;
-            } else {
-              avatar.position.x = stageX[checkpointIndex];
-              avatar.position.y = stageTop[checkpointIndex];
-              verticalSpeed = 0;
-              onGround = true;
-              currentPlatform = checkpointIndex;
-              updateInteractionPrompt();
-            }
+        let nearestIndex = -1;
+        let nearestDistance = Infinity;
+        points.forEach((point,index) => {
+          const distance = Math.hypot(avatar.position.x - point.x,avatar.position.z - point.z);
+          if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearestIndex = index;
           }
         });
-        collectibles.forEach((item) => {
-          if (item.collected) return;
-          item.mesh.rotation.y += delta * 2;
-          item.mesh.position.y = item.baseY + Math.sin(elapsedTotal * 3 + item.mesh.userData.placeIndex) * .12;
-          const dx = avatar.position.x - item.mesh.position.x;
-          const dy = avatar.position.y + .9 - item.mesh.position.y;
-          if (Math.hypot(dx, dy) < .78) {
-            item.collected = true;
-            item.mesh.visible = false;
-            shellCount += 1;
-            updateHud();
-          }
+        const nextPlace = nearestDistance < 2.8 ? nearestIndex : -1;
+        if (nextPlace !== currentPlaceIndex) {
+          currentPlaceIndex = nextPlace;
+          updateInteraction();
+        }
+        if (nextPlace >= 0 && nextPlace > checkpointIndex) {
+          checkpointIndex = nextPlace;
+          updateHud();
+        }
+
+        seaSpirits.forEach((spirit) => {
+          spirit.mesh.position.y = .23 + Math.sin(elapsedTotal * 2 + spirit.phase) * .08;
+          spirit.mesh.rotation.y = Math.sin(elapsedTotal + spirit.phase) * .12;
         });
-        markerMeshes.forEach((marker, index) => {
-          const selected = index === checkpointIndex;
-          const hot = index === hovered || index === activeIndex;
-          const scale = selected || hot ? 1.2 : 1;
-          marker.scale.lerp(new THREE.Vector3(scale, scale, scale), .14);
+        stationMarkers.forEach((marker,index) => {
+          marker.material.color.set(index === currentPlaceIndex ? "#ffffff" : "#b9eee4");
+          marker.scale.setScalar(index === currentPlaceIndex ? 1.18 : 1);
         });
-        cloudGroups.forEach((cloud, index) => {
-          cloud.position.x = index * 15 - 10 + Math.sin(elapsedTotal * .12 + index) * .35;
+        waveTiles.forEach(({mesh,phase}) => {
+          mesh.position.x += Math.sin(elapsedTotal * .7 + phase) * .002;
+          mesh.material.color.setHSL(.52 + Math.sin(elapsedTotal + phase) * .015,.55,.55);
         });
-        const cameraX = avatar.position.x + 1.6;
-        const cameraY = Math.max(.9, Math.min(2.4, avatar.position.y + 1.2));
-        camera.position.x += (cameraX - camera.position.x) * .08;
-        camera.position.y += (cameraY - camera.position.y) * .06;
-        camera.lookAt(camera.position.x, camera.position.y, 0);
-        renderer.render(scene, camera);
+        const cameraTarget = new THREE.Vector3(avatar.position.x,0,avatar.position.z);
+        camera.position.x += (avatar.position.x - camera.position.x) * .1;
+        camera.position.z += (avatar.position.z + 10 - camera.position.z) * .1;
+        camera.lookAt(cameraTarget);
+        renderer.render(scene,camera);
       };
       animate();
     } catch (error) {
@@ -983,19 +1350,27 @@
     (() => {
       const dayPanels = {
         night: document.querySelector("#day-night"),
-        day: document.querySelector("#day-day")
+        day: document.querySelector("#day-day"),
+        day3: document.querySelector("#day-day3")
       };
       const tabs = {
         night: document.querySelector("#tab-night"),
-        day: document.querySelector("#tab-day")
+        day: document.querySelector("#tab-day"),
+        day3: document.querySelector("#tab-day3")
       };
       const progressTrack = document.querySelector(".progress-track");
       const progressBar = document.querySelector(".progress-bar");
       const progressLabel = document.querySelector("#progress-label");
       const progressCount = document.querySelector("#progress-count");
+      const routeOptions = document.querySelector("#route-options");
+      const routeSummary = document.querySelector("#route-selection-summary");
+      const nightRouteOptions = document.querySelector("#night-route-options");
+      const nightRouteSummary = document.querySelector("#night-route-summary");
       const storageKey = "okinawa-itinerary-completed-v1";
       let completed = {};
       let selectedDay = "night";
+      let selectedRoute = "route1";
+      let selectedNightPlan = "planA";
       let timerInterval = null;
       let pausedAt = null;
 
@@ -1021,10 +1396,11 @@
 
       function updateProgress() {
         const panel = dayPanels[selectedDay];
-        const checks = [...panel.querySelectorAll('input[type="checkbox"]')];
+        const checks = [...panel.querySelectorAll(".timeline-row:not([hidden]) input[type=\"checkbox\"]")];
         const done = checks.filter((check) => check.checked).length;
         const percent = checks.length ? Math.round((done / checks.length) * 100) : 0;
-        progressLabel.textContent = selectedDay === "night" ? "第一晚完成进度" : "第二天完成进度";
+        const dayLabels = { night: "第一天", day: "第二天", day3: "第三天" };
+        progressLabel.textContent = `${dayLabels[selectedDay]}完成进度`;
         progressCount.textContent = `${done} / ${checks.length}`;
         progressBar.style.width = `${percent}%`;
         progressTrack.setAttribute("aria-valuenow", String(percent));
@@ -1036,6 +1412,10 @@
 
       function selectDay(day) {
         selectedDay = day;
+        routeOptions.hidden = day !== "day";
+        routeSummary.hidden = day !== "day";
+        nightRouteOptions.hidden = day !== "night";
+        nightRouteSummary.hidden = day !== "night";
         Object.keys(dayPanels).forEach((key) => {
           const active = key === day;
           dayPanels[key].hidden = !active;
@@ -1045,13 +1425,142 @@
         updateProgress();
         updateCurrentItem();
       }
+
+      const nightPlanDescriptions = {
+        planA: "方案A：先去 Steak House 88，随后入住酒店并去酒店区域酒吧。机场至餐厅的出租车路线已附；先确认最后点单与携带行李政策。",
+        planB: "方案B：先把行李放到酒店再去 Steak House 88。抵店会更晚，务必先确认餐厅接单时间；若赶不上切换方案C。",
+        planC: "方案C：航班延误时不跨区追赶。先入住，再只前往电话确认仍接单的附近牛肉店；放弃酒吧，回酒店休息。"
+      };
+
+      function applyNightPlan(plan) {
+        selectedNightPlan = plan;
+        document.querySelectorAll(".timeline-row[data-night-plan]").forEach((row) => {
+          row.hidden = row.dataset.nightPlan !== plan;
+        });
+        document.querySelectorAll(".route-option[data-night-plan]").forEach((button) => {
+          button.setAttribute("aria-pressed", String(button.dataset.nightPlan === plan));
+        });
+        nightRouteSummary.textContent = nightPlanDescriptions[plan];
+        nightRouteSummary.hidden = selectedDay !== "night";
+        updateProgress();
+        renderTimer();
+        updateCurrentItem();
+      }
+
+      document.querySelectorAll(".route-option[data-night-plan]").forEach((button) => {
+        button.addEventListener("click", () => applyNightPlan(button.dataset.nightPlan));
+      });
+
+      const routeDescriptions = {
+        route1: "路线1保留壶屋陶器街漫步和濑长岛海景；市区步行与购物日较满，Outlet 约1小时40分钟，营业时间和停车需确认。",
+        route2: "路线2跳过壶屋陶器街，波上宫后直接前往鞋店；之后留45分钟试鞋/休息缓冲，再依序前往Golf5与Outlet。",
+        route3: "路线3保留壶屋陶器街，晚餐后直接回酒店休息，再步行前往酒吧；省去濑长岛往返驾驶。"
+      };
+
+      function applyRoute(route) {
+        selectedRoute = route;
+        const route2 = route === "route2";
+        const route3 = route === "route3";
+        document.querySelectorAll(".route-option[data-route]").forEach((button) => {
+          button.setAttribute("aria-pressed", String(button.dataset.route === route));
+        });
+        document.querySelectorAll(".route-citywalk").forEach((row) => { row.hidden = route2; });
+        document.querySelectorAll(".route-umikaji").forEach((row) => { row.hidden = route3; });
+        document.querySelector(".route2-buffer").hidden = !route2;
+        document.querySelector(".route3-rest").hidden = !route3;
+
+        const shoeDrive = document.querySelector("[data-route-shoe-drive]");
+        const shoeVisit = document.querySelector("[data-route-shoe-visit]");
+        const shoeOrigin = document.querySelector("[data-route-shoe-origin]");
+        const shoeLink = document.querySelector("[data-route-shoe-link]");
+        if (route2) {
+          shoeDrive.dataset.start = "2026-11-14T10:55:00+09:00";
+          shoeDrive.dataset.end = "2026-11-14T11:20:00+09:00";
+          shoeDrive.querySelector(".time-label").textContent = "10:55";
+          shoeOrigin.textContent = "波上宫 → On 昂跑候选：Sports Depo 天久店 · 那霸市天久1-2-1";
+          shoeLink.href = "https://www.google.com/maps/dir/?api=1&origin=Naminoue+Shrine%2C+Naha&destination=Sports+Depo+Ameku%2C+Naha&travelmode=driving";
+          shoeLink.textContent = "↗ 波上宫 → 候选鞋店";
+          shoeVisit.dataset.start = "2026-11-14T11:20:00+09:00";
+          shoeVisit.dataset.end = "2026-11-14T12:05:00+09:00";
+          document.querySelector("[data-route-shoe-visit-time]").textContent = "11:20";
+        } else {
+          shoeDrive.dataset.start = "2026-11-14T11:50:00+09:00";
+          shoeDrive.dataset.end = "2026-11-14T12:15:00+09:00";
+          shoeDrive.querySelector(".time-label").textContent = "11:50";
+          shoeOrigin.textContent = "壶屋陶器街 → On 昂跑候选：Sports Depo 天久店 · 那霸市天久1-2-1";
+          shoeLink.href = "https://www.google.com/maps/dir/?api=1&origin=Tsuboya+Yachimun+Street%2C+Naha&destination=Sports+Depo+Ameku%2C+Naha&travelmode=driving";
+          shoeLink.textContent = "↗ 壶屋陶器街 → 候选鞋店";
+          shoeVisit.dataset.start = "2026-11-14T12:15:00+09:00";
+          shoeVisit.dataset.end = "2026-11-14T13:00:00+09:00";
+          document.querySelector("[data-route-shoe-visit-time]").textContent = "12:15";
+        }
+        const routeTimes = route2
+          ? {
+              lunch: ["12:50", "13:15"], "golf-drive": ["13:15", "13:55"],
+              "golf-visit": ["13:55", "14:40"], "outlet-walk": ["14:40", "14:55"],
+              "outlet-visit": ["14:55", "16:45"]
+            }
+          : {
+              lunch: ["13:00", "13:25"], "golf-drive": ["13:25", "14:05"],
+              "golf-visit": ["14:05", "14:50"], "outlet-walk": ["14:50", "15:05"],
+              "outlet-visit": ["15:05", "16:45"]
+            };
+        Object.entries(routeTimes).forEach(([key, [start, end]]) => {
+          const row = document.querySelector(`[data-route-row="${key}"]`);
+          row.dataset.start = `2026-11-14T${start}:00+09:00`;
+          row.dataset.end = `2026-11-14T${end}:00+09:00`;
+          row.querySelector(".time-label").textContent = start;
+        });
+
+        const hotelReturn = document.querySelector("[data-route-hotel-return]");
+        const returnTitle = document.querySelector("[data-route-return-title]");
+        const returnPlace = document.querySelector("[data-route-return-place]");
+        const returnDistance = document.querySelector("[data-route-return-distance]");
+        const returnTime = document.querySelector("[data-route-return-time]");
+        const returnLink = document.querySelector("[data-route-return-link]");
+        if (route3) {
+          hotelReturn.dataset.start = "2026-11-14T17:45:00+09:00";
+          hotelReturn.dataset.end = "2026-11-14T18:30:00+09:00";
+          hotelReturn.querySelector(".time-label").textContent = "17:45";
+          returnTitle.textContent = "晚餐后自驾返回酒店并停车";
+          returnPlace.textContent = "ASHIBINAA → Loisir Hotel Naha · 那霸市西3-2-1";
+          returnDistance.textContent = "📍 约14–16 km估算";
+          returnTime.textContent = "🚗 约30–45分钟估算";
+          returnLink.href = "https://www.google.com/maps/dir/?api=1&origin=Okinawa+Outlet+Mall+Ashibinaa&destination=Loisir+Hotel+Naha&travelmode=driving";
+          returnLink.textContent = "↗ Outlet → 酒店自驾";
+        } else {
+          hotelReturn.dataset.start = "2026-11-14T18:35:00+09:00";
+          hotelReturn.dataset.end = "2026-11-14T19:10:00+09:00";
+          hotelReturn.querySelector(".time-label").textContent = "18:35";
+          returnTitle.textContent = "濑长岛自驾返回酒店并停车";
+          returnPlace.textContent = "Umikaji Terrace → Loisir Hotel Naha · 那霸市西3-2-1";
+          returnDistance.textContent = "📍 约8–10 km估算";
+          returnTime.textContent = "🚗 约20–30分钟估算";
+          returnLink.href = "https://www.google.com/maps/dir/?api=1&origin=Umikaji+Terrace+Senagajima&destination=Loisir+Hotel+Naha&travelmode=driving";
+          returnLink.textContent = "↗ 濑长岛 → 酒店自驾";
+        }
+        routeSummary.textContent = routeDescriptions[route];
+        routeSummary.hidden = selectedDay !== "day";
+        updateProgress();
+        renderTimer();
+        updateCurrentItem();
+      }
+
+      document.querySelectorAll(".route-option").forEach((button) => {
+        button.addEventListener("click", () => applyRoute(button.dataset.route));
+      });
+
       tabs.night.addEventListener("click", () => selectDay("night"));
       tabs.day.addEventListener("click", () => selectDay("day"));
-      [tabs.night, tabs.day].forEach((tab, index) => {
+      tabs.day3.addEventListener("click", () => selectDay("day3"));
+      const tabOrder = ["night", "day", "day3"];
+      tabOrder.forEach((key, index) => {
+        const tab = tabs[key];
         tab.addEventListener("keydown", (event) => {
           if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
             event.preventDefault();
-            const next = index === 0 ? "day" : "night";
+            const direction = event.key === "ArrowRight" ? 1 : -1;
+            const next = tabOrder[(index + direction + tabOrder.length) % tabOrder.length];
             selectDay(next);
             tabs[next].focus();
           }
@@ -1059,7 +1568,7 @@
       });
 
       function getRows() {
-        return [...document.querySelectorAll(".timeline-row")].map((row) => ({
+        return [...document.querySelectorAll(".timeline-row:not([hidden])")].map((row) => ({
           row,
           start: new Date(row.dataset.start).getTime(),
           end: new Date(row.dataset.end).getTime()
@@ -1093,7 +1602,8 @@
           return;
         }
         const dateString = new Date(next.start).toLocaleDateString("zh-CN", { month: "long", day: "numeric", timeZone: "Asia/Tokyo" });
-        const selectedDate = new Date(next.start).getDate() === 13 ? "第一晚" : "第二天";
+        const dateNumber = new Date(next.start).getDate();
+        const selectedDate = dateNumber === 13 ? "第一天" : dateNumber === 14 ? "第二天" : "第三天";
         day.textContent = `${selectedDate} · ${dateString}`;
         const target = current ? current.end : next.start;
         let seconds = Math.max(0, Math.floor((target - now) / 1000));
@@ -1137,12 +1647,15 @@
       document.querySelectorAll(".mobile-bar a").forEach((link) => {
         link.addEventListener("click", () => {
           if (link.getAttribute("href") === "#itinerary") {
-            selectDay(new Date().getDate() === 14 ? "day" : "night");
+            const dateNumber = new Date().getDate();
+            selectDay(dateNumber === 14 ? "day" : dateNumber === 15 ? "day3" : "night");
           }
         });
       });
 
       updateProgress();
+      applyNightPlan(selectedNightPlan);
+      applyRoute(selectedRoute);
       renderTimer();
       updateCurrentItem();
       window.setInterval(() => {
